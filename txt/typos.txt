@@ -1,0 +1,30 @@
+#Common OCR Mis-spelling, FIX smartly?
+ananas = bananas
+apaya = papaya
+asta = pasta
+ausage = sausage
+ea = tea
+elat = gelatin
+elatin = gelatin
+ereal = cereal
+ettuce = lettuce
+galdressing = gal dressing
+iceber = iceberg
+oup = soup
+joup = soup
+pples = apples
+muf'fin = muffin
+muf'fln = muffin
+proe)uce = produce
+quash  = squash
+ranges = oranges
+ranola = granola
+ravy = gravy
+reese = cheese
+rink = drink
+ucumbers = cucumbers
+ugar = sugar
+'hips = chips
+`hips = chips
+#I.E. check for first character missing!
+

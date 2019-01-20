@@ -1,0 +1,6 @@
+#Common OCR Split word fixes
+mi x=mix
+hawai ian=hawaiian
+sw ftener=sweetener
+saus lk=sausage links
+1 x=mix
