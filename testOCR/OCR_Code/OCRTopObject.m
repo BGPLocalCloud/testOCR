@@ -83,9 +83,9 @@ static OCRTopObject *sharedInstance = nil;
     {
         //OK, let's go and get the field name to figure out what to do w data...
         NSString* fieldName = [ot getBoxFieldName:i];
-        NSLog(@" duh: the next fieldname is [%@]",fieldName);
         CGRect rr = [ot getBoxRect:i]; //In document coords!
         NSMutableArray *a = [od findAllWordsInRect:rr];
+        NSLog(@" duh: the next fieldname is [%@], %d items",fieldName,(int)a.count);
         if (a.count > 0) //Found a match!
         {
             if ([fieldName isEqualToString:INVOICE_NUMBER_FIELD]) //Looking for a number?
@@ -100,6 +100,7 @@ static OCRTopObject *sharedInstance = nil;
             {
                 //[od dumpArray:a];
                 _invoiceDate = [od findDateInArrayOfFields:a]; //Looks for things with slashes in them?
+                if (_invoiceDate == nil) _invoiceDate = [NSDate date]; //Default to today on date failure...
                 NSLog(@" invoice date %@",_invoiceDate);
             }
             else if ([fieldName isEqualToString:INVOICE_CUSTOMER_FIELD]) //Looking for Customer?
@@ -115,6 +116,9 @@ static OCRTopObject *sharedInstance = nil;
             }
             else if ([fieldName isEqualToString:INVOICE_HEADER_FIELD]) //Header is SPECIAL!
             {
+                //headerY = [od autoFindHeader];
+                // 1/20 try fully automatic header finder
+                [od dumpArrayFull:a];
                 headerY = [od findHeader:rr :100]; //Get header ypos (document coords!!)
                 if (headerY == -1)
                 {
@@ -140,14 +144,20 @@ static OCRTopObject *sharedInstance = nil;
             }
             
         } //end if a.count
-        if ([fieldName isEqualToString:INVOICE_COLUMN_FIELD]) //Columns must be resorted from L->R...
+        if ([fieldName isEqualToString:INVOICE_COLUMN_FIELD] ||
+            [fieldName isEqualToString:INVOICE_COLUMN_ITEM_FIELD] ||
+            [fieldName isEqualToString:INVOICE_COLUMN_DESCRIPTION_FIELD] ||
+            [fieldName isEqualToString:INVOICE_COLUMN_QUANTITY_FIELD] ||
+            [fieldName isEqualToString:INVOICE_COLUMN_PRICE_FIELD] ||
+            [fieldName isEqualToString:INVOICE_COLUMN_AMOUNT_FIELD]
+            ) //Columns: some are tagged by type, others assume I/Q/D/P/A distribution
         {
             //CGRect dr = [od template2DocRect:rr];
             //NSLog(@"templateRect %@",NSStringFromCGRect(rr));
             //NSLog(@"documentRect %@",NSStringFromCGRect(dr));
             //NSLog(@" column found==================");
-            //[od dumpArrayFull:a];
-            [ot addHeaderColumnToSortedArray : i : headerY + od.glyphHeight];
+            //[od dumpArrayFull:a];  asdf
+            [ot addHeaderColumnToSortedArray : i : fieldName : headerY + od.glyphHeight];
         }
     }
     
@@ -176,8 +186,9 @@ static OCRTopObject *sharedInstance = nil;
         CGRect rr = [ot getColumnByIndex:i];
         rr.origin.y = columnDataTop; //Adjust Y according to found header!
         NSMutableArray *stringArray;
-        stringArray = [od getColumnStrings : rr : i];
-        NSMutableArray *cleanedUpArray = [od cleanUpPriceColumns : i : stringArray];
+        stringArray = [od getColumnStrings : rr : i : [ot getColumnType:i]];
+        
+        NSMutableArray *cleanedUpArray = [od cleanUpPriceColumns : i : [ot getColumnType:i] : stringArray ];
         [od addColumnStringData:cleanedUpArray];
         NSLog(@" col[%d] cleanup %@",i,cleanedUpArray);
     }
@@ -222,6 +233,187 @@ static OCRTopObject *sharedInstance = nil;
 } //end applyTemplate
 
 
+//=============(OCRTopObject)=====================================================
+// Retreives data from a column in the array w/ limit checking.
+-(NSString *)getLineItem : (int) index  : (int) licount : (NSArray *)a
+{
+    NSString *result = @"EMPTY";
+    if (index >= licount) NSLog(@" ...get lineitem %d past end!",index);
+    result  = a[index];
+    return result;
+} //end getLineItem
+
+
+
+//=============(OCRTopObject)=====================================================
+// DocParser hands  back a CSV file after eating invoices.  This breaks it into
+//  lineitems after determining which fields are present (THIS WILL VARY BY VENDOR)
+// Just eats canned file now...spits result out to EXP table, no invoice yet
+//  Is there a way to get page# from docParser?
+//  https://www.labnol.org/software/upload-dropbox-files-by-email/18526/
+// Need to hook this up to dropbox delegate return after [dbt downloadCSV:whatever];
+-(void) loadCSVFileFromDocParser : (NSString *)fname : (NSString *)vendor
+{
+    NSError *error;
+    NSString *path = [[NSBundle mainBundle] pathForResource:fname ofType:@"csv" inDirectory:@"txt"];
+    NSURL *url = [NSURL fileURLWithPath:path];
+    NSString *fileContentsAscii = [NSString stringWithContentsOfURL:url encoding:NSASCIIStringEncoding error:&error];
+    if (error != nil)
+    {
+        NSLog(@" error reading CSV file %@",fname);
+        return;
+    }
+    [self loadCSVValuesFromString: vendor :fileContentsAscii];
+
+} //end loadCSVFileFromDocParser
+
+
+
+//=============(OCRTopObject)=====================================================
+// DocParser hands  back a CSV file after eating invoices.  This breaks it into
+//  lineitems after determining which fields are present (THIS WILL VARY BY VENDOR)
+// Just eats canned file now...spits result out to EXP table, no invoice yet
+//  Is there a way to get page# from docParser?
+//  https://www.labnol.org/software/upload-dropbox-files-by-email/18526/
+// Need to hook this up to dropbox delegate return after [dbt downloadCSV:whatever];
+-(void) loadCSVValuesFromString : (NSString *)avendor : (NSString *)s
+{
+    NSArray *sItems;
+    
+    _invoiceNumberString = @"stubbedInvoiceNumber";
+    _invoiceCustomer     = @"stubbedCustomer";
+    pagesReturned = 0; //What should this be??
+    _vendor = avendor; //For invoice save...
+    smartProducts *smartp = [[smartProducts alloc] init];
+    sItems    = [s componentsSeparatedByString:@"\n"];
+    
+    int filenameColumn  = -1;
+    int dateColumn      = -1;
+    int lineItemsColumn = -1;
+    
+    BOOL firstRecord = TRUE;
+
+    smartCount  = 0;
+    [et clear]; //Set up EXP for new entries...
+    
+    for (NSString*s in sItems)
+    {
+        NSArray* lineItems = [s componentsSeparatedByString:@";"];
+        int lccount        = (int) lineItems.count;
+        if (lccount >= 4)
+        {
+            if (firstRecord) //Get titles for fields...
+            {
+                int column = 0;
+                NSLog(@" titles... %@",s);
+                for (NSString *headerDescr in lineItems)
+                {
+                    if ([headerDescr.lowercaseString containsString:@"filename"] && filenameColumn == -1)
+                        filenameColumn = column;
+                    else if ([headerDescr.lowercaseString containsString:@"date"] && dateColumn == -1)
+                        dateColumn = column;
+                    else if ([headerDescr.lowercaseString containsString:@"line items"] && lineItemsColumn == -1)
+                        lineItemsColumn = column;
+                    column++;
+                }
+                NSLog(@" fnc %d dc %d lic %d",filenameColumn,dateColumn,lineItemsColumn);
+                firstRecord = FALSE;
+            }
+            else //Process CSV... (assume line items are Quantity , Price, Amount
+            {
+                NSString *liFname       = lineItems[filenameColumn];
+                NSString *liLineNumber  = @"";
+                NSString *liItem        = @"";
+                NSString *liQtyOrdered  = @"";
+                NSString *liQtyShipped  = @"";
+                NSString *liUOM         = @"";
+                NSString *liDescription = @"";
+                NSString *liUnits       = @"";
+                NSString *liPrice       = @"";
+                NSString *liAmount      = @"";
+                //NSString *livendor      = avendor;
+                NSString *dateStr = @"";
+                //NOTE: filename should include vendor name, there is no other way to ID!!!
+                if ([avendor.lowercaseString isEqualToString:@"greco"]) //Greco Vendor is all we have now...
+                {
+                    //"Document ID";"Remote ID";Filename;"Received At";"Processed At";"Invoice Date Match";"Invoice Date Iso8601";"Totals Net";"Totals Tax";"Totals Total";"Totals Carriage";"Totals Confidence";"Line Items";"Line Items 1";"Line Items 2";"Line Items 3";"Line Items 4";"Line Items 5";"Line Items 6";"Line Items 7";"Line Items 8"
+                    if (dateColumn < lccount) dateStr = lineItems[dateColumn];
+                    int i = lineItemsColumn;
+                    liLineNumber  = [self getLineItem:i++ :lccount :lineItems];
+                    liItem        = [self getLineItem:i++ :lccount :lineItems];
+                    liQtyOrdered  = [self getLineItem:i++ :lccount :lineItems];
+                    liQtyShipped  = [self getLineItem:i++ :lccount :lineItems];
+                    liUOM         = [self getLineItem:i++ :lccount :lineItems];
+                    liDescription = [self getLineItem:i++ :lccount :lineItems];
+                    liUnits       = [self getLineItem:i++ :lccount :lineItems];
+                    liPrice       = [self getLineItem:i++ :lccount :lineItems];
+                    liAmount      = [self getLineItem:i++ :lccount :lineItems];
+                    
+                    //Convert date...
+                    NSString *dformat   = @"MM/dd/yy";
+                    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                    [dateFormatter setDateFormat:dformat];
+                    NSDate *liDate = [dateFormatter dateFromString:dateStr];
+                    _invoiceDate = liDate; //This the right place?
+                    [smartp clear];
+                    [smartp addVendor:avendor]; //Is this the right string?
+                    [smartp addProductName:liDescription];
+                    [smartp addDate:liDate];
+                    [smartp addLineNumber:liItem.intValue];
+                    [smartp addQuantity : liUnits];  //This seems to be the quantity paid for, NOT quantity shipped
+                    [smartp addUOM:liUOM]; //This overrides internal UOM matching
+                    [smartp addPrice: liPrice];
+                    [smartp addAmount: liAmount];
+                    int aError = [smartp analyze];
+                    if (aError != 0)
+                    {
+                        NSLog(@" error analyzing %@",liDescription);
+                    }
+                    else if (smartp.minorError != 0)
+                    {
+                        NSLog(@" minor error %@",[smartp getMinorErrorString]);
+                    }
+                    else if (smartp.majorError != 0)
+                    {
+                        NSLog(@" major error %@",[smartp getMajorErrorString]);
+                    }
+                    
+                    if (aError == 0) //Only save valid stuff!
+                    {
+                        NSString *errStatus = @"OK";
+                        if (smartp.majorError != 0) //Major error trumps minor one...
+                            errStatus = [NSString stringWithFormat:@"E:%@",[smartp getMajorErrorString]];
+                        else if (smartp.minorError != 0) //Minor error? encode!
+                            errStatus = [NSString stringWithFormat:@"W:%@",[smartp getMinorErrorString]];
+                        smartCount++;
+                        //Format line count to triple digits, max 999
+                        NSString *lineString = [NSString stringWithFormat:@"%3.3d",(_totalLines + smartCount)];
+                        //CSV: Tons of args: adds allll this shit to the next EXP table entry for saving to parse...
+                        //vendor invoice# pdffile batch all nil!
+                        [et addRecord:smartp.invoiceDate : smartp.analyzedCategory : smartp.analyzedShortDateString :
+                              liItem : smartp.analyzedUOM : smartp.analyzedBulkOrIndividual :
+                              avendor : smartp.analyzedProductName : smartp.analyzedProcessed :
+                              smartp.analyzedLocal : lineString : @"docparser" :
+                              smartp.analyzedQuantity : smartp.analyzedPrice : smartp.analyzedAmount :
+                            _batchID : errStatus : liFname : [NSNumber numberWithInt:0]  ]; //last arg is page..??
+                    } //end analyzeOK
+                    
+                } //end greco
+                
+            } //end !firstrecord
+            firstRecord = FALSE;
+        } //end lccount > 4
+    } //end for strings in file
+    if (smartCount > 0) //Read in some lines OK? Ssave'em
+    {
+        NSLog(@" save CSV to EXP table, PAGE STUBBED!!!");
+        [et saveToParse : 0 : TRUE]; //page count 0 based, # pages
+        _totalLines += smartCount;
+    }
+    return;
+} //end loadCSVFileFromDocParser
+
+
 
 //=============(OCRTopObject)=====================================================
 -(NSString *) getParsedText
@@ -257,7 +449,7 @@ static OCRTopObject *sharedInstance = nil;
     //First, check cache: may already have downloaded OCR raw txt for this file...
     if ([oc txtExistsByID:fname])
     {
-        NSLog(@" Cache HIT: perform OCR on cached file...%@",fname);
+        NSLog(@" OCR Cache HIT: perform OCR on cached file...%@",fname);
         rawOCRResult  = [oc getTxtByID:fname];  //Raw OCR'ed text, needs to goto JSON
         r             = [oc getRectByID:fname]; //Get cached image size too...
         NSData *jsonData = [rawOCRResult dataUsingEncoding:NSUTF8StringEncoding];
@@ -268,8 +460,10 @@ static OCRTopObject *sharedInstance = nil;
         [self performFinalOCROnDocument : r : ot ]; //This calls delegate when done
         return; //Bail!
     }
-    // Create URL request
-    NSURL *url = [NSURL URLWithString:@"https://api.ocr.space/Parse/Image"];
+    // Create URL request (this is the :free: ocr server
+//    NSURL *url = [NSURL URLWithString:@"https://api.ocr.space/Parse/Image"];
+    // This is the PAID server (pro plan)
+    NSURL *url = [NSURL URLWithString:@"https://apipro1.ocr.space/parse/image"];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"POST"];
     NSString *boundary = @"randomString";
@@ -278,7 +472,8 @@ static OCRTopObject *sharedInstance = nil;
     NSURLSession *session = [NSURLSession sharedSession];
     
     NSDictionary *parametersDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-                                          @"99bb6b410288957", @"apikey",
+                                          //@"99bb6b410288957", @"apikey",  // :free: key
+                                          @"PDMXB3665888A", @"apikey",    // :paid: key (pro plan)
                                           @"True", @"isOverlayRequired",
                                           @"True", @"isTable",
                                           @"True", @"scale",
@@ -478,9 +673,6 @@ static OCRTopObject *sharedInstance = nil;
         [smartp addPrice: ac[od.priceColumn]];
         [smartp addAmount: ac[od.amountColumn]];
         [smartp addQuantity : ac[od.quantityColumn]];
-
-        if ([productName containsString:@"ICED"])
-            NSLog(@" asdf bing ICED");
         int aError = [smartp analyze]; //fills out fields -> smartp.analyzed...
         NSLog(@" analyze OK %d [%@]->%@",smartp.analyzeOK,productName, smartp.analyzedProductName);
         if (aError == 0) //Only save valid stuff!
@@ -493,14 +685,13 @@ static OCRTopObject *sharedInstance = nil;
             smartCount++;
             //Format line count to triple digits, max 999
             NSString *lineString = [NSString stringWithFormat:@"%3.3d",(_totalLines + smartCount)];
-            //Tons of args: adds allll this shit to the next EXP table entry for saving to parse...
+            //OCR: Tons of args: adds allll this shit to the next EXP table entry for saving to parse...
             [et addRecord:smartp.invoiceDate : smartp.analyzedCategory : smartp.analyzedShortDateString :
              ac[od.itemColumn] : smartp.analyzedUOM : smartp.analyzedBulkOrIndividual :
              _vendor : smartp.analyzedProductName : smartp.analyzedProcessed :
              smartp.analyzedLocal : lineString : _invoiceNumberString :
              smartp.analyzedQuantity : smartp.analyzedPrice : smartp.analyzedAmount :
-//             [od getPostOCRQuantity:i] : [od getPostOCRPrice:i] : [od getPostOCRAmount:i] :
-                _batchID : errStatus : _imageFileName : [NSNumber numberWithInt:page]  ];
+             _batchID : errStatus : _imageFileName : [NSNumber numberWithInt:page]  ];
         } //end analyzeOK
         else //Bad product ID? Report error
         {

@@ -16,7 +16,18 @@
 #import "EXPObject.h"
 
 @implementation EXPObject
-{
-}
 
+//DHS 1/23-----------------------
+-(void) dump
+{
+    NSLog(@" dump ExpObject-------");
+    NSLog(@"  ID %@ Date %@",_objectId,_expdate);
+    NSLog(@"  cat %@ mon %@ item %@",_category,_month,_item);
+    NSLog(@"  uom %@ bulk %@ vendor %@",_uom,_bulk,_vendor);
+    NSLog(@"  pname %@ processed %@ local %@",_productName,_processed,_local);
+    NSLog(@"  cat %@ mon %@ item %@",_category,_month,_item);
+    NSLog(@"  line %@ invoice %@ quantity %@",_lineNumber,_invoiceNumber,_quantity);
+    NSLog(@"  total %@ price %@ batch %@",_total,_pricePerUOM,_batch);
+    NSLog(@"  err %@ pdf %@ page %@",_errStatus,_PDFFile,_page);
+}
 @end

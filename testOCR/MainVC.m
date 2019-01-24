@@ -36,14 +36,15 @@
     batchIcon = [UIImage imageNamed:@"multiNOT"];
     versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
     oc = [OCRCache sharedInstance];
- 
+    pc = [PDFCache sharedInstance];
+
     refreshControl = [[UIRefreshControl alloc] init];
     batchPFObjects = nil;
     
     fixingErrors = TRUE;
 
     //Test only, built-in OCR crap...
-    [self loadBuiltinOCRToCache];
+    //[self loadBuiltinOCRToCache];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didReadBatchByIDs:)
@@ -123,7 +124,7 @@
 {
     [super viewWillAppear:animated];
     [act readActivitiesFromParse:nil :nil];
- //   [self testit];
+    [self testit];
 }
 
 
@@ -171,13 +172,17 @@
                                                               [self performSegueWithIdentifier:@"templateSegue" sender:@"mainVC"];
                                                           }];
     UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Clear OCR Cache",nil)
-                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                               [self clearCacheMenu];
-                                                           }];
+                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                              [self clearCacheMenu];
+                                                          }];
+    UIAlertAction *fourthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Clear PDF Cache",nil)
+                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                              [self clearPDFCacheMenu];
+                                                          }];
     NSString* t = @"Minimum Activity Logging";
     AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     if (mappDelegate.verbose) t = @"Verbose Activity Logging";
-    UIAlertAction *fourthAction = [UIAlertAction actionWithTitle:NSLocalizedString(t,nil)
+    UIAlertAction *fifthAction = [UIAlertAction actionWithTitle:NSLocalizedString(t,nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               mappDelegate.verbose = !mappDelegate.verbose;
                                                           }];
@@ -189,6 +194,7 @@
     [alert addAction:secondAction];
     [alert addAction:thirdAction];
     [alert addAction:fourthAction];
+    [alert addAction:fifthAction];
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
 
@@ -292,23 +298,44 @@
 -(void) clearCacheMenu
 {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:
-                                NSLocalizedString(@"Clear Cache? (Cannot be undone!)",nil)
+                                NSLocalizedString(@"Clear OCR Cache? (Cannot be undone!)",nil)
                                                                    message:nil
                                                             preferredStyle:UIAlertControllerStyleAlert];
     
     
     UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"YES",nil)
-                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              [self->oc clearHardCore];
-                                                          }];
+                                                        style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                            [self->oc clearHardCore];
+                                                        }];
     UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"NO",nil)
-                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                           }];
+                                                       style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                       }];
     //DHS 3/13: Add owner's ability to delete puzzle
     [alert addAction:yesAction];
     [alert addAction:noAction];
     [self presentViewController:alert animated:YES completion:nil];
     
+} //end menu
+
+//=============OCR MainVC=====================================================
+// Yes/No for cache clear...
+-(void) clearPDFCacheMenu
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:
+                                NSLocalizedString(@"Clear PDF Cache? (Cannot be undone!)",nil)
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"YES",nil)
+                                                        style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                            [self->pc clearHardCore];
+                                                        }];
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"NO",nil)
+                                                       style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                       }];
+    //DHS 3/13: Add owner's ability to delete puzzle
+    [alert addAction:yesAction];
+    [alert addAction:noAction];
+    [self presentViewController:alert animated:YES completion:nil];
 } //end menu
 
 
@@ -640,11 +667,80 @@
     return jdict;
 }
 
+int currentYear = 2019;
+
+//=============(OCRDocument)=====================================================
+-(NSString*) cleanUpNumberString : (NSString *)nstr
+{
+    NSString *outstr;
+    outstr = [nstr   stringByReplacingOccurrencesOfString:@"O" withString:@"0"];
+    outstr = [outstr stringByReplacingOccurrencesOfString:@"C" withString:@"0"];  //C ... really?
+    outstr = [outstr stringByReplacingOccurrencesOfString:@"o" withString:@"0"];
+    outstr = [outstr stringByReplacingOccurrencesOfString:@"S" withString:@"5"];
+    outstr = [outstr stringByReplacingOccurrencesOfString:@"B" withString:@"8"];
+    outstr = [outstr stringByReplacingOccurrencesOfString:@"'" withString:@" "]; //Bad punctuation?
+    outstr = [outstr stringByReplacingOccurrencesOfString:@"`" withString:@" "];
+    outstr = [outstr stringByReplacingOccurrencesOfString:@" " withString:@""]; //No spaces in number...
+    return outstr;
+}
+
+//=============(OCRDocument)=====================================================
+-(NSDate *)getGarbledDate : (NSString *) dstr
+{
+    if (dstr.length < 7) return nil; //Too short!
+    NSString*dclean = [self cleanUpNumberString : dstr]; //Get rid of weird typos...
+    //Try to fix garbled date, where slashes are replaced by ones for instance...
+    NSString *tmonth = [dclean substringToIndex:2];
+    int imon,iday,iyear;
+    iyear = currentYear;
+    iday  = 1;
+    imon = tmonth.intValue;
+    int offset = 3;
+    if (imon >= 1 && imon <= 12) //Got a month?
+    {
+        int slen = (int)dclean.length;
+        NSString *tday = [dclean substringWithRange:NSMakeRange(offset, 2)];
+        if ([tday containsString:@"/"]) //maybe we went too far? as in MMDD/YY?
+        {
+            offset--;
+            tday = [dclean substringWithRange:NSMakeRange(offset, 2)];
+        }
+        iday = tday.intValue;
+        NSString *tyear = @"";
+        if (slen > 6)
+        {
+            offset+=3;
+            tyear = [dclean substringWithRange:NSMakeRange(offset, slen-offset)];
+            iyear = tyear.intValue;
+            //Try to make sense of year:
+            if (iyear < 100) iyear += 2000;
+            else if (iyear < 1900) iyear = currentYear;
+        }
+        
+        NSString *datestr = [NSString stringWithFormat:@"%4.4d-%2.2d-%2.2d",iyear,imon,iday];
+        NSDateFormatter *dformat = [[NSDateFormatter alloc]init];
+        [dformat setDateFormat:@"yyyy-MM-dd"];
+        return [dformat dateFromString:datestr];
+    } //end imon
+    return nil;
+} //end getGarbledDate
+
 //=============OCR MainVC=====================================================
 -(void) testit
 {
-//    NSLog(@"Crashlytics crash?");
-//    [[Crashlytics sharedInstance] crash];
+    
+    [self getGarbledDate:@"1026/18"];
+//    NSArray *dog = [[NSArray alloc]init];
+//  //@[@"test1",@"test2",@"test3"];
+//    NSString *teststr =  [dog componentsJoinedByString:@","];
+//    NSLog(@" testit [%@]",teststr);
+//    NSArray *doodoo = [teststr componentsSeparatedByString:@","];
+//    NSLog(@" doodoo is %@",doodoo);
+   // OCRTopObject *oto = [[OCRTopObject alloc] init];
+    //Load locally, use dropbox eventually
+   // [oto loadCSVFileFromDocParser :  @"UCLS-Greco-2019-01-21" : @"greco"];
+   // NSLog(@"Crashlytics crash?");
+   // [[Crashlytics sharedInstance] crash];
 
     return;
     

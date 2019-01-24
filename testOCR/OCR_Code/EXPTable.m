@@ -85,7 +85,13 @@
     workPDFFile     = PDFFile;
     workPage        = page;
     //ERR Check! Look for nils! Clumsy but it's all we can do w/ all these args!
-    if (fdate == nil)       errstr = PInv_Date_key;
+    if (fdate == nil)
+    {
+        errstr = @"Null date";
+        allErrors =  [allErrors stringByAppendingString:errstr];
+        errorsByLineNumber[workPage.intValue] = FIELD_ERROR_STRING;
+        fdate = [NSDate date]; //Just pass todays date...
+    }
     //Fix nil strings, add error indicator as needed...
     category    = [self TrackNilErrors : category : PInv_Category_key];
     month       = [self TrackNilErrors : month : PInv_Month_key];
@@ -298,6 +304,8 @@
                 EXPObject *e = [self getEXPObjectFromPFObject:pfo];
                 [d setObject:e forKey:pfo.objectId];
                 [self->_expos addObject: e];
+                NSLog(@" getObjectsByIDs=================");
+                [e dump];
             }
             [self.delegate didGetObjectsByIds : d];
         }
@@ -395,7 +403,6 @@
         totalSentCount = 0;
         for (int i=0;i<32;i++) totalSentCount+=sentCounts[i];
     }
-    AppDelegate *eappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     for (EXPObject *exo in _expos)
     {
         PFObject *exoRecord = [PFObject objectWithClassName:tableName];
@@ -418,7 +425,7 @@
         exoRecord[PInv_ErrStatus_key]           = exo.errStatus;
         exoRecord[PInv_PDFFile_key]             = exo.PDFFile;
         exoRecord[PInv_Page_key]                = exo.page;
-        exoRecord[PInv_BatchID_key]             = eappDelegate.batchID;
+        exoRecord[PInv_BatchID_key]             = exo.batch;
         exoRecord[PInv_VersionNumber]           = _versionNumber;
         //NSLog(@"EXP ->parse [%@] %@ x %@ = %@",exo.productName,exo.quantity,exo.pricePerUOM,exo.total);
         [exoRecord saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {

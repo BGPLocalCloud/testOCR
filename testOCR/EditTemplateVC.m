@@ -420,15 +420,9 @@
         [oto setupDocumentFrameAndParseJSON : r];
         oto.totalLines = 0; //Stubbed call... this is for keeping track of multiple page
         [oto applyTemplate:ot];
-       // [oto cleanupInvoice];
         [oto writeEXPToParse : 0]; //Note 2nd arg is page!
         NSString *OCR_Results_Dump = [oto dumpResults];
         [self alertMessage:@"Invoice Dump" :OCR_Results_Dump];
-
-//        [self applyTemplate];
-        //Let's try getting a form for pam now...
-//        [self cleanupInvoice];
-       // [self writeEXPToParse];
     }
     else{   //Better make sure template is set up here!!!
         [self loadStubbedOCRDataLite]; //asdf

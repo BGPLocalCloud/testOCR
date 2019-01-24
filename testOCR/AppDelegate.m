@@ -49,7 +49,6 @@
     //Settings...
     _settings = [OCRSettings sharedInstance];
     Vendors* vv = [Vendors sharedInstance];
-    NSLog(@" duh?");
     [vv readFromParse];
 
     

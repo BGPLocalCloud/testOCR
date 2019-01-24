@@ -61,13 +61,14 @@ static PDFCache *sharedInstance = nil;
 // Blows away disk cache...
 -(void) clearHardCore
 {
+    NSLog(@" CLEAR PDF CACHE HARDCORE....");
     NSString *path;
     [self clear];
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
     // DHS 2/8/18 Remove each cache jpg imagefile...
-    for (NSString* workID in cacheNames)
+    if (cacheNames != nil) for (NSString* workID in cacheNames)
     {
         NSString *filepath  = [NSString stringWithFormat:@"%@/%@.jpg",cachesDirectory,workID];
         if ([fileManager fileExistsAtPath:filepath])
@@ -207,17 +208,18 @@ static PDFCache *sharedInstance = nil;
 //=====(PDFCache)======================================================================
 -(BOOL) imageExistsByID : (NSString *) oidIn : (int) page
 {
+    if (cacheNames == nil) return FALSE; //DHS 1/22
     NSString *oid = [self cleanupID : oidIn : page];
     NSLog(@" oid %@",oid);
     NSLog(@" index %d",(int)[cacheNames indexOfObject:oid]);
     return ([cacheNames indexOfObject:oid] != NSNotFound); //DHS 1/10
-//    return ([PDFDict objectForKey:oid] != nil);
 }
 
 //=====(PDFCache)======================================================================
 // Just loads cache filenames, images are too big to load all at once...
 -(void) loadCache
 {
+    if (cacheNames == nil) return;
     int ccount = (int)[cacheNames count];
     if (ccount <= 0) return;
     NSString *pdfFile;

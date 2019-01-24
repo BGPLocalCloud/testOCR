@@ -107,7 +107,9 @@ static BatchObject *sharedInstance = nil;
 -(void) fixError : (int) index
 {
     if (index < 0 || index >= errorList.count) return;
-    [fixedList addObject:[errorList objectAtIndex:index]];
+    NSString *errString = [errorList objectAtIndex:index];
+    if ([fixedList indexOfObject:errString] == NSNotFound) //1/23 No Dupes allowed
+        [fixedList addObject:errString];
 }
 
 //=============(BatchObject)=====================================================
@@ -115,7 +117,9 @@ static BatchObject *sharedInstance = nil;
 -(void) fixWarning : (int) index
 {
     if (index < 0 || index >= warningList.count) return;
-    [warningFixedList addObject:[warningList objectAtIndex:index]];
+    NSString *warnString = [warningList objectAtIndex:index];
+    if ([warningFixedList indexOfObject:warnString] == NSNotFound) //1/23 No Dupes allowed
+        [warningFixedList addObject:warnString];
 }
 
 
@@ -184,23 +188,32 @@ static BatchObject *sharedInstance = nil;
     [warningReportList removeAllObjects];
     [self.delegate batchUpdate : @"Started Batch..."];
     oto.batchID      = _batchID; //Make sure OCR toplevel has batchID...
-    vendorName       = vv.vNames[vindex];
-    vendorFolderName = vv.vFolderNames[vindex];
-    vendorRotation   = vv.vRotations[vindex];
-    [self updateParse];
-    NSString *actData = [NSString stringWithFormat:@"%@:%@",_batchID,vendorName];
-    [act saveActivityToParse:@"Batch Started" : actData];
-    if (index >= 0)
+    
+    //Run just one vendor...
+    if (vindex >= 0)
     {
-        gotTemplate = FALSE;
-        //After template comes through THEN dropbox is queued up to start downloading!
-        [ot readFromParse:vendorName]; //Get our template
+        [self startBatchForVendor:vindex];
     }
     else
     {
         NSLog(@" run ALL batches...");
     }
 } //end runOneOrMoreBatches
+
+//=============(BatchObject)=====================================================
+// For each vendor: sets up batch vendor items, updates status and gets template
+-(void) startBatchForVendor : (int)vindex
+{
+    vendorName       = vv.vNames[vindex];
+    vendorFolderName = vv.vFolderNames[vindex];
+    vendorRotation   = vv.vRotations[vindex];  //For templates: portrait / landscape orient
+    [self updateParse];
+    NSString *actData = [NSString stringWithFormat:@"%@:%@",_batchID,vendorName];
+    [act saveActivityToParse:@"Batch Started" : actData];
+    gotTemplate = FALSE;
+    //After template comes through THEN dropbox is queued up to start downloading!
+    [ot readFromParse:vendorName]; //Get our template, delegate return continues processing
+} //end startBatchForVendor
 
 
 //=============(BatchObject)=====================================================
@@ -242,13 +255,13 @@ static BatchObject *sharedInstance = nil;
 #ifdef RENAME_FILES_AFTER_PROCESSING
     if (batchCount > 0)
     {
-        NSMutableArray *chunks = (NSMutableArray*)[lastPDFProcessed componentsSeparatedByString:@"/"];
+        NSMutableArray *chunks = (NSMutableArray*)[lastFileProcessed componentsSeparatedByString:@"/"];
         if (chunks.count > 2)
         {
             AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
             chunks[1] = bappDelegate.settings.outputFolder;
             NSString *outputPath = [chunks componentsJoinedByString:@"/"];
-            [dbt renameFile:lastPDFProcessed : outputPath];
+            [dbt renameFile:lastFileProcessed : outputPath];
         }
     }
 #endif
@@ -259,24 +272,35 @@ static BatchObject *sharedInstance = nil;
     int i = batchCount-1; //Batch Count is 1...n
     if (i < 0 || i >= pdfEntries.count) return; //Out of bounds!
     DBFILESMetadata *entry = pdfEntries[i];
-    lastPDFProcessed = [NSString stringWithFormat:@"%@/%@",dbt.prefix,entry.name];
+    lastFileProcessed = [NSString stringWithFormat:@"%@/%@",dbt.prefix,entry.name];
+    NSLog(@" processing %@",lastFileProcessed);
     //Check for "skip" string, ignore file if so...
-    if ([lastPDFProcessed.lowercaseString containsString:@"skip"]) //Skip this file?
+    if ([lastFileProcessed.lowercaseString containsString:@"skip"]) //Skip this file?
     {
         [self processNextFile];  //Re-entrant call, should be OK
+    }
+    else if ([lastFileProcessed.lowercaseString containsString:@".csv"]) // CSV File?
+    {
+        //remember the filename...comma on 2nd... file
+        if (batchCount > 1) batchFiles = [batchFiles stringByAppendingString:@","];
+        batchFiles = [batchFiles stringByAppendingString:lastFileProcessed];
+        batchProgress = [NSString stringWithFormat:@"Download CSV..."];
+        [self.delegate batchUpdate : batchProgress];
+        [act saveActivityToParse : batchProgress : lastFileProcessed];
+        [dbt downloadCSV : lastFileProcessed : vendorName];
     }
     else
     {
         //remember the filename...comma on 2nd... file
         if (batchCount > 1) batchFiles = [batchFiles stringByAppendingString:@","];
-        batchFiles = [batchFiles stringByAppendingString:lastPDFProcessed];
+        batchFiles = [batchFiles stringByAppendingString:lastFileProcessed];
         batchProgress = [NSString stringWithFormat:@"Download PDF..."];
         [self.delegate batchUpdate : batchProgress];
         //DHS 1/16 keep batch activity abreast of stuff...
-        [act saveActivityToParse : batchProgress : lastPDFProcessed];
-        if ([pc imageExistsByID:lastPDFProcessed : 1])  // 1/19 pdf cache more logical
+        [act saveActivityToParse : batchProgress : lastFileProcessed];
+        if ([pc imageExistsByID:lastFileProcessed : 1])  // 1/19 pdf cache more logical
         {
-            NSLog(@" Cache HIT! %@",lastPDFProcessed);
+            NSLog(@" PDF Cache HIT! %@",lastFileProcessed);
             if (!gotTemplate) //Handle obvious errors
             {
                 NSLog(@" ERROR: tried to process images w/o template");
@@ -285,12 +309,12 @@ static BatchObject *sharedInstance = nil;
             }
 
             oto.vendor = vendorName;
-            oto.imageFileName = lastPDFProcessed;
-            [oto performOCROnData : lastPDFProcessed : nil : CGRectZero : ot];
+            oto.imageFileName = lastFileProcessed;
+            [oto performOCROnData : lastFileProcessed : nil : CGRectZero : ot];
         }
         else
         {
-            [dbt downloadImages:lastPDFProcessed];    //Asyncbonous, need to finish before handling results
+            [dbt downloadImages:lastFileProcessed];    //Asyncbonous, need to finish before handling results
         }
     }
 } //end processNextFile
@@ -362,19 +386,16 @@ static BatchObject *sharedInstance = nil;
     else //OLD PDF DATA, potentially skewed! asdf
     {
         NSData *data = dbt.batchImageData[0];  //Raw PDF data, need to process...
-        NSString *ipath = dbt.batchFileList[0]; //[paths objectAtIndex:batchPage];
+        //NSString *ipath = dbt.batchFileList[0]; //[paths objectAtIndex:batchPage];
         NSValue *rectObj = dbt.batchImageRects[0]; //PDF size (hopefully!)
         CGRect imageFrame = [rectObj CGRectValue];
         NSLog(@"  ...PDF imageXYWH %d %d, %d %d",
               (int)imageFrame.origin.x,(int)imageFrame.origin.y,
               (int)imageFrame.size.width,(int)imageFrame.size.height);
         oto.vendor = vendorName;
-        oto.imageFileName = ipath; //@"hawaiiBeefInvoice.jpg"; //ipath;
-        [oto performOCROnData : ipath : data : imageFrame : ot];
-
-    }
-    
-
+        oto.imageFileName = lastFileProcessed; // DHS 1/22 was using wrong filename!
+        [oto performOCROnData : lastFileProcessed : data : imageFrame : ot];
+    } //end else
 
 } //end processPDFPages
 
@@ -409,6 +430,17 @@ static BatchObject *sharedInstance = nil;
 
 
 //=============(BatchObject)=====================================================
+// Stupid but necessary: using componentsSeparatedByString somehow creates a
+//  ?singleton array? which crashese when addObject is called!
+-(NSMutableArray *) unpackErrorString : (NSString*)packedString
+{
+    NSMutableArray *result = [[NSMutableArray alloc] init];
+    NSArray *dog = [packedString componentsSeparatedByString : @","];
+    for (NSString *lildog in dog) [result addObject:lildog];
+    return result;
+}
+
+//=============(BatchObject)=====================================================
 -(void) readFromParseByID : (NSString *) bID
 {
     PFQuery *query = [PFQuery queryWithClassName:tableName];
@@ -427,11 +459,11 @@ static BatchObject *sharedInstance = nil;
                 self->batchErrors      = pfo[PInv_BatchErrors_key];
                 self->batchWarnings    = pfo[PInv_BatchWarnings_key];
                 self->batchFixed       = pfo[PInv_BatchFixed_key];
-                self->errorList        = (NSMutableArray*)[self->batchErrors componentsSeparatedByString:@","];
-                self->fixedList        = (NSMutableArray*)[self->batchFixed  componentsSeparatedByString:@","];
-                self->warningList      = (NSMutableArray*)[self->batchWarnings componentsSeparatedByString:@","];
-                self->warningFixedList = (NSMutableArray*)[pfo[PInv_BatchWFixed_key]
-                                                           componentsSeparatedByString:@","];
+                //If there is no string, don't attempt to split stuff into an array!
+                self->errorList = [self unpackErrorString:self->batchErrors];
+                self->fixedList = [self unpackErrorString:self->batchFixed];
+                self->warningList = [self unpackErrorString:self->batchWarnings];
+                self->warningFixedList = [self unpackErrorString:pfo[PInv_BatchWFixed_key]];
                 [self.delegate didReadBatchByID : bID];
             }
             else
@@ -539,7 +571,7 @@ static BatchObject *sharedInstance = nil;
 
     //Save to Dropbox...
     //last filename looks like: /inputfolder/vendor/filename.pdf
-    NSMutableArray *chunks = (NSMutableArray*)[lastPDFProcessed componentsSeparatedByString:@"/"];
+    NSMutableArray *chunks = (NSMutableArray*)[lastFileProcessed componentsSeparatedByString:@"/"];
     if (chunks.count >= 4)
     {
         AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -589,6 +621,20 @@ static BatchObject *sharedInstance = nil;
     }
 } //end didCountEntries
 
+
+//===========<DropboxToolDelegate>================================================
+- (void)didDownloadCSVFile : (NSString *)vendor : (NSString *)result
+{
+    NSLog(@" didDownloadCSVFile: %@ %@",vendor,result);
+    [oto loadCSVValuesFromString : vendor : result]; //This does EXP writes...
+    //Since there is no big wait for a file fetch, consider this step done ...
+    if (batchPage >= batchTotalPages)
+    {
+        [self processNextFile];
+    }
+
+
+}
 
 //===========<DropboxToolDelegate>================================================
 - (void)didDownloadImages
@@ -656,6 +702,9 @@ static BatchObject *sharedInstance = nil;
 - (void)errorPerformingOCR : (NSString *) errMsg
 {
     [self addError : errMsg : @"n/a": @"n/a"];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self completeBatch];
+    });
 }
 
 //===========<OCRTopObjectDelegate>================================================

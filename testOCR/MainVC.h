@@ -29,6 +29,7 @@
 #import "OCRDocument.h"
 #import "PDFCache.h"
 #import "spinnerView.h"
+#import "smartProducts.h"
 #import "Vendors.h"
 NS_ASSUME_NONNULL_BEGIN
 
@@ -47,6 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSString* sdata;
     UIRefreshControl *refreshControl;
     OCRCache *oc;
+    PDFCache *pc;
     BatchObject *bbb;
     NSMutableArray *batchPFObjects;
     BOOL fixingErrors;

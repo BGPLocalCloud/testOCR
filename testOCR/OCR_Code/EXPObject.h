@@ -45,4 +45,7 @@
 @property (nonatomic , strong) NSNumber* page;
 
 
+
+-(void) dump;
+
 @end

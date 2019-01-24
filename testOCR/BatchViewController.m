@@ -42,7 +42,6 @@
     spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, csz.width, csz.height)];
     [self.view addSubview:spv];
 
-    
     [spv start : @"Get batch counts"];
     _batchTableLabel.text = @"...";
     _runButton.hidden = TRUE;
@@ -124,6 +123,7 @@
     for (NSString *s in vv.vNames)
     {
         int vc = [bbb getVendorFileCount:vv.vFolderNames[vindex]];
+        [vv.vFileCounts addObject: [NSNumber numberWithInt: vc]]; //Save filecounts for later
         //NSString *rotation = vv.vRotations[vindex];
         if (vc > 0) //Don't add a batch run option for empty batch folders!
         {

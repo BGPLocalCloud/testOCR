@@ -36,6 +36,7 @@ static Vendors *sharedInstance = nil;
         _vNames       = [[NSMutableArray alloc] init]; // Vendor names
         _vFolderNames = [[NSMutableArray alloc] init]; //  and matching folder names
         _vRotations   = [[NSMutableArray alloc] init]; //  invoices rotated?
+        _vFileCounts  = [[NSMutableArray alloc] init]; //  runtime filecounts of PDF/CSV's to process
         _loaded       = FALSE;
         [self readFromParse];
     }

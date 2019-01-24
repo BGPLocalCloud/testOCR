@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSString *fileLocation;
     NSString *fileWorkString;
     CGRect headerColumns[32]; //Overkill
+    NSString * headerTypes[32];  
     int headerColumnCount;
     //Comes from templated document (original)
     CGRect tlDocRect,trDocRect;
@@ -42,14 +43,19 @@ NS_ASSUME_NONNULL_BEGIN
     int headerY; 
 }
 
-#define INVOICE_NUMBER_FIELD   @"INVOICE_NUMBER"
-#define INVOICE_DATE_FIELD     @"INVOICE_DATE"
-#define INVOICE_SUPPLIER_FIELD @"INVOICE_SUPPLIER"
-#define INVOICE_CUSTOMER_FIELD @"INVOICE_CUSTOMER"
-#define INVOICE_HEADER_FIELD   @"INVOICE_HEADER"
-#define INVOICE_COLUMN_FIELD   @"INVOICE_COLUMN"
-#define INVOICE_IGNORE_FIELD   @"INVOICE_IGNORE"
-#define INVOICE_TOTAL_FIELD    @"INVOICE_TOTAL"
+#define INVOICE_NUMBER_FIELD                @"INVOICE_NUMBER"
+#define INVOICE_DATE_FIELD                  @"INVOICE_DATE"
+#define INVOICE_SUPPLIER_FIELD              @"INVOICE_SUPPLIER"
+#define INVOICE_CUSTOMER_FIELD              @"INVOICE_CUSTOMER"
+#define INVOICE_HEADER_FIELD                @"INVOICE_HEADER"
+#define INVOICE_COLUMN_FIELD                @"INVOICE_COLUMN"
+#define INVOICE_IGNORE_FIELD                @"INVOICE_IGNORE"
+#define INVOICE_TOTAL_FIELD                 @"INVOICE_TOTAL"
+#define INVOICE_COLUMN_ITEM_FIELD           @"INVOICE_COLUMN_ITEM"
+#define INVOICE_COLUMN_DESCRIPTION_FIELD    @"INVOICE_COLUMN_DESCRIPTION"
+#define INVOICE_COLUMN_QUANTITY_FIELD       @"INVOICE_COLUMN_QUANTITY"
+#define INVOICE_COLUMN_PRICE_FIELD          @"INVOICE_COLUMN_PRICE"
+#define INVOICE_COLUMN_AMOUNT_FIELD         @"INVOICE_COLUMN_AMOUNT"
 
 @property (nonatomic , strong) NSString* versionNumber;
 @property (nonatomic , strong) NSString* supplierName;
@@ -69,13 +75,14 @@ NS_ASSUME_NONNULL_BEGIN
 -(CGRect) getBoxRect :(int) index;
 -(NSString*) getBoxFieldName :(int) index;
 -(NSString*) getBoxFieldFormat :(int) index;
+-(NSString *) getColumnType : (int) column;
 -(CGRect) getTLOriginalRect;
 -(CGRect) getTROriginalRect;
 -(int) getColumnCount;
 -(CGRect) getColumnByIndex : (int) index;
 -(CGRect) getColumnRect :(int) index;
 -(int)  getTagCount : (int) index;
--(void) addHeaderColumnToSortedArray : (int) index : (int) y;
+-(void) addHeaderColumnToSortedArray : (int) index : (NSString *)columnType : (int) y;
 -(void) dump;
 -(void) dumpBox : (int) index;
 -(BOOL) isSupplierAMatch : (NSString *)stest;

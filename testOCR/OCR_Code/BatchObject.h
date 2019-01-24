@@ -58,7 +58,7 @@
     NSString *batchWarnings;
     NSString *batchFixed;
     NSString *cachesDirectory;
-    NSString *lastPDFProcessed;
+    NSString *lastFileProcessed;
     NSMutableArray *vendorFileCounts;
     NSMutableDictionary *vendorFolders;
     NSArray *pdfEntries;  //Fetched list of PDF files from batch folder

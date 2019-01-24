@@ -90,7 +90,7 @@
     NSArray* bItems    = [_batchData componentsSeparatedByString:@":"];
     if (bItems.count > 0)
     {
-        [spv start : @"Read batch"];
+        [spv start : @"Get Batch Errors"];
         batchID = bItems[0];
         [bbb readFromParseByID : batchID];
     }
@@ -225,7 +225,6 @@
             [bbb fixWarning : selectedRow];  //Moves error from batch "errorList" to "fixedList"
         bbb.batchID = batchID;        //BatchID was passed in as part of batchData from parent
         [bbb updateParse];           //annnd save updated batch record
-
     }
     _fixNumberView.hidden = TRUE;
     [_table reloadData];
@@ -260,6 +259,7 @@
 
 #pragma mark - UITableViewDelegate
 //=============Error VC=====================================================
+// Looks at contents of errorlist, an array of errors. displays fixed/broken status
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"Cell";
@@ -270,8 +270,10 @@
         cell = [[errorCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     NSString *errStr = [errorList objectAtIndex:row];
+    NSLog(@" cell %d str %@ fixed %d",row,errStr,[bbb isErrorFixed:errStr]);
     if ([bbb isErrorFixed:errStr])
     {
+        NSLog(@" ...FIXED %d",row);
         cell.errIcon.image = okIcon;
         cell.backgroundColor = [UIColor whiteColor];
     } //asdf
@@ -290,7 +292,6 @@
     }
     NSString *fullErr = [errorList objectAtIndex:row];
     cell.errorLabel.text = fullErr;
-    NSLog(@" cell %d %@",row,fullErr);
 
     NSString *pname = @"...";
     //Look for product name in parentheses
@@ -306,13 +307,19 @@
     //Maybe there is a matching EXP object we can find...
     else if (expRecordsByID.count > 0)
     {
+        if (row == 3)
+            NSLog(@"bing");
         NSString *oid = [self getIDFromErrorString : fullErr];
+        NSLog(@" id from err %@ is %@",fullErr,oid);
         if (oid != nil && oid.length > 0)
         {
             EXPObject *e = [expRecordsByID objectForKey:oid];
+            NSLog(@" object for id %@",oid);
+            [e dump];
             if (e != nil)
             {
                 pname = e.productName;
+                NSLog(@" ...pname %@",pname );
             }
         }
     }
@@ -340,7 +347,7 @@
     NSArray *sItems = [errString componentsSeparatedByString:@":"];
     if (sItems.count > 1)
     {
-        NSString *s = sItems[2]; //DHS 1/12
+        NSString *s = sItems[2]; //If not n/a it is an objectID
         if (![s containsString:@"/"] ) return s;
     }
     return @"";
@@ -369,12 +376,12 @@
     {
         [spv start : @"Get EXP object"];
         fixingObjectID = sItems[2]; //DHS 1/12 now 3 items in error
-        NSLog(@" duh %@",fixingObjectID);
-        [et getObjectByID:fixingObjectID];
+        if (![fixingObjectID isEqualToString:@"n/a"]) //Make sure objectID exists...
+        {
+            NSLog(@" get EXP object:%@",fixingObjectID);
+            [et getObjectByID:fixingObjectID]; //Delegate callback updates ui...
+        }
     }
-    //EXPObject *e = [et.expos objectAtIndex:selectedRow];
-    //[self performSegueWithIdentifier:@"expDetailSegue" sender:e];
-    
 } //end didSelectRowAtIndexPath
 
 
@@ -547,7 +554,7 @@
 - (void)didFixPricesInObjectByID : (NSString *)oid
 {
     NSLog(@" OK: saved qpt for object %@ , delete from error list",oid);
-    [errorList removeObjectAtIndex:selectedRow];
+    //1/23 WRONG![errorList removeObjectAtIndex:selectedRow];
     [_table reloadData];
 
 

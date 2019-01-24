@@ -14,7 +14,8 @@
 //
 //  1/15 hook up filename property
 //  1/18 change 2nd scroll area  to textfield, add segue to editVC
-
+//  1/19 Added dropbox file save and PDF cache save
+//
 #import "CheckTemplateVC.h"
 
 @interface CheckTemplateVC ()
@@ -30,6 +31,13 @@
     //   _versionNumber    = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
     oto = [OCRTopObject sharedInstance];
     oto.delegate = self;
+    //Dropbox...
+    dbt = [[DropboxTools alloc] init];
+    dbt.delegate = self;
+    [dbt setParent:self];
+
+    //PDF Cache: for saving images
+    pc = [PDFCache sharedInstance];
 
     return self;
 }
@@ -37,6 +45,10 @@
 //=============CheckTemplate VC=====================================================
 - (void)viewDidLoad {
     [super viewDidLoad];
+    // 1/19 Add spinner busy indicator...
+    CGSize csz   = [UIScreen mainScreen].bounds.size;
+    spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, csz.width, csz.height)];
+    [self.view addSubview:spv];
     // Do any additional setup after loading the view.
     _imageView.image = _photo;
     _scrollView.delegate=self;
@@ -97,7 +109,14 @@
 //=============CheckTemplate VC=====================================================
 - (IBAction)nextSelect:(id)sender
 {
-    [self performSegueWithIdentifier:@"editTemplateSegue" sender:@"addTemplateVC"];
+    AppDelegate *tappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSString *templateFolder  = tappDelegate.settings.templateFolder;
+    NSString *outputPath      = [NSString stringWithFormat:@"%@/template_%@.png",templateFolder,_vendor];
+    [spv start : @"Saving Template Image"];
+    //Add image to PDF cache...
+    [pc addPDFImage : _photo : outputPath : 1];
+    //OK save our template image...
+    [dbt uploadPNGImage:outputPath : _photo];
 
 }
 
@@ -160,5 +179,26 @@
 {
     [self errMsg:@"Error Performing OCR" :errMsg];
 }
+
+#pragma mark - DropboxToolsDelegate
+
+//===========<DropboxToolDelegate>================================================
+- (void)didUploadImageFile : (NSString *)fname
+{
+    NSLog(@" didUploadImageFile[%@]",fname);
+    // OK came back from dropbox image save, now segue to image editor...
+    [spv stop];
+    [self performSegueWithIdentifier:@"editTemplateSegue" sender:@"addTemplateVC"];
+
+}
+
+//===========<DropboxToolDelegate>================================================
+- (void)errorUploadingImage : (NSString *)s
+{
+    NSLog(@" errorUploadingImage[%@] ",s);
+    [spv stop];
+}
+
+
 
 @end

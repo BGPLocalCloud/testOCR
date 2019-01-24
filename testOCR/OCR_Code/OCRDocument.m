@@ -30,6 +30,7 @@
         columnStringData     = [[NSMutableArray alloc] init];
         ignoreList           = [[NSMutableArray alloc] init];
         finalYs              = [[NSMutableArray alloc] init];
+        headerArray          = [[NSMutableArray alloc] init];
 
         gT10  = [[NSMutableSet alloc] init];
         gB10  = [[NSMutableSet alloc] init];
@@ -184,7 +185,7 @@
     for (NSNumber *n in a)
     {
         OCRWord *ow = allWords[n.longValue];
-        NSLog(@" w[%d] %@ [%@,%@ : %@,%@]",n.intValue,ow.wordtext,ow.top,ow.left,ow.width,ow.height);
+        NSLog(@" w[%d] %@ [XY:%@,%@/WH:%@,%@]",n.intValue,ow.wordtext,ow.left,ow.top,ow.width,ow.height);
     }
 }
 
@@ -263,25 +264,29 @@
 
 //=============(OCRDocument)=====================================================
 // Fix typos etc in price / amount columns..
--(NSMutableArray *) cleanUpPriceColumns : (int) index : (NSMutableArray*) a
+// 1/23 added support for column types
+-(NSMutableArray *) cleanUpPriceColumns : (int) index : (NSString *)ctype : (NSMutableArray*) a
 {
-    //THIS NEEDS IMPROVEMENT, and abstraction!
-    if (index != _priceColumn &&
-        index != _amountColumn &&
-        index != _quantityColumn) return a; //Using our 5 canned columns
+    if ([ctype isEqualToString:@"INVOICE_COLUMN"]) //Columns assumed I/Q/D/P/A??
+    {
+        if (index != _priceColumn &&
+            index != _amountColumn &&
+            index != _quantityColumn) return a; //Using our 5 canned columns
+    }
     //Need a cleanup?
     NSMutableArray *aout = [[NSMutableArray alloc] init];
-    if ( index != _quantityColumn) //Cleanup dollar amounts...
+    //Cleanup dollar amounts... 1/23 added new column types...
+    if ([ctype isEqualToString:@"INVOICE_COLUMN_PRICE"] || [ctype isEqualToString:@"INVOICE_COLUMN_TOTAL"])
     {
         for (NSString * s in a) [aout addObject:[self cleanupPrice:s]];
     }
-    else //quantity
+    else if ([ctype isEqualToString:@"INVOICE_COLUMN_QUANTITY"]) //quantity
     {
-        //NSLog(@" cleanup quantity...");
         for (NSString * s in a) [aout addObject:[self cleanUpNumberString : s]];
     }
+    else aout = [NSMutableArray arrayWithArray:a];
     return aout;
-}
+} //end cleanUpPriceColumns
 
 
 //=============(OCRDocument)=====================================================
@@ -460,10 +465,11 @@
 //  into line. Note ytolerance...
 -(NSMutableArray *) getSortedWordPairsFromArray : (NSMutableArray*) a
 {
+    //NSLog(@" assemble word.....................................");
+    //[self dumpArrayFull:a];
     NSMutableArray *wordPairs = [[NSMutableArray alloc] init];
-    //NSLog(@" assemble word...");
-    int ys[32];  //we can handle up to 32 words...
-    for (int i=0;i<32;i++) ys[i] = -999;
+    int ys[64];  //we can handle up to 256 words...
+    for (int i=0;i<64;i++) ys[i] = -999;
     int yptr = 0;
     int ytolerance = 1.5 * _glyphHeight;
     int fonyWidth = topmostRightRect.origin.x + topmostRightRect.size.width;
@@ -480,11 +486,130 @@
         //NSLog(@"add2wordpairs wid %d y %d owleft %d w %@ abspos %d",fonyWidth,y,ow.left.intValue,ow.wordtext,abspos);
         //add dict of string / y pairs
         [wordPairs addObject:@{@"Word": ow.wordtext,@"XY":[NSNumber numberWithInt:abspos],@"W":[NSNumber numberWithInt:w],@"T":[NSNumber numberWithInt:y]}];
+        if (yptr >= 64) break; //Out of room ? string too big anyway!
     }
     NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:@"XY" ascending:YES];
     [wordPairs sortUsingDescriptors:@[descriptor]];
     return wordPairs;
 } //end getSortedWordPairsFromArray
+
+//=============(OCRDocument)=====================================================
+-(void) getWordHistogram : (int) ytop : (int) numLines
+{
+    int colcountz[2048];
+    for (int i=0;i<2048;i++) colcountz[i]=0;
+    //Vertical search region is from header down...
+    int ybot = numLines * _glyphHeight;
+    for (OCRWord *ow in allWords)
+    {
+        if (ow.top.intValue > ytop && ow.top.intValue < ybot)
+        {
+            int xmin = ow.left.intValue;
+            int xmax = ow.width.intValue + xmin;
+            for (int j=xmin;j<=xmax;j++) colcountz[j]++;
+        }
+    }
+    
+} //end getWordHistogram
+
+//=============(OCRDocument)=====================================================
+// Assume allWords is unsorted, brute force...
+-(int) findWord : (NSString *)w
+{
+    int i=0;
+    NSString *wl = w.lowercaseString;
+    for (OCRWord *ow in allWords)
+    {
+        if ([ow.wordtext.lowercaseString isEqualToString:wl]) return i;
+        i++;
+    }
+    return 0;
+} //end findWord
+
+
+//=============(OCRDocument)=====================================================
+// in array of words (indices to allWords) find nearest neighbor to the right
+-(int) getClosestWordToRight : (int) xpos : (NSArray *)a
+{
+    int xmin = 9999;
+    int closest = -1;
+    for (int i=0;i<a.count;i++)
+    {
+        NSNumber *nn = a[i];
+        OCRWord *ow = allWords[nn.intValue];
+        int xdel = ow.left.intValue - xpos;
+        if (xdel >= 0 && xdel < xmin)
+        {
+            xmin = xdel;
+            closest = nn.intValue;
+        }
+    }
+    return closest;
+} //end getClosestWordToRight
+
+//=============(OCRDocument)=====================================================
+// Finds header in doc. Automatically. Creates array of boxes with word indices
+-(int) autoFindHeader
+{
+    [headerArray removeAllObjects];
+    int dindex = [self findWord:@"description"];
+    OCRWord *ow = allWords[dindex];
+    int yc = ow.top.intValue + ow.height.intValue/2;
+    CGRect hdrRect = CGRectMake(0, yc - _glyphHeight, _width, 2*_glyphHeight);
+    //NSLog(@" full hdr rect %@",NSStringFromCGRect(hdrRect));
+    //Header rect ready. Find words now.
+    NSArray *a = [self findAllWordsInRect:hdrRect];
+    //[self dumpArrayFull:a];
+    BOOL done = FALSE;
+    int col = 0; //asdf
+    int xLeft = 0;
+    while (!done) //Go get header strings
+    {
+        documentBox *db = [[documentBox alloc] init];
+        CGRect nr = CGRectZero;
+        //Find the word nearest to left edge, must be to RIGHT
+        int closest     = [self getClosestWordToRight:xLeft :a];
+        if (closest < 0) break; //Nothing found? We are done
+        OCRWord *cw     = allWords[closest];
+        //Create rectangle starting at xLeft, bounding closest word too...
+        nr.origin.x     = xLeft;
+        NSLog(@" next hdr box: xleft %d",xLeft);
+        nr.origin.y     = hdrRect.origin.y;
+        nr.size.width   = (cw.left.intValue + cw.width.intValue) - xLeft;
+        nr.size.height  = hdrRect.size.height;
+        //Now look for stuff near this word,
+        NSMutableArray *na = [[NSMutableArray alloc] init];
+        [na addObject:[NSNumber numberWithInt:closest]];
+        for (NSNumber *nn in a)
+        {
+            OCRWord *tw     = allWords[nn.intValue];
+            int twl = tw.left.intValue;
+            if (twl >= xLeft && twl - (nr.origin.x +nr.size.width) < _glyphHeight)
+            {
+                NSLog(@"  nextword[%@] x %d  vs boxorigin %f width %f edge %f",
+                      tw.wordtext,twl,nr.origin.x,nr.size.width,(nr.origin.x +nr.size.width));
+                if ([na indexOfObject:nn] == NSNotFound) //No Dupes!
+                {
+                    //New word nearby? expand our rectangle to include it...
+                    int testWidth = (tw.left.intValue + tw.width.intValue) - nr.origin.x;
+                    if (testWidth > nr.size.width)  nr.size.width = testWidth;
+                    [na addObject:nn];
+                }
+            }
+        }
+        db.frame = nr;
+        db.items = na;
+        [headerArray addObject:db];
+        NSLog(@" col %d rect %@",col,NSStringFromCGRect(nr));
+        //Space over some, reset our left edge for the next column
+        xLeft = (nr.origin.x + nr.size.width) + 1*_glyphHeight;
+        col++;
+    }
+  
+    for (documentBox *dbb in headerArray) [dbb dump];
+    NSLog(@" auto=found headers %@",headerArray);
+    return yc; //Return Y coord of header center...
+} //end autoFindHeader
 
 //=============(OCRDocument)=====================================================
 // Finds header in doc, given r as possible place to start. returns top left ypos
@@ -522,7 +647,8 @@
     for (NSNumber *n in a) //Get every word on the same lines as the keyword
     {
         OCRWord *ow = allWords[n.longValue];
-        if (abs(ow.top.intValue - yTest) < 1*_glyphHeight ) [b addObject: n];
+        //DHS 1/23 expanded v. size for greco invoice
+        if (abs(ow.top.intValue - yTest) < 1.5*_glyphHeight ) [b addObject: n];
     }
    // [self dumpArrayFull:b];
     NSString * hdrSentence =  [self assembleWordFromArray : b : FALSE : 2];
@@ -573,43 +699,52 @@
 //=============(OCRDocument)=====================================================
 // Uses rr to get column L/R boundary, uses rowY's to get top area to look at...
 // 1/18 uses finalYs, gotten from computeRowYpositions
--(NSMutableArray*)  getColumnStrings: (CGRect)rr : (int) column
+-(NSMutableArray*)  getColumnStrings: (CGRect)rr : (int) column : (NSString *)ctype
 {
     //NOTE the rowYs array is coming in in DOCUMENT coords!!!
     NSMutableArray *resultStrings = [[NSMutableArray alloc] init];
     int yc = (int)finalYs.count;
+    NSLog(@" col %d yc %d",column,yc);
+    int lastYSize = 0;
     for (int i=0;i<yc;i++)
     {
         NSNumber *ny = finalYs[i];
         //DHS Jan 10 1/10/19 This may be needed for docs that are tilted by a few degrees..
         // What would be best would be something that follows the page's tilt.....
         int thisY = ny.intValue - _glyphHeight; //1/9/19 Fudge by half glyph height
-//        int thisY = ny.intValue - _glyphHeight/2; //Fudge by half glyph height
         thisY = [self doc2templateY:thisY];      //Go back to template coords...
-        int nextY = rr.origin.y + rr.size.height;
-        if (i < yc-1)
+        int nextY = thisY + lastYSize; //1/21 Assume next cell same as previous (this is for bottom case)
+        if (i < yc-2)  //Not last row? get next rows Y
         {
             NSNumber *nyy = finalYs[i+1];
             nextY = nyy.intValue - 1;
+            nextY = [self doc2templateY:nextY];
         }
-        nextY = [self doc2templateY:nextY];
         CGRect cr = CGRectMake(rr.origin.x, thisY, rr.size.width, nextY-thisY);
         NSMutableArray *a = [self findAllWordsInRect:cr];
-        //NSLog(@" getColumnString:(col %d row %d) rect %@",column,i,NSStringFromCGRect(cr));
-        //[self dumpArray:a];
+        CGRect docRect = [self  template2DocRect : cr];
+//        NSLog(@" getColumnString:(col %d row %d) rect %@ thisy %d nexty %d",
+//              column,i,NSStringFromCGRect(docRect),thisY,nextY);
+        [self dumpArray:a];
         [resultStrings addObject:[self assembleWordFromArray : a : FALSE : 2]];
+        lastYSize = nextY - thisY;
     }
     
     NSString *headerForThisColumn = [self getHeaderStringFromRect:rr];
     headerForThisColumn = headerForThisColumn.lowercaseString;
     //let's see what it contains:
-    if ([headerForThisColumn containsString:@"item"])        _itemColumn = column;
-    if ([headerForThisColumn containsString:@"quantity"])    _quantityColumn = column;
-    if ([headerForThisColumn containsString:@"description"]) _descriptionColumn = column;
-    if ([headerForThisColumn containsString:@"price"])       _priceColumn = column;
-    if ([headerForThisColumn containsString:@"amount"])      _amountColumn = column;
-    NSLog(@" column header[%d] %@ ic %d qc %d",column,headerForThisColumn,_itemColumn,_quantityColumn);
-
+    if ([headerForThisColumn containsString:@"item"] || [ctype.lowercaseString containsString:@"item"])
+        _itemColumn = column;
+    if ([headerForThisColumn containsString:@"quantity"] || [ctype.lowercaseString containsString:@"quantity"])
+        _quantityColumn = column;
+    if ([headerForThisColumn containsString:@"description"] || [ctype.lowercaseString containsString:@"description"])
+        _descriptionColumn = column;
+    if ([headerForThisColumn containsString:@"price"] || [ctype.lowercaseString containsString:@"price"])
+        _priceColumn = column;
+    if ([headerForThisColumn containsString:@"amount"] || [ctype.lowercaseString containsString:@"amount"])
+        _amountColumn = column;
+    NSLog(@" column header[%d] %@ ic %d qc %d dc %d pc %d ac %d",column,headerForThisColumn,
+          _itemColumn,_quantityColumn,_descriptionColumn,_priceColumn,_amountColumn);
     return resultStrings;
 } //end getColumnStrings
 
@@ -635,7 +770,7 @@
     //Get all content within this rect, assume one item per line!
     NSMutableArray *a = [self findAllWordsInRect:rr];
     NSLog(@" getColumnYPositionsInRect %d,%d : %d,%d",(int)rr.origin.x,(int)rr.origin.y,(int)rr.size.width,(int)rr.size.height);
-    [self dumpArrayFull:a];
+    //[self dumpArrayFull:a];
     NSMutableArray *colPairs = [[NSMutableArray alloc] init];
     int oldy = -99999;
     //Get each item in our column box...
@@ -687,7 +822,8 @@
     for (NSNumber *nextY in sortedArray)
     {
         int dy = nextY.doubleValue - lastY.doubleValue;
-        if (dy >_glyphHeight) [finalYs addObject:nextY];
+        //DHS 1/23 NOTE: this sometimes makes duplicate items show up! (at least in HFM invoice)
+        if (dy > _glyphHeight) [finalYs addObject:nextY];
         lastY = nextY;
     }
     return 0; //OK
@@ -994,7 +1130,7 @@
 //=============(OCRDocument)=====================================================
 -(NSDate *)getGarbledDate : (NSString *) dstr
 {
-    if (dstr.length < 8) return nil; //Too short!
+    if (dstr.length < 7) return nil; //Too short!
     NSString*dclean = [self cleanUpNumberString : dstr]; //Get rid of weird typos...
     //Try to fix garbled date, where slashes are replaced by ones for instance...
     NSString *tmonth = [dclean substringToIndex:2];
@@ -1002,15 +1138,22 @@
     iyear = currentYear;
     iday  = 1;
     imon = tmonth.intValue;
+    int offset = 3;
     if (imon >= 1 && imon <= 12) //Got a month?
     {
         int slen = (int)dclean.length;
-        NSString *tday = [dclean substringWithRange:NSMakeRange(3, 2)];
+        NSString *tday = [dclean substringWithRange:NSMakeRange(offset, 2)];
+        if ([tday containsString:@"/"]) //maybe we went too far? as in MMDD/YY?
+        {
+            offset--;
+            tday = [dclean substringWithRange:NSMakeRange(offset, 2)];
+        }
         iday = tday.intValue;
         NSString *tyear = @"";
-        if (slen > 8)
+        if (slen > 6)
         {
-            tyear = [dclean substringWithRange:NSMakeRange(6, slen-6)];
+            offset+=3;
+            tyear = [dclean substringWithRange:NSMakeRange(offset, slen-offset)];
             iyear = tyear.intValue;
             //Try to make sense of year:
             if (iyear < 100) iyear += 2000;
@@ -1159,7 +1302,7 @@
         rcFrame.size.height +=2*_glyphHeight;
         //NSLog(@" annnd headerRect for column %d is %@",i,NSStringFromCGRect(rcFrame));
         NSMutableArray *a = [self findAllWordsInRect:rcFrame];
-        [self dumpArrayFull:a];
+        //[self dumpArrayFull:a];
         i++;
     }
     

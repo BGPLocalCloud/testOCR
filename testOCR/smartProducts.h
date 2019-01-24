@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSString *fullProductName;
     NSString *vendor;
     NSString *price;
+    NSString *uom;
     NSString *amount;
     NSString *quantity;
     BOOL processed;
@@ -92,6 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(void) addLineNumber : (int)n;
 -(void) addAmount : (NSString*)price;
 -(void) addPrice : (NSString*)price;
+-(void) addUOM : (NSString*)uom;
 -(void) addQuantity : (NSString*)qstr;
 -(int) analyze;
 //-(void) dump;

@@ -59,6 +59,7 @@ static OCRCache *sharedInstance = nil;
 // Blows away disk cache...
 -(void) clearHardCore
 {
+    NSLog(@" CLEAR OCR CACHE HARDCORE....");
     NSString *path;
     [self clear];
     
@@ -117,7 +118,7 @@ static OCRCache *sharedInstance = nil;
     [self updateMasterFile:oid];
     //[self dumpCacheToLog];
     _cacheSize++;
-} //end addOCRTxt
+} //end addOCRTxtWithRect
 
 //=====(OCRCache)======================================================================
 -(NSString *) cleanupID : (NSString*) inoid

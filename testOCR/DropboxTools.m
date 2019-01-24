@@ -255,11 +255,19 @@ static DropboxTools *sharedInstance = nil;
 
 //=============(DropboxTools)=====================================================
 // Eat CSV file spat out from another OCR provider, delegate gets didDownloadTextFile callback
-- (void)downloadCSV:(NSString *)path
+- (void)downloadCSV : (NSString *)path : (NSString *)vendor
 {
-    //For now just download text?
-    [self downloadTextFile : path];
+    DBUserClient *client = [DBClientsManager authorizedClient];
+    NSLog(@" dropbox dload txt [%@[",path);
     
+    [[client.filesRoutes downloadData:path]
+     setResponseBlock:^(DBFILESFileMetadata *result, DBFILESDownloadError *routeError, DBRequestError *error, NSData *fileData) {
+         if (result) {
+             NSString *str = [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
+             [self->_delegate didDownloadCSVFile : vendor : str];
+         }
+     }];
+
 }  //end downloadCSV
 
 //=============(DropboxTools)=====================================================

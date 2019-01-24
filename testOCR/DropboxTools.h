@@ -43,7 +43,7 @@
 -(void) countEntries : (NSString *)batchFolder : (NSString *)vendorFolder;
 
 - (void)downloadImages:(NSString *)imagePath;
-- (void)downloadCSV:(NSString *)path;
+- (void)downloadCSV : (NSString *)path : (NSString *)vendor;
 - (void)downloadTextFile:(NSString *)imagePath;
 -(void) errMsg : (NSString *)title : (NSString*)message;
 -(void) setParent : (UIViewController*) p;
@@ -51,7 +51,7 @@
 -(void) getFolderList : (NSString *) folderPath;
 -(void) renameFile : (NSString*) fromPath : (NSString*) toPath;
 -(void) saveTextFile : (NSString *)fpath : (NSString *)stringToSave;
-- (void)uploadPNGImage:(NSString *)imagePath : (UIImage *)pngImage;
+-(void) uploadPNGImage : (NSString *)imagePath : (UIImage *)pngImage;
 
 
 @end
@@ -65,6 +65,7 @@
 - (void)errorGettingBatchList : (NSString *)type : (NSString *)s;
 - (void)didDownloadImages;
 - (void)didDownloadTextFile : (NSString *)result;
+- (void)didDownloadCSVFile : (NSString *)vendor : (NSString *)result;
 - (void)didGetFolderList : (NSArray *)entries;
 - (void)errorDownloadingImages : (NSString *)s;
 - (void)didUploadImageFile : (NSString *)fname;

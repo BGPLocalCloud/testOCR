@@ -13,16 +13,22 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "OCRTopObject.h"
+#import "DropboxTools.h"
 #import "EditTemplateVC.h"
+#import "OCRTopObject.h"
+#import "PDFCache.h"
+#import "spinnerView.h"
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CheckTemplateVC : UIViewController <UIScrollViewDelegate,OCRTopObjectDelegate>
+@interface CheckTemplateVC : UIViewController <UIScrollViewDelegate,OCRTopObjectDelegate, DropboxToolsDelegate>
 {
     int viewWid,viewHit,viewW2,viewH2;
     int photoPixWid,photoPixHit;
     OCRTopObject *oto;
     NSString *ocredText;
+    DropboxTools *dbt;
+    spinnerView *spv;
+    PDFCache *pc;
 
 }
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;

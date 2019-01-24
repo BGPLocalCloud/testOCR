@@ -48,7 +48,12 @@
 //=============(OCRTemplate)=====================================================
 -(void) clearHeaders
 {
-    for (int i=0;i<32;i++) headerColumns[i] = CGRectMake(0, 0, 0, 0);
+    for (int i=0;i<32;i++)
+    {
+        headerColumns[i] = CGRectMake(0, 0, 0, 0);
+        headerTypes[i]   = @"";
+    }
+    
     headerColumnCount = 0;
 }
 
@@ -79,6 +84,7 @@
 }
 
 //=============(OCRTemplate)=====================================================
+// Was called by cleanupColumns, which is now stubbed
 -(int) getColumnXRanges
 {
     int count;
@@ -153,7 +159,7 @@
     ob.fieldName = fname;
     ob.fieldFormat = format;
     [ocrBoxes addObject:ob];
-}
+} //end addBox
 
 //=============(OCRTemplate)=====================================================
 -(void) addTag : (int) index : (NSString*)tag
@@ -164,7 +170,7 @@
 
 //=============(OCRTemplate)=====================================================
 // New arg: headerY, just below found position of actual header in doc coords
--(void) addHeaderColumnToSortedArray : (int) index : (int) y
+-(void) addHeaderColumnToSortedArray : (int) index : (NSString *)columnType : (int) y
 {
     headerY = y;
     OCRBox *ob = ocrBoxes[index];
@@ -179,25 +185,34 @@
             for (int j=headerColumnCount;j>i;j--)
             {
                 headerColumns[j] = headerColumns[j-1];
+                headerTypes[j]   = headerTypes[j-1];
             }
             whereToAdd = i;
             break;
         }
     }
     //NSLog(@" where %d rect %@",whereToAdd,NSStringFromCGRect(ob.frame));
-    headerColumns[whereToAdd] = ob.frame; //OK add it
+    headerColumns[whereToAdd] = ob.frame;   //OK add it
+    headerTypes[whereToAdd]   = columnType; //OK add it
     headerColumnCount++;
     NSLog(@" addhc %d , count %d",index,headerColumnCount);
 
 } //end addHeaderColumnToSortedArray
 
 
-//=============(OCRTopObject)=====================================================
+//=============(OCRTemplate)=====================================================
 // which item in he
 -(CGRect) getColumnRect :(int) index
 {
     if (index < 0 || index > 31) return CGRectZero;
     return headerColumns[index];
+}
+
+//=============(OCRTemplate)=====================================================
+-(NSString *) getColumnType : (int) column
+{
+    if (column < 0 || column > 31) return @"";
+    return headerTypes[column];
 }
 
 

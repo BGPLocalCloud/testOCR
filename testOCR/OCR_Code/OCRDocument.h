@@ -15,6 +15,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "OCRWord.h"
+#import "documentBox.h"
 
 NS_ASSUME_NONNULL_BEGIN
 #define MAX_QPA_ROWS 512
@@ -27,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSDictionary *rawJSONDict;
     NSString *parsedText;
     NSMutableArray *headerPairs;
+    NSMutableArray *headerArray;
+
     NSMutableArray *columnStringData; //Array of Arrays...
     NSMutableArray *finalYs; //Y tops of each row across the invoice, computed
     NSString * postOCRQuantities[MAX_QPA_ROWS];
@@ -76,9 +79,10 @@ NS_ASSUME_NONNULL_BEGIN
 -(void) clearAllColumnStringData;
 -(void) addColumnStringData : (NSMutableArray*)stringArray;
 -(void) addIgnoreBoxItems  : (CGRect )rr;
+-(int)  autoFindHeader;
 -(NSString*) cleanUpNumberString : (NSString *)nstr;
 -(NSString *)cleanupPrice : (NSString *)s;
--(NSMutableArray *) cleanUpPriceColumns : (int) index : (NSMutableArray*) a;
+-(NSMutableArray *) cleanUpPriceColumns : (int) index : (NSString *)ctype : (NSMutableArray*) a;
 -(NSString*) cleanUpProductNameString : (NSString *)pstr;
 -(void) computeScaling: (CGRect )tlr : (CGRect )trr;
 -(void) dumpArrayFull : (NSArray*)a;
@@ -97,8 +101,9 @@ NS_ASSUME_NONNULL_BEGIN
 -(float) findPriceInArrayOfFields : (NSArray*)aof;
 -(NSDate *) findDateInArrayOfFields : (NSArray*)aof;
 -(NSString *) findTopStringInArrayOfFields : (NSArray*)aof;
--(NSMutableArray*)  getColumnStrings: (CGRect)rr : (int) index;
+-(NSMutableArray*)  getColumnStrings: (CGRect)rr : (int) index : (NSString*)ctype;
 -(NSArray*)  getHeaderNames;
+-(void) getWordHistogram : (int) ytop : (int) numLines;
 -(NSString*) getPostOCRQuantity : (int) row;
 -(NSString*) getPostOCRPrice    : (int) row;
 -(NSString*) getPostOCRAmount   : (int) row;

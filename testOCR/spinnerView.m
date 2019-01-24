@@ -99,16 +99,14 @@
     //Trigger indicator animation..
     animTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(animtimerTick:) userInfo:nil repeats:YES];
     animTick = 0;
-    spView.hidden  = FALSE;
-    spLabel.hidden = FALSE;
+    self.hidden  = FALSE;
 } //end startPlaceholder
 
 //==========spinnerView=========================================================================
 -(void) stop
 {
     [animTimer invalidate]; //DHS 2/19/18 Stop load animation
-    spView.hidden  = TRUE; //DHS 2/19/18
-    spLabel.hidden = TRUE;
+    self.hidden  = TRUE; //DHS 2/19/18
 }
 
 //==========spinnerView=========================================================================

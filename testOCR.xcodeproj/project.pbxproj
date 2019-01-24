@@ -34,6 +34,7 @@
 		720FB49D21EC4F5800C0F320 /* yellowWarningIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 720FB49C21EC4F5800C0F320 /* yellowWarningIcon.png */; };
 		720FB4A021EC679F00C0F320 /* BatchReportController.m in Sources */ = {isa = PBXBuildFile; fileRef = 720FB49F21EC679F00C0F320 /* BatchReportController.m */; };
 		72183DED21C5FA86005627AB /* squareMask.png in Resources */ = {isa = PBXBuildFile; fileRef = 72183DEC21C5FA86005627AB /* squareMask.png */; };
+		721C296621F56DD100631570 /* documentBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 721C296521F56DD100631570 /* documentBox.m */; };
 		721D9C2021CB122F00D1E78A /* OCRCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D9C1F21CB122F00D1E78A /* OCRCategories.m */; };
 		721D9C2421CB13E500D1E78A /* CatObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D9C2321CB13E500D1E78A /* CatObject.m */; };
 		722E08F321BF504700BBD88D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08F221BF504700BBD88D /* SystemConfiguration.framework */; };
@@ -157,6 +158,8 @@
 		720FB49E21EC679F00C0F320 /* BatchReportController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BatchReportController.h; sourceTree = "<group>"; };
 		720FB49F21EC679F00C0F320 /* BatchReportController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BatchReportController.m; sourceTree = "<group>"; };
 		72183DEC21C5FA86005627AB /* squareMask.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = squareMask.png; path = Resources/squareMask.png; sourceTree = SOURCE_ROOT; };
+		721C296421F56DD100631570 /* documentBox.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = documentBox.h; sourceTree = "<group>"; };
+		721C296521F56DD100631570 /* documentBox.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = documentBox.m; sourceTree = "<group>"; };
 		721D9C1E21CB11DA00D1E78A /* OCRCategories.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCRCategories.h; sourceTree = "<group>"; };
 		721D9C1F21CB122F00D1E78A /* OCRCategories.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OCRCategories.m; sourceTree = "<group>"; };
 		721D9C2221CB13E500D1E78A /* CatObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CatObject.h; sourceTree = "<group>"; };
@@ -467,6 +470,8 @@
 				721D9C1F21CB122F00D1E78A /* OCRCategories.m */,
 				7209608D21B8173200D49C63 /* OCRDocument.h */,
 				7209608E21B8173200D49C63 /* OCRDocument.m */,
+				721C296421F56DD100631570 /* documentBox.h */,
+				721C296521F56DD100631570 /* documentBox.m */,
 				72F0D8BF21D93216005979D2 /* OCRSettings.h */,
 				72F0D8C021D93216005979D2 /* OCRSettings.m */,
 				7209609921B81FB900D49C63 /* OCRTemplate.h */,
@@ -720,6 +725,7 @@
 				72BA4D2821CEFC0100F432E9 /* ActivityTable.m in Sources */,
 				729C592C21C1D08900F4C695 /* smartProducts.m in Sources */,
 				721D9C2421CB13E500D1E78A /* CatObject.m in Sources */,
+				721C296621F56DD100631570 /* documentBox.m in Sources */,
 				728EECC821ED1DDB00F83129 /* invoiceCell.m in Sources */,
 				7272C5F021D6ABFE0094D7D1 /* OCRCache.m in Sources */,
 				72435B3721C8C8EA00620F4B /* EXPTable.m in Sources */,
