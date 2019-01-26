@@ -34,7 +34,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MainVC : UIViewController <NavButtonsDelegate,ActivityTableDelegate,
-                    UITableViewDelegate,UITableViewDataSource, batchObjectDelegate>
+                    UITableViewDelegate,UITableViewDataSource, batchObjectDelegate,DropboxToolsDelegate>
 {
     NavButtons *nav;
     int viewWid,viewHit,viewW2,viewH2;
@@ -53,6 +53,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableArray *batchPFObjects;
     BOOL fixingErrors;
     spinnerView *spv;
+    DropboxTools *dbt;
+
 
 }
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;

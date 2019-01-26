@@ -114,45 +114,31 @@
                                                                    message:nil
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     [alert setValue:tatString forKey:@"attributedTitle"];
-
-    UIAlertAction *actions[MAX_POSSIBLE_VENDORS]; //Up to 16 vendors...
-
-    
-    int i = 0;
     int vindex = 0;
     for (NSString *s in vv.vNames)
     {
         int vc = [bbb getVendorFileCount:vv.vFolderNames[vindex]];
         [vv.vFileCounts addObject: [NSNumber numberWithInt: vc]]; //Save filecounts for later
-        //NSString *rotation = vv.vRotations[vindex];
         if (vc > 0) //Don't add a batch run option for empty batch folders!
         {
-            actions[i] = [UIAlertAction actionWithTitle:s
+            [alert addAction: [UIAlertAction actionWithTitle:s
                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                       self->vendorName = s;
                                                       [self->spv start : @"Run Batch..."];
                                                       [self->bbb runOneOrMoreBatches : vindex];
-                                                  }];
-            i++;
-            if (i >= MAX_POSSIBLE_VENDORS) break;
+                                                  }]];
         }
         vindex++; //Update vendor index (for checking vendor filecounts)
     }
-#ifdef CAN_RUN_ALL_BATCHES
     UIAlertAction *allAction    = [UIAlertAction actionWithTitle:NSLocalizedString(@"Run All",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                                [self->spv start : @"Run Batch..."];
                                                                [self->bbb runOneOrMoreBatches : -1];
                                                            }];
-#endif
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                            }];
-    //DHS 3/13: Add owner's ability to delete puzzle
-    for (int ii = 0;ii<i;ii++) [alert addAction:actions[ii]];
-#ifdef CAN_RUN_ALL_BATCHES
     [alert addAction:allAction];
-#endif
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
 }
@@ -177,7 +163,7 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self->_titleLabel.text = @"Batch Complete!";;
-        [spv stop];
+        [self->spv stop];
     });
 
 }
@@ -187,7 +173,7 @@
 {
     NSLog(@" batch FAILURE!");
     dispatch_async(dispatch_get_main_queue(), ^{
-        [spv stop];
+        [self->spv stop];
     });
 }
 

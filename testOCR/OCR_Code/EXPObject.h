@@ -43,6 +43,7 @@
 @property (nonatomic , strong) NSString* PDFFile;
 @property (nonatomic , strong) NSString* versionNumber;
 @property (nonatomic , strong) NSNumber* page;
+@property (nonatomic , strong) NSString* batchCounter;
 
 
 

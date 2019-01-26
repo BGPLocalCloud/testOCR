@@ -234,6 +234,14 @@ static OCRTopObject *sharedInstance = nil;
 
 
 //=============(OCRTopObject)=====================================================
+// passes buck down to exptable. unique record count throughout batch
+-(void) clearEXPBatchCounter
+{
+    [et clearBatchCounter];
+}
+
+
+//=============(OCRTopObject)=====================================================
 // Retreives data from a column in the array w/ limit checking.
 -(NSString *)getLineItem : (int) index  : (int) licount : (NSArray *)a
 {
@@ -771,7 +779,8 @@ static OCRTopObject *sharedInstance = nil;
     [act saveActivityToParse:@"...save Invoice" : _invoiceNumberString];
     NSString *its = [NSString stringWithFormat:@"%4.2f",_invoiceTotal];
     its = [od cleanupPrice:its]; //Make sure total is formatted!
-    [it saveToParse];
+    [it updateInvoice : _vendor : _invoiceNumberString];
+//    [it saveToParse];
 
 }
 

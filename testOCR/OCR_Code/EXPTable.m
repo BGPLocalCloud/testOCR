@@ -11,6 +11,7 @@
 //  Created by Dave Scruton on 12/17/18.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  1/24 added batchCounter, removed batch_key
 
 #import "EXPTable.h"
 
@@ -43,6 +44,13 @@
     allErrors = @"";
     for (int i=0;i<32;i++)  returnCounts[i] = 0;
     for (int i=0;i<256;i++) errorsByLineNumber[i] = @"";
+}
+
+
+//=============(EXPTable)=====================================================
+-(void) clearBatchCounter
+{
+    batchCounter = 0;
 }
 
 #define PInv_Local_key @"Local"
@@ -105,7 +113,7 @@
     lineNumber  = [self TrackNilErrors : lineNumber : PInv_Local_key];
     pricePerUOM = [self TrackNilErrors : pricePerUOM : PInv_PricePerUOM_key];
     total       = [self TrackNilErrors : total : PInv_TotalPrice_key];
-    batch       = [self TrackNilErrors : batch : PInv_Batch_key];
+    batch       = [self TrackNilErrors : batch : PInv_BatchID_key];
     errStatus   = [self TrackNilErrors : errStatus : PInv_ErrStatus_key];
     PDFFile     = [self TrackNilErrors : PDFFile : PInv_PDFFile_key];
     if (allErrors.length > 1) //Got error(s)?
@@ -134,7 +142,9 @@
     exo.errStatus       = errStatus;
     exo.PDFFile         = PDFFile;
     exo.page            = page;
+    exo.batchCounter    = [NSString stringWithFormat:@"%@_%4.4d",batch,batchCounter];
     [_expos addObject:exo];
+    batchCounter++;
     
 } //end addRecord
 
@@ -191,7 +201,6 @@
     e.quantity          = pfo[PInv_Quantity_key];
     e.total             = pfo[PInv_TotalPrice_key];
     e.pricePerUOM       = pfo[PInv_PricePerUOM_key];
-    e.batch             = pfo[PInv_Batch_key];
     e.errStatus         = pfo[PInv_ErrStatus_key];
     e.PDFFile           = pfo[PInv_PDFFile_key];
     e.page              = pfo[PInv_Page_key];
@@ -421,11 +430,11 @@
         exoRecord[PInv_Quantity_key]            = exo.quantity;
         exoRecord[PInv_TotalPrice_key]          = exo.total;
         exoRecord[PInv_PricePerUOM_key]         = exo.pricePerUOM;
-        exoRecord[PInv_Batch_key]               = exo.batch;
         exoRecord[PInv_ErrStatus_key]           = exo.errStatus;
         exoRecord[PInv_PDFFile_key]             = exo.PDFFile;
         exoRecord[PInv_Page_key]                = exo.page;
         exoRecord[PInv_BatchID_key]             = exo.batch;
+        exoRecord[PInv_BatchCounter_key]        = exo.batchCounter;
         exoRecord[PInv_VersionNumber]           = _versionNumber;
         //NSLog(@"EXP ->parse [%@] %@ x %@ = %@",exo.productName,exo.quantity,exo.pricePerUOM,exo.total);
         [exoRecord saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
@@ -434,7 +443,7 @@
                 [self->objectIDs addObject:objID];
                 self->returnCounts[page]++;
                 self->totalReturnCount++;
-                //NSLog(@" ...EXP[%d] [%@/%@]->parse",i,exo.vendor,exo.productName);
+                NSLog(@" ...EXP[%d] [%@/%@]->parse",i,exo.vendor,exo.productName);
                 //NSLog(@" ...  EXP: ids %@",self->objectIDs);
                 //NSLog(@" for page[%d] sent %d return %d",page,self->sentCounts[page],self->returnCounts[page]);
                 //NSLog(@" for page[%d] totalsent %d totalreturn %d",page,self->totalSentCount,self->totalReturnCount);

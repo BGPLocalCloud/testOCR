@@ -93,6 +93,7 @@
 + (id)sharedInstance;
 -(NSString *) getRawResult;
 -(NSString *) getParsedText;
+-(void) clearEXPBatchCounter;
 - (void) loadCSVFileFromDocParser : (NSString *)fname : (NSString *)vendor;
 - (void) loadCSVValuesFromString : (NSString *)avendor : (NSString *)s;
 - (void)performOCROnImage : (NSString *)fname : (UIImage *)imageToOCR : (OCRTemplate *)ot;

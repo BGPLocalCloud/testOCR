@@ -22,19 +22,6 @@
 @implementation DropboxTools
 
 
-static DropboxTools *sharedInstance = nil;
-
-
-//=============(DropboxTools)=====================================================
-// Get the shared instance and create it if necessary.
-+ (DropboxTools *)sharedInstance {
-    if (sharedInstance == nil) {
-        sharedInstance = [[super allocWithZone:NULL] init];
-    }
-
-    return sharedInstance;
-}
-
 //=============(DropboxTools)=====================================================
 -(instancetype) init
 {
@@ -179,6 +166,21 @@ static DropboxTools *sharedInstance = nil;
      }];
 
 } //end getFolderList
+
+//=============(DropboxTools)=====================================================
+-(void) createFolderIfNeeded : (NSString *)folderPath
+{
+    [[client.filesRoutes createFolderV2:folderPath]
+     setResponseBlock:^(DBFILESListFolderResult *result, DBFILESListFolderError *routeError, DBRequestError *error) {
+         if (result) {
+             [self->_delegate didCreateFolder : folderPath];
+         }
+         else
+         {
+             [self->_delegate errorCreatingFolder : folderPath];
+         }
+     }];
+}
 
 //=============(DropboxTools)=====================================================
 // Looks in default location for this app, we have ONLY one folder for now...

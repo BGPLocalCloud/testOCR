@@ -15,6 +15,8 @@
 // Pull OIDs stuff asap
 //  1/9 Added file rename (stubbed out for now)\
 //  1/12 add OCRCache check to avoid download
+//  1/24 add all vendors support, updateBatchProgress
+//  1/25 add reports folder for batch reports on dropbox
 #import "BatchObject.h"
 
 @implementation BatchObject
@@ -162,67 +164,87 @@ static BatchObject *sharedInstance = nil;
 // vendor vindex -1 means run ALL
 -(void) runOneOrMoreBatches : (int) vindex
 {
-    if (vindex < 0)
-    {
-        NSLog(@" all vendors not implemented yet!");
-        return;
-    }
-    if (vindex >= vv.vFolderNames.count)
+    if (vindex >= (int)vv.vFolderNames.count)
     {
         NSLog(@" ERROR: illegal vendor index");
         return;
     }
     if (!_authorized) return; //can't get at dropbox w/o login!
     [self getNewBatchID];
+    [self updateBatchProgress : [NSString stringWithFormat:@"Batch Started:%@",_batchID]];
+    
     AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     bappDelegate.batchID = _batchID; //This way everyone can see the batch
     batchStatus   = BATCH_STATUS_RUNNING;
     batchErrors   = @"";
     batchFiles    = @"";
     batchProgress = @"";
-    [errorList removeAllObjects];        //Clear error / warning accumulators
+    [errorList removeAllObjects];        //Clear error / warning / fixed accumulators
     [warningList removeAllObjects];
-    [fixedList removeAllObjects];       // clear "fixed" accumulators too!
+    [fixedList removeAllObjects];
     [warningFixedList removeAllObjects];
     [errorReportList removeAllObjects];   //one set for parse storage, one for report
     [warningReportList removeAllObjects];
     [self.delegate batchUpdate : @"Started Batch..."];
     oto.batchID      = _batchID; //Make sure OCR toplevel has batchID...
-    
+    [oto clearEXPBatchCounter]; //for sorting EXP records on final output
     //Run just one vendor...
     if (vindex >= 0)
     {
-        [self startBatchForVendor:vindex];
+        vendorIndex   = vindex;
+        runAllBatches = FALSE;
+        [self startBatchForCurrentVendor];
     }
     else
     {
-        NSLog(@" run ALL batches...");
+        vendorIndex   = 0;
+        runAllBatches = TRUE;
+        [self startNextVendorBatch : FALSE];
+        NSLog(@" run ALL batches..."); //asdf
     }
 } //end runOneOrMoreBatches
 
 //=============(BatchObject)=====================================================
-// For each vendor: sets up batch vendor items, updates status and gets template
--(void) startBatchForVendor : (int)vindex
+// Get next vendor with staged files and start batch
+-(void) startNextVendorBatch : (BOOL) preIncrement
 {
-    vendorName       = vv.vNames[vindex];
-    vendorFolderName = vv.vFolderNames[vindex];
-    vendorRotation   = vv.vRotations[vindex];  //For templates: portrait / landscape orient
+    if (!runAllBatches) [self completeBatch : 0]; //Bail on single batch only...
+    if (preIncrement) vendorIndex++;
+    int vfcsize = (int)vv.vFileCounts.count;
+    if (vendorIndex >= vfcsize) [self completeBatch : 1];
+    //Find next vendor with staged files...
+    BOOL found = FALSE;
+    while (vendorIndex < vfcsize && !found)
+    {
+        if ([self getVendorFileCount : vv.vNames[vendorIndex]] > 0) found = TRUE;
+        else vendorIndex++;
+    } //End while...
+    if (vendorIndex >= vfcsize) [self completeBatch : 2];               //End of vendors? Done!
+    else                        [self startBatchForCurrentVendor]; //More? Run next batch!
+} //end StartNextVendorBatch
+
+//=============(BatchObject)=====================================================
+// For each vendor: sets up batch vendor items, updates status and gets template
+-(void) startBatchForCurrentVendor
+{
+    vendorName       = vv.vNames[vendorIndex];
+    vendorFolderName = vv.vFolderNames[vendorIndex];
+    vendorRotation   = vv.vRotations[vendorIndex];  //For templates: portrait / landscape orient
     [self updateParse];
-    NSString *actData = [NSString stringWithFormat:@"%@:%@",_batchID,vendorName];
-    [act saveActivityToParse:@"Batch Started" : actData];
+    [self updateBatchProgress : [NSString stringWithFormat:@"Next Vendor:%@",vendorName]];
     gotTemplate = FALSE;
     //After template comes through THEN dropbox is queued up to start downloading!
     [ot readFromParse:vendorName]; //Get our template, delegate return continues processing
-} //end startBatchForVendor
+} //end startBatchForCurrentVendor
 
 
 //=============(BatchObject)=====================================================
--(void) completeBatch
+-(void) completeBatch : (int) wherefrom
 {
+    if ([batchStatus isEqualToString: BATCH_STATUS_COMPLETED]) return; //No dupes
     batchStatus = BATCH_STATUS_COMPLETED;
     [self updateParse];
-    NSString *actData = [NSString stringWithFormat:@"%@:%@",_batchID,vendorName];
-    [act saveActivityToParse:@"Batch Completed" : actData];
+    [self updateBatchProgress : @"Batch Completed"];
     [self.delegate didCompleteBatch];
     [self writeBatchReport];
 }
@@ -266,8 +288,8 @@ static BatchObject *sharedInstance = nil;
     }
 #endif
     batchCount++;
-    //Last file? Bail... we are now waiting on asynchronous operations to complete...
-    if (batchCount > batchTotal)  return;
+    //Last file? Time for next vendor!
+    if (batchCount > batchTotal)  [self startNextVendorBatch : TRUE];
 
     int i = batchCount-1; //Batch Count is 1...n
     if (i < 0 || i >= pdfEntries.count) return; //Out of bounds!
@@ -284,9 +306,7 @@ static BatchObject *sharedInstance = nil;
         //remember the filename...comma on 2nd... file
         if (batchCount > 1) batchFiles = [batchFiles stringByAppendingString:@","];
         batchFiles = [batchFiles stringByAppendingString:lastFileProcessed];
-        batchProgress = [NSString stringWithFormat:@"Download CSV..."];
-        [self.delegate batchUpdate : batchProgress];
-        [act saveActivityToParse : batchProgress : lastFileProcessed];
+        [self updateBatchProgress : @"Download CSV..."];
         [dbt downloadCSV : lastFileProcessed : vendorName];
     }
     else
@@ -294,10 +314,7 @@ static BatchObject *sharedInstance = nil;
         //remember the filename...comma on 2nd... file
         if (batchCount > 1) batchFiles = [batchFiles stringByAppendingString:@","];
         batchFiles = [batchFiles stringByAppendingString:lastFileProcessed];
-        batchProgress = [NSString stringWithFormat:@"Download PDF..."];
-        [self.delegate batchUpdate : batchProgress];
-        //DHS 1/16 keep batch activity abreast of stuff...
-        [act saveActivityToParse : batchProgress : lastFileProcessed];
+        [self updateBatchProgress : @"Download PDF..."];
         if ([pc imageExistsByID:lastFileProcessed : 1])  // 1/19 pdf cache more logical
         {
             NSLog(@" PDF Cache HIT! %@",lastFileProcessed);
@@ -441,6 +458,16 @@ static BatchObject *sharedInstance = nil;
 }
 
 //=============(BatchObject)=====================================================
+-(void) updateBatchProgress : (NSString *)message
+{
+    [self.delegate batchUpdate : message]; //Should update UI if possible
+    NSString* arg2 = @"";
+    if (lastFileProcessed != nil) arg2 = lastFileProcessed;
+    [act saveActivityToParse : message : arg2];
+}
+
+
+//=============(BatchObject)=====================================================
 -(void) readFromParseByID : (NSString *) bID
 {
     PFQuery *query = [PFQuery queryWithClassName:tableName];
@@ -540,7 +567,8 @@ static BatchObject *sharedInstance = nil;
 
 
 //=============(BatchObject)=====================================================
-// Saves batch report in file named B_WHATEVERDATE.txt, saves in caches folder for now
+// Saves batch report in file named B_WHATEVERDATE.txt,
+//   and in dropbox processedFiles area...
 -(void) writeBatchReport
 {
     NSString *path = [NSString stringWithFormat:@"%@/%@.txt",cachesDirectory,_batchID];
@@ -562,29 +590,34 @@ static BatchObject *sharedInstance = nil;
     {
         s = [s stringByAppendingString:[NSString stringWithFormat:@"->%@\n",ns]];
     }
-
+    batchReportString = s;
     //Save locally...
     NSData *data =[s dataUsingEncoding:NSUTF8StringEncoding];
     [data writeToFile:path atomically:YES];
-    NSLog(@" ...writeBatchReport %@",path);
+    NSLog(@" ...writeBatchReport local %@",path);
     NSLog(@" ...   string %@",s);
 
     //Save to Dropbox...
-    //last filename looks like: /inputfolder/vendor/filename.pdf
+    //break up lastFileProcessed, looks like: /inputfolder/vendor/filename.pdf
     NSMutableArray *chunks = (NSMutableArray*)[lastFileProcessed componentsSeparatedByString:@"/"];
     if (chunks.count >= 4)
     {
+        ///outputFolder/reports/fname
         AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        chunks[1] = bappDelegate.settings.outputFolder;
-        chunks[3] = [NSString stringWithFormat:@"%@_report.txt",_batchID];
-//        chunks[3] = @"report.txt";
-        NSString *outputPath = [chunks componentsJoinedByString:@"/"];
-        DropboxTools *dbt = [DropboxTools sharedInstance];
-        [dbt saveTextFile : outputPath : s];
-        NSLog(@" ...report saved to dropbox: %@",outputPath);
+        NSString *folderPath = [NSString stringWithFormat : @"/%@/reports",bappDelegate.settings.outputFolder];
+        [dbt createFolderIfNeeded:folderPath]; //Delegate callback handles reset
     }
     return;
 } //end writeBatchReport
+
+//===========<OCRTemplateDelegate>================================================
+// Called by delegate callbacks after output folder is created or exists
+-(void) finishSavingReportToDropbox : (NSString *)filePath
+{
+    NSString *outputPath = [NSString stringWithFormat : @"%@/%@_report.txt",filePath,_batchID];
+    NSLog(@" ...save report %@",outputPath);
+    [dbt saveTextFile : outputPath : batchReportString];
+} //end finishSavingReportToDropbox
 
 
 
@@ -609,9 +642,9 @@ static BatchObject *sharedInstance = nil;
 -(void) didCountEntries:(NSString *)vname :(int)count
 {
     //NSLog(@" didcountp[%@]  %d",vname,count);
+    [vendorFileCounts addObject:@{@"Vendor": vname,@"Count":[NSNumber numberWithInt:count]}];
     if (count != 0)
     {
-        [vendorFileCounts addObject:@{@"Vendor": vname,@"Count":[NSNumber numberWithInt:count]}];
         [vendorFolders setObject:dbt.entries forKey:vname];
     }
     returnCount++; //Count returns, did we hit all the vendors? let delegate know
@@ -654,6 +687,20 @@ static BatchObject *sharedInstance = nil;
     [self addError : s : @"n/a": @"n/a"];
 }
 
+
+//===========<OCRTemplateDelegate>================================================
+- (void)didCreateFolder : (NSString *)folderPath
+{
+    [self finishSavingReportToDropbox : folderPath];
+}
+
+//===========<OCRTemplateDelegate>================================================
+- (void)errorCreatingFolder : (NSString *)folderPath
+{
+    [self finishSavingReportToDropbox : folderPath];
+}
+
+
 #pragma mark - OCRTemplateDelegate
 
 //===========<OCRTemplateDelegate>================================================
@@ -666,15 +713,15 @@ static BatchObject *sharedInstance = nil;
 
 }
 
+
+
 //===========<OCRTemplateDelegate>================================================
 - (void)errorReadingTemplate : (NSString *)errmsg
 {
     NSString *s = [NSString stringWithFormat:@"%@ Template Error [%@]",vendorName,errmsg];
     gotTemplate = FALSE;
     [self addError : s : @"n/a": @"n/a"];
-    [self completeBatch];
-    //MUST END BATCH!
-    //asdf
+    [self startNextVendorBatch : TRUE];
 }
 
 
@@ -703,7 +750,7 @@ static BatchObject *sharedInstance = nil;
 {
     [self addError : errMsg : @"n/a": @"n/a"];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self completeBatch];
+        [self processNextFile];
     });
 }
 
@@ -712,7 +759,7 @@ static BatchObject *sharedInstance = nil;
 {
     [self addError : errMsg : @"n/a": @"n/a"];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self completeBatch];
+        [self processNextFile];
     });
 }
 
@@ -720,9 +767,9 @@ static BatchObject *sharedInstance = nil;
 //===========<OCRTopObjectDelegate>================================================
 - (void)didSaveOCRDataToParse : (NSString *) s
 {
-    NSLog(@" OK: full OCR -> DB done, invoice %@",s);
+    NSLog(@" OK: vendor OCR -> DB done, invoice %@",s);
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self completeBatch];
+        [self processNextFile];
     });
 }
 

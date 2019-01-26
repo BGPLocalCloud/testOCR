@@ -4,17 +4,6 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
-	<key>CFBundleDocumentTypes</key>
-	<dict>
-		<key>CFBundleTypeName</key>
-		<string>public.pdf</string>
-		<key>CFBundleTypeRole</key>
-		<string>Viewer</string>
-		<key>LSHandlerRank</key>
-		<string>Owner</string>
-		<key>LSItemContentTypes</key>
-		<string>com.adobe.pdf</string>
-	</dict>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -26,7 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.037</string>
+	<string>1.0.039</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -39,7 +28,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1.0.037</string>
+	<string>1.0.039</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>

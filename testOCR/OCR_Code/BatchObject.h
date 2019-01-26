@@ -47,7 +47,8 @@
     
     BOOL gotTemplate;
     NSString *batchFolder;
-
+    BOOL runAllBatches;
+    int vendorIndex;  //Index to vendors object for currentbatch
     NSString *vendorName; //Whose batch we're running
     NSString *vendorRotation; //Are pages rotated typically?
     NSString *vendorFolderName;  
@@ -77,6 +78,7 @@
 
     OCRCache *oc;
     PDFCache *pc;
+    NSString *batchReportString;
 
 }
 @property (nonatomic , strong) NSString* batchID;
@@ -87,7 +89,7 @@
 
 + (id)sharedInstance;
 
--(void) addError : (NSString *) errDesc : (NSString *) objectID;
+-(void) addError : (NSString *) errDesc : (NSString *) objectID : (NSString*) productName;
 -(void) fixError : (int) index;
 -(void) fixWarning : (int) index;
 -(BOOL) isErrorFixed :(NSString *)errStr;

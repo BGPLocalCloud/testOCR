@@ -12,7 +12,8 @@
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 // New columns? PDF source URL?  OCR'ed TextDump? is this useful?
-
+// 1/25 add invoice update, adds new objectIDs to existing record...
+//
 #import "invoiceTable.h"
 
 @implementation invoiceTable
@@ -94,6 +95,40 @@
 } //end packInvoiceOids
 
 //=============(invoiceTable)=====================================================
+// Gets invoice, if not there creates object.
+//   if it exists, updates PInv_EXPObjectID_key field with new info and saves
+-(void) updateInvoice : (NSString *)vendor : (NSString *)invoiceNumberstring
+{
+    NSLog(@" updateInvoice %@",invoiceNumberstring);
+    [self setupVendorTableName:vendor];
+    if (tableName.length < 1) return; //Error: no table name!
+    PFQuery *query = [PFQuery queryWithClassName:tableName];
+    [query whereKey:PInv_InvoiceNumber_key equalTo:invoiceNumberstring];
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) { //Query came back...
+            if (objects.count == 0) [self saveToParse];  //Nothing? Just save
+            else for( PFObject *pfo in objects)         //Exists? Update first object
+            {
+                NSString *oldOIDs    = pfo[PInv_EXPObjectID_key];
+                NSString *newOIDs    = self->packedOIDs;
+                newOIDs              = [NSString stringWithFormat:@"%@,%@",oldOIDs,newOIDs];
+                pfo[PInv_EXPObjectID_key] = newOIDs;
+                NSLog(@" ...found, update Invoice:%@",newOIDs);
+                [pfo saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                    if (succeeded) {
+                        NSLog(@" ...update save OKI");
+                        [self.delegate didUpdateInvoiceTable:invoiceNumberstring];
+                    } else {
+                        NSLog(@" ERROR: updating invoice: %@",error.localizedDescription);
+                    }
+                }];
+                break; //Done after one
+            } //end else
+        }    //end !error
+    }];     //end query
+} //end updateInvoice
+
+//=============(invoiceTable)=====================================================
 //Reads one invoice, using vendor and number
 -(void) readFromParse : (NSString *)vendor : (NSString *)invoiceNumberstring
 {
@@ -173,12 +208,8 @@
     //NSLog(@" itable savetoParse...");
     [iRecord saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
         if (succeeded) {
-            NSLog(@" ...invoiceTable [vendor:%@]->parse",self->_ivendor);
+            NSLog(@" ...invoice [vendor:%@]->parse",self->_ivendor);
             //NSString *objID = iRecord.objectId;
-            // HMM this is broken. maybe we need to use NSNotification to send
-            //  objectID's across objects over to the batchObject singleton.
-            //AppDelegate *gappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-            //[gappDelegate.bbb addOID:objID : self->tableName]; //Links current batcself->h to this record
             [self.delegate didSaveInvoiceTable:self->_inumber];
         } else {
             NSLog(@" ERROR: saving invoice: %@",error.localizedDescription);

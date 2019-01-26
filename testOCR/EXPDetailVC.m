@@ -9,7 +9,7 @@
 //  testOCR
 //
 //  Created by Dave Scruton on 1/4/19.
-//  Copyright © 2019 huedoku. All rights reserved.
+//  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 
 #import "EXPDetailVC.h"

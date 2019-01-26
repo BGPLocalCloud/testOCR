@@ -328,8 +328,6 @@
 				7206008C21B64052000B26DC /* EditTemplateVC.m */,
 				7209159121E0908B00F94258 /* ErrorViewController.h */,
 				7209159221E0908C00F94258 /* ErrorViewController.m */,
-				7209159421E0982A00F94258 /* errorCell.h */,
-				7209159521E0982A00F94258 /* errorCell.m */,
 				720C17B821CCC1150059CA2D /* AddTemplateViewController.h */,
 				72E785AB21CCBFC600EEEF1F /* AddTemplateViewController.m */,
 				72AFBE9221D4AEA400B75388 /* CheckTemplateVC.h */,
@@ -489,6 +487,8 @@
 			children = (
 				7290229A21D58FF900885EF9 /* activityCell.h */,
 				7290229B21D58FF900885EF9 /* activityCell.m */,
+				7209159421E0982A00F94258 /* errorCell.h */,
+				7209159521E0982A00F94258 /* errorCell.m */,
 				729E92B021DBE25B00048DAF /* EXPCell.m */,
 				729E92AF21DBE25B00048DAF /* EXPCell.h */,
 				728EECC621ED1DDB00F83129 /* invoiceCell.h */,
@@ -886,7 +886,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = HV8UXF4ZBD;
+				DEVELOPMENT_TEAM = Q3UNUAXG6Q;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -909,7 +909,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = HV8UXF4ZBD;
+				DEVELOPMENT_TEAM = Q3UNUAXG6Q;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

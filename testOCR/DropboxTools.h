@@ -12,6 +12,7 @@
 //  Created by Dave Scruton on 12/21/18.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  1/25 Got rid of singleton, too many different uses across app needing delegate callbacks..
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
@@ -38,9 +39,9 @@
 @property (nonatomic , strong) NSArray* entries;
 
 
-+ (id)sharedInstance;
 
 -(void) countEntries : (NSString *)batchFolder : (NSString *)vendorFolder;
+-(void) createFolderIfNeeded : (NSString *)folderPath;
 
 - (void)downloadImages:(NSString *)imagePath;
 - (void)downloadCSV : (NSString *)path : (NSString *)vendor;
@@ -63,6 +64,8 @@
 - (void)didGetBatchList : (NSArray *)a;
 - (void)didCountEntries : (NSString *)vname : (int) count;
 - (void)errorGettingBatchList : (NSString *)type : (NSString *)s;
+- (void)didCreateFolder : (NSString *)folderPath;
+- (void)errorCreatingFolder : (NSString *)folderPath;
 - (void)didDownloadImages;
 - (void)didDownloadTextFile : (NSString *)result;
 - (void)didDownloadCSVFile : (NSString *)vendor : (NSString *)result;

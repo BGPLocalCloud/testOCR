@@ -163,7 +163,7 @@
                       //NOT A STRING PInv_Date_key ,
                       PInv_LineNumber_key ,
                       PInv_InvoiceNumber_key ,
-                      PInv_Batch_key ,
+                      PInv_BatchID_key ,
                       PInv_ErrStatus_key ,
                       PInv_PDFFile_key
                       //NOT A STRING PInv_Page_key
