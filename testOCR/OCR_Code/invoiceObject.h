@@ -26,6 +26,8 @@
 @property (nonatomic , strong) NSString* customer;
 @property (nonatomic , strong) NSString* batchID;
 @property (nonatomic , strong) NSString* vendor;
+@property (nonatomic , strong) NSString* PDFFile;
+@property (nonatomic , strong) NSString* pageCount;
 
 
 @end

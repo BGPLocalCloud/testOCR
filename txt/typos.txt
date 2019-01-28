@@ -10,6 +10,7 @@ ereal = cereal
 ettuce = lettuce
 galdressing = gal dressing
 iceber = iceberg
+inach = spinach
 oup = soup
 joup = soup
 pples = apples
@@ -26,5 +27,6 @@ ucumbers = cucumbers
 ugar = sugar
 'hips = chips
 `hips = chips
+(tk.)rkey = turkey
 #I.E. check for first character missing!
 

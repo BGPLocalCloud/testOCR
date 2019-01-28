@@ -15,6 +15,8 @@
 
 #import <Foundation/Foundation.h>
 #import "OCRCategories.h"
+#import <Parse/Parse.h>
+#import "DBKeys.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -44,21 +46,26 @@ NS_ASSUME_NONNULL_BEGIN
     BOOL local;
     BOOL bulk;
     int lineNumber;
+    //Built-in values
     NSArray *beverageNames;
     NSArray *breadNames;
     NSArray *dairyNames;
     NSArray *dryGoodsNames;
-    NSArray *miscNames;    
+    NSArray *miscNames;
     NSArray *proteinNames;
     NSArray *produceNames;
+    NSArray *snacksNames;
     NSArray *suppliesNames;
     NSArray *nonProducts;
+    NSArray *categories;
     NSMutableArray *typos;
     NSMutableArray *fixed;
     NSMutableArray *splits;
     NSMutableArray *joined;
     NSMutableArray *wilds;
     NSMutableArray *notwilds;
+    
+    NSMutableDictionary *keywords;
 
     OCRCategories* occ; //Categories / processed / local lookup table
 }
@@ -101,6 +108,11 @@ NS_ASSUME_NONNULL_BEGIN
 -(NSString*) getDollarsAndCentsString : (float) fin;
 -(NSString*) getMinorErrorString;
 -(NSString*) getMajorErrorString;
+
+-(NSString*) getKeyword : (NSString*)category : (int) index;
+-(int) getKeywordCount : (NSString*)category;
+-(void) saveBuiltinKeywordsToParse;
+
 
 @end
 

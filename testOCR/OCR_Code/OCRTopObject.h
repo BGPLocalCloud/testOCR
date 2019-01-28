@@ -101,7 +101,7 @@
 -(void) stubbedOCR: (NSString*)imageName : (UIImage *)imageToOCR : (OCRTemplate *)ot;
 -(void) setupTestDocumentJSON : (NSDictionary *) json;  //FOR TESTING ONLY
 -(void) setupDocumentFrameAndParseJSON : (CGRect) r;
-- (void)applyTemplate : (OCRTemplate *)ot;             //FOR TESTING ONLY
+- (void)applyTemplate : (OCRTemplate *)ot : (int) page;             //FOR TESTING ONLY
 -(void) writeEXPToParse : (int) page;
 -(NSString *) dumpResults;
 

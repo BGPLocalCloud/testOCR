@@ -419,7 +419,7 @@
         //We only need the frame now!
         [oto setupDocumentFrameAndParseJSON : r];
         oto.totalLines = 0; //Stubbed call... this is for keeping track of multiple page
-        [oto applyTemplate:ot];
+        [oto applyTemplate : ot : 1];
         [oto writeEXPToParse : 0]; //Note 2nd arg is page!
         NSString *OCR_Results_Dump = [oto dumpResults];
         [self alertMessage:@"Invoice Dump" :OCR_Results_Dump];
@@ -1220,7 +1220,7 @@
     [it setupVendorTableName : supplierName];
     NSString *its = [NSString stringWithFormat:@"%4.2f",invoiceTotal];
     its = [od cleanupPrice:its]; //Make sure total is formatted!
-    [it setBasicFields:invoiceDate :invoiceNumberString : its : supplierName : invoiceCustomer];
+    [it setBasicFields:invoiceDate :invoiceNumberString : its : supplierName : invoiceCustomer : @"EmptyPDF" : @"1"];
     for (NSString *objID in a) [it addInvoiceItemByObjectID : objID];
     [it saveToParse];
 } //end didSaveEXPTable

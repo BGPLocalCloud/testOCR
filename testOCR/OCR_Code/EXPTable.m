@@ -443,7 +443,7 @@
                 [self->objectIDs addObject:objID];
                 self->returnCounts[page]++;
                 self->totalReturnCount++;
-                NSLog(@" ...EXP[%d] [%@/%@]->parse",i,exo.vendor,exo.productName);
+                NSLog(@" ...EXP[%d/%d] [%@/%@]->parse",self->totalReturnCount,self->totalSentCount,exo.vendor,exo.productName);
                 //NSLog(@" ...  EXP: ids %@",self->objectIDs);
                 //NSLog(@" for page[%d] sent %d return %d",page,self->sentCounts[page],self->returnCounts[page]);
                 //NSLog(@" for page[%d] totalsent %d totalreturn %d",page,self->totalSentCount,self->totalReturnCount);

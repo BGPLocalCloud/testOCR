@@ -146,6 +146,8 @@
                 self->_ivendor       = pfo[PInv_Vendor_key];
                 self->_versionNumber = pfo[PInv_VersionNumber];
                 self->packedOIDs     = pfo[PInv_EXPObjectID_key];
+                self->_PDFFile       = pfo[PInv_PDFFile_key];
+                self->_pageCount     = pfo[PInv_PageCount_key];
                 [self unpackInvoiceOids];
             }
             [self->_delegate didReadInvoiceTable];
@@ -205,6 +207,9 @@
     iRecord[PInv_EXPObjectID_key]   = packedOIDs;
     iRecord[PInv_BatchID_key]       = iappDelegate.batchID;
     iRecord[PInv_VersionNumber]     = _versionNumber;
+    iRecord[PInv_PDFFile_key]       = _PDFFile;
+    iRecord[PInv_PageCount_key]     = _pageCount;
+
     //NSLog(@" itable savetoParse...");
     [iRecord saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
         if (succeeded) {
@@ -218,13 +223,16 @@
 } //end saveToParse
 
 //=============(invoiceTable)=====================================================
--(void) setBasicFields : (NSDate *) ddd : (NSString*)num : (NSString*)total : (NSString*)vendor : (NSString*)customer
+-(void) setBasicFields : (NSDate *) ddd : (NSString*)num : (NSString*)total :
+                    (NSString*)vendor : (NSString*)customer : (NSString*)PDFFile : (NSString*)pageCount
 {
     _idate  = ddd;
     _inumber    = num;
     _itotal     = total;
     _ivendor    = vendor;
     _icustomer  = customer;
+    _PDFFile    = PDFFile;
+    _pageCount  = pageCount;
 } //end setBasicFields
 
 //=============(invoiceTable)=====================================================

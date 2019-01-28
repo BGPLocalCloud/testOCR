@@ -55,12 +55,17 @@
 //Invoice table items...
 #define PInv_EXPObjectID_key @"EXPObjectID"
 #define PInv_CustomerKey @"Customer"
+#define PInv_PageCount_key @"PageCount"
 
 //Batch table...
 #define PInv_BatchSOIDs_key     @"BatchSOIDs"
 
 //Vendor table...
 #define PInv_Rotated_key     @"Rotated"
+
+//Keyword table...
+#define PInv_Name_key     @"Name"
+
 
 //Generic
 #define PInv_VersionNumber @"versionNumber"

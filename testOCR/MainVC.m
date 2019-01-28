@@ -480,6 +480,7 @@
         {
             NSString *batchID = adItems[0];
             //NSLog(@" list[%d] bid %@",row,batchID);
+            cell.checkmark.hidden = FALSE; //Assume no errs...
             for (PFObject *pfo in batchPFObjects)
             {
                 if ([pfo[PInv_BatchID_key] isEqualToString:batchID]) //Batch Match? Look for errors
@@ -496,7 +497,6 @@
                         cell.checkmark.hidden              = TRUE;
                     }
                     else{ //No errors, show checkmark
-                        cell.checkmark.hidden              = FALSE;
                     }
                     bcount = [self countCommas:pfo[PInv_BatchWarnings_key]];
                     fcount = [self countCommas:pfo[PInv_BatchWFixed_key]];;
@@ -507,10 +507,6 @@
                         cell.badgeWLabel.text               = [NSString stringWithFormat:@"%d",wCount];
                         cell.badgeWLabel.layer.cornerRadius = 10;
                         cell.badgeWLabel.clipsToBounds      = YES;
-                        cell.wcheckmark.hidden              = TRUE;
-                    }
-                    else{ //No errors, show checkmark
-                        cell.wcheckmark.hidden              = FALSE;
                     }
                 } //end batch match
             } //end for (PFOb....)
@@ -519,7 +515,6 @@
     else //Non-batch activity?
     {
         cell.checkmark.hidden   = TRUE; //No checkmarks!
-        cell.wcheckmark.hidden  = TRUE;
         cell.badgeLabel.hidden  = TRUE;
         cell.badgeWLabel.hidden = TRUE;
     }
@@ -676,6 +671,9 @@ int currentYear = 2019;
 -(void) testit
 {
  
+   // smartProducts *smartp = [[smartProducts alloc] init];
+   // [smartp saveBuiltinKeywordsToParse]; //ONLY CALL THIS ONCE!
+   // NSLog(@" smart testit");
     return;
     
 //    AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];

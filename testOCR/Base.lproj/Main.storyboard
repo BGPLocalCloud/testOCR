@@ -64,7 +64,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="99" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5o5-dk-RPy">
-                                                    <rect key="frame" x="44" y="0.0" width="20" height="20"/>
+                                                    <rect key="frame" x="39" y="0.0" width="25" height="20"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <color key="backgroundColor" red="1" green="0.23456418492020248" blue="0.097490876519700453" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="12"/>
@@ -72,18 +72,14 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="99" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TwV-IT-ovK">
-                                                    <rect key="frame" x="44" y="44" width="20" height="20"/>
+                                                    <rect key="frame" x="39" y="44" width="25" height="20"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <color key="backgroundColor" red="1" green="0.78645154082790758" blue="0.12685598718550195" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="12"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="lilGreenCheck.png" translatesAutoresizingMaskIntoConstraints="NO" id="r4X-yc-S7Z">
-                                                    <rect key="frame" x="44" y="0.0" width="20" height="20"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                </imageView>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="lilGreenCheck.png" translatesAutoresizingMaskIntoConstraints="NO" id="cFK-cP-5wb">
-                                                    <rect key="frame" x="44" y="44" width="20" height="20"/>
+                                                    <rect key="frame" x="39" y="0.0" width="25" height="20"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
                                             </subviews>
@@ -109,7 +105,6 @@
                                             <outlet property="dateLabel" destination="UdF-vT-tBu" id="aPB-qM-uRN"/>
                                             <outlet property="icon" destination="Krs-oj-L0J" id="7xW-ZJ-t2h"/>
                                             <outlet property="topLabel" destination="rIB-jN-aXL" id="aCC-cM-WQ3"/>
-                                            <outlet property="wcheckmark" destination="cFK-cP-5wb" id="1gN-Lq-bbq"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>

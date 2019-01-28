@@ -31,17 +31,88 @@
         joined   =  [[NSMutableArray alloc] init];
         wilds    =  [[NSMutableArray alloc] init];
         notwilds =  [[NSMutableArray alloc] init];
+        keywords =  [[NSMutableDictionary alloc] init];
+        
         [self loadRulesTextFile : @"splits" : FALSE : splits : joined];
         [self loadRulesTextFile : @"typos"  : TRUE :  typos  : fixed];
         [self loadRulesTextFile : @"wild"   : TRUE :  wilds  : notwilds];
+        [self loadKeywordsFromParse];
     }
     return self;
 }
 
 //=============(smartProducts)=====================================================
+-(int) getKeywordCount : (NSString*)category
+{
+    if ([category.lowercaseString isEqualToString:@"beverage"])      return (int)beverageNames.count;
+    else if ([category.lowercaseString isEqualToString:@"bread"])    return (int)breadNames.count;
+    else if ([category.lowercaseString isEqualToString:@"dairy"])    return (int)dairyNames.count;
+    else if ([category.lowercaseString isEqualToString:@"drygoods"]) return (int)dryGoodsNames.count;
+    else if ([category.lowercaseString isEqualToString:@"misc"])     return (int)miscNames.count;
+    else if ([category.lowercaseString isEqualToString:@"protein"])  return (int)proteinNames.count;
+    else if ([category.lowercaseString isEqualToString:@"produce"])  return (int)produceNames.count;
+    else if ([category.lowercaseString isEqualToString:@"supplies"]) return (int)suppliesNames.count;
+
+    return 0;
+}
+
+//=============(smartProducts)=====================================================
+// Provides external access to the built-in categories
+-(NSString*) getKeyword : (NSString*)category : (int) index
+{
+    NSString *result = @"";
+    if (index < 0) return result;
+    if ([category.lowercaseString isEqualToString:@"beverage"])
+    {
+        if (index < beverageNames.count) return beverageNames[index];
+    }
+    else if ([category.lowercaseString isEqualToString:@"bread"])
+    {
+        if (index < breadNames.count) return breadNames[index];
+    }
+    else if ([category.lowercaseString isEqualToString:@"dairy"])
+    {
+        if (index < dairyNames.count) return dairyNames[index];
+    }
+    else if ([category.lowercaseString isEqualToString:@"drygoods"])
+    {
+        if (index < dryGoodsNames.count) return dryGoodsNames[index];
+    }
+    else if ([category.lowercaseString isEqualToString:@"misc"])
+    {
+        if (index < miscNames.count) return miscNames[index];
+    }
+    else if ([category.lowercaseString isEqualToString:@"protein"])
+    {
+        if (index < proteinNames.count) return proteinNames[index];
+    }
+    else if ([category.lowercaseString isEqualToString:@"produce"])
+    {
+        if (index < produceNames.count) return produceNames[index];
+    }
+    else if ([category.lowercaseString isEqualToString:@"supplies"])
+    {
+        if (index < suppliesNames.count) return suppliesNames[index];
+    }
+    return result;
+} //end getKeyword
+
+//=============(smartProducts)=====================================================
 //STUBBED FOR NOW, use DB
 -(void) loadTables
 {
+    
+    categories = @[  //CANNED stuff that never is a product
+                    @"beverage",
+                    @"bread",
+                    @"dairy",
+                    @"drygoods",
+                    @"misc",
+                    @"protein",
+                    @"produce",
+                    @"supplies"
+                    ];
+
     nonProducts = @[  //CANNED stuff that never is a product
                     @"subtotal",
                     @"charge",
@@ -57,6 +128,7 @@
                       @"coffee",
                       @"coke",
                       @"cream",
+                      @"drink",
                       @"drink mix",
                       @"ginger ale",
                       @"grape juice",
@@ -75,9 +147,11 @@
     breadNames = @[
                    @"bagel",
                    @"bread",
+                   @"bun",
                    @"dough",
                    @"english",
                    @"muffin",
+                   @"roll",
                    @"tortilla",
                    @"waffle"
                   ];
@@ -113,6 +187,7 @@
                       @"cereal",
                       @"chicken base",
                       @"chowder",
+                      @"coconut",
                       @"coconut milk",
                       @"condensed milk",
                       @"corn meal",
@@ -129,6 +204,7 @@
                       @"filling cherry pie",
                       @"filling blueberry",
                       @"flour",
+                      @"fries",
                       @"fruit tropical mix",
                       @"fruit bowl",
                       @"fruit cocktail",
@@ -142,6 +218,7 @@
                       @"mashed potatoes",
                       @"mayonnaise",
                       @"mustard",
+                      @"noodle",
                       @"oats",
                       @"oil",
                       @"olives",
@@ -150,6 +227,7 @@
                       @"paprika",
                       @"pasta",
                       @"paste",
+                      @"peanut",
                       @"penne",
                       @"pepper",
                       @"peaches", //NEVER FRESH?
@@ -170,8 +248,10 @@
                       @"tahini",
                       @"thickener",
                       @"tortilla",
+                      @"tofu",
                       @"topping",
                       @"vanilla",
+                      @"vegetables",
                       @"vienna sausage", //WHY NOT PROTEIN?
                       @"vinegar",
                       @"wafer"
@@ -185,6 +265,7 @@
                      @"brst",
                      @"capicolla",
                      @"chicken",
+                     @"crab",
                      @"eggs",
                      @"fish",
                      @"fishcake",
@@ -204,6 +285,7 @@
                      @"berries",
                      @"bok choy",
                      @"blueberries",
+                     @"breadfruit",
                      @"broccoli",
                      @"cantaloupes",
                      @"cabbage",
@@ -225,6 +307,7 @@
                      @"papaya",
                      @"papayas",
                      @"peas",
+                     @"pineapple",
                      @"pineapples",
                      @"potato",
                      @"potatoes",
@@ -238,7 +321,15 @@
                      @"vegetable blend",
                      @"watermelon"
                      ];
-    suppliesNames = @[ //CANNED
+    snacksNames = @[
+                    @"chips",
+                    @"cookie",
+                    @"cookies",
+                    @"gelatin"
+                    ];
+    suppliesNames = @[
+                      @"cont",
+                      @"cups",
                       @"degreaser",
                       @"delimer",
                       @"detergent",
@@ -284,6 +375,46 @@
     _analyzedDateString = @"";
 
 }
+
+
+//=============(OCRTemplate)=====================================================
+// Only run once, to set up external keywords table on DB
+-(void) saveBuiltinKeywordsToParse
+{
+    //Loop over all types, then over all kw's...
+    for (NSString *cat in categories)
+    {
+        for (int i=0;i<[self getKeywordCount:cat];i++) //Get each kw in category
+        {
+            PFObject *kwRecord = [PFObject objectWithClassName:@"Keywords"];
+            kwRecord[PInv_Category_key] = cat;
+            NSString *keyword = [self getKeyword:cat :i];
+            kwRecord[PInv_Name_key] = keyword;
+            NSLog(@" ...write [%@]%@",cat,keyword);
+            [kwRecord saveEventually]; //Just save right off, don't care about return
+        }
+    }
+} //end saveBuiltinKeywordsToParse
+
+//=============(smartProducts)=====================================================
+-(void) loadKeywordsFromParse
+{
+    PFQuery *query = [PFQuery queryWithClassName:@"Keywords"];
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            [self->keywords removeAllObjects];
+            for (PFObject *pfo in objects)
+            {
+                NSString *keyword = pfo[PInv_Name_key];
+                NSString *cat     = pfo[PInv_Category_key];
+                [self->keywords setObject:cat forKey:keyword];
+            }
+            NSLog(@" ...loaded keywords");
+        }
+    }];
+     
+}
+
 
 //=============(smartProducts)=====================================================
 -(void) clear
@@ -420,9 +551,11 @@
     // Get product category / processed / local / bulk / etc....
     //Try matching with built-in CSV file cat.txt first...
     BOOL found = FALSE;
+#ifdef USE_CATEGORIES_FILE
     NSArray *a = [occ matchCategory:fullProductName]; //Returns array[4] on matche...
     if (a != nil && a.count >=4)  //Hit?
     {
+        NSLog(@" OCC Cat match [%@]",fullProductName);
         _analyzedCategory  = a[0]; //Get canned data out from array...
         _analyzedProcessed = a[2];
         _analyzedLocal     = a[3];
@@ -435,6 +568,7 @@
         _analyzedProductName = fullProductName; //Set output product name!
         found = TRUE;
     }
+#endif
     //Miss? Try matching words in the product name with some generic lists of items...
     //  Must do it word-by-word, so it's SLOW...
     for (NSString *nextWord in pItems) //Note we bail this section immediately if found is true
@@ -442,7 +576,7 @@
         if (found) break;
         NSString *lowerCase = [nextWord lowercaseString]; //Always match on lowercase
         lowerCase = [lowerCase   stringByReplacingOccurrencesOfString:@"/" withString:@""]; //Get rid of illegal stuff!
-        if ([beverageNames indexOfObject:lowerCase] != NSNotFound) // Protein category Found?
+        if ([beverageNames indexOfObject:lowerCase] != NSNotFound) // Beverage category Found?
         {
             found = TRUE;
             _analyzedCategory = BEVERAGE_CATEGORY;
@@ -450,7 +584,7 @@
             processed = TRUE;
             bulk = TRUE;
         }
-        else if ([breadNames indexOfObject:lowerCase] != NSNotFound) // Protein category Found?
+        else if ([breadNames indexOfObject:lowerCase] != NSNotFound) // Bread category Found?
         {
             found = TRUE;
             _analyzedCategory = BREAD_CATEGORY;
@@ -458,7 +592,7 @@
             processed = TRUE;
             bulk = TRUE;
         }
-        else if ([dairyNames indexOfObject:lowerCase] != NSNotFound) // Protein category Found?
+        else if ([dairyNames indexOfObject:lowerCase] != NSNotFound) // Dairy category Found?
         {
             found = TRUE;
             _analyzedCategory = DAIRY_CATEGORY;
@@ -466,7 +600,7 @@
             processed = TRUE;    //   UOM/processed/bulk, matching product names one for one
             bulk = TRUE;
         }
-        else if ([dryGoodsNames indexOfObject:lowerCase] != NSNotFound) // Protein category Found?
+        else if ([dryGoodsNames indexOfObject:lowerCase] != NSNotFound) // Dry Goods category Found?
         {
             found = TRUE;
             _analyzedCategory = DRY_GOODS_CATEGORY;
@@ -474,7 +608,7 @@
             processed = TRUE;
             bulk = TRUE;
         }
-        else if ([miscNames indexOfObject:lowerCase] != NSNotFound) // Protein category Found?
+        else if ([miscNames indexOfObject:lowerCase] != NSNotFound) // Misc category Found?
         {
             found = TRUE;
             _analyzedCategory = MISC_CATEGORY;
@@ -482,7 +616,7 @@
             processed = FALSE;
             bulk = FALSE;
         }
-        else if ([produceNames indexOfObject:lowerCase] != NSNotFound) // Protein category Found?
+        else if ([produceNames indexOfObject:lowerCase] != NSNotFound) // Produce category Found?
         {
             found = TRUE;
             _analyzedCategory = PRODUCE_CATEGORY;
@@ -498,7 +632,15 @@
             processed = FALSE; //Is ground beef processed?
             bulk = TRUE; //Is this ok for all meat?
         }
-        else if ([suppliesNames indexOfObject:lowerCase] != NSNotFound) // Protein category Found?
+        else if ([snacksNames indexOfObject:lowerCase] != NSNotFound) // Snacks category Found?
+        {
+            found = TRUE;
+            _analyzedCategory = SNACKS_CATEGORY;
+            _analyzedUOM = @"case";
+            processed = TRUE;
+            bulk = FALSE;
+        }
+        else if ([suppliesNames indexOfObject:lowerCase] != NSNotFound) // Supplies category Found?
         {
             found = TRUE;
             _analyzedCategory = SUPPLIES_CATEGORY;

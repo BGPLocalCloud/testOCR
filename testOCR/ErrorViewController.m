@@ -345,7 +345,7 @@
 -(NSString *) getIDFromErrorString : (NSString *)errString
 {
     NSArray *sItems = [errString componentsSeparatedByString:@":"];
-    if (sItems.count > 1)
+    if (sItems.count > 2) //DHS 1/27 format is E : ErrMsg : objectID
     {
         NSString *s = sItems[2]; //If not n/a it is an objectID
         if (![s containsString:@"/"] ) return s;
@@ -361,7 +361,9 @@
     [expRecordsByID removeAllObjects];
     for (NSString *e in errorList)
     {
+        NSLog(@" err %@",e);
         NSString *s = [self getIDFromErrorString : e];
+        NSLog(@" .....s %@",s);
         if (s.length > 0) [objectIDs addObject: s];
     }
     [et getObjectsByIDs : objectIDs];

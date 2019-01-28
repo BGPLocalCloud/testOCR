@@ -38,12 +38,15 @@
 @property (nonatomic , strong) NSString* ivendor;
 @property (nonatomic , strong) NSString* icustomer;
 @property (nonatomic , strong) NSString* versionNumber;
+@property (nonatomic , strong) NSString* PDFFile;
+@property (nonatomic , strong) NSString* pageCount;
 
 @property (nonatomic, unsafe_unretained) id <invoiceTableDelegate> delegate; // receiver of completion messages
 
 
 -(void) addInvoiceItemByObjectID:(NSString *)oid;
--(void) setBasicFields : (NSDate *) ddd : (NSString*)num : (NSString*)total : (NSString*)vendor : (NSString*)customer;
+-(void) setBasicFields : (NSDate *) ddd : (NSString*)num : (NSString*)total :
+                (NSString*)vendor : (NSString*)customer : (NSString*)PDFFile : (NSString*)pageCount;
 -(void) clear;
 -(int) getItemCount;
 -(void) readFromParse : (NSString *)vendor : (NSString *)invoiceNumberstring;

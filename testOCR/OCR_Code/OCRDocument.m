@@ -600,7 +600,7 @@
         db.frame = nr;
         db.items = na;
         [headerArray addObject:db];
-        NSLog(@" col %d rect %@",col,NSStringFromCGRect(nr));
+        //NSLog(@" col %d rect %@",col,NSStringFromCGRect(nr));
         //Space over some, reset our left edge for the next column
         xLeft = (nr.origin.x + nr.size.width) + 1*_glyphHeight;
         col++;
@@ -704,7 +704,7 @@
     //NOTE the rowYs array is coming in in DOCUMENT coords!!!
     NSMutableArray *resultStrings = [[NSMutableArray alloc] init];
     int yc = (int)finalYs.count;
-    NSLog(@" col %d yc %d",column,yc);
+    //NSLog(@" col %d yc %d",column,yc);
     int lastYSize = 0;
     for (int i=0;i<yc;i++)
     {
@@ -725,7 +725,7 @@
         CGRect docRect = [self  template2DocRect : cr];
 //        NSLog(@" getColumnString:(col %d row %d) rect %@ thisy %d nexty %d",
 //              column,i,NSStringFromCGRect(docRect),thisY,nextY);
-        [self dumpArray:a];
+        //[self dumpArray:a];
         [resultStrings addObject:[self assembleWordFromArray : a : FALSE : 2]];
         lastYSize = nextY - thisY;
     }
@@ -769,7 +769,7 @@
 {
     //Get all content within this rect, assume one item per line!
     NSMutableArray *a = [self findAllWordsInRect:rr];
-    NSLog(@" getColumnYPositionsInRect %d,%d : %d,%d",(int)rr.origin.x,(int)rr.origin.y,(int)rr.size.width,(int)rr.size.height);
+    //NSLog(@" getColumnYPositionsInRect %d,%d : %d,%d",(int)rr.origin.x,(int)rr.origin.y,(int)rr.size.width,(int)rr.size.height);
     //[self dumpArrayFull:a];
     NSMutableArray *colPairs = [[NSMutableArray alloc] init];
     int oldy = -99999;

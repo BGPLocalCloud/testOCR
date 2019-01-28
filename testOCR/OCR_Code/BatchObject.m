@@ -171,7 +171,8 @@ static BatchObject *sharedInstance = nil;
     }
     if (!_authorized) return; //can't get at dropbox w/o login!
     [self getNewBatchID];
-    [self updateBatchProgress : [NSString stringWithFormat:@"Batch Started:%@",_batchID]];
+    NSString *actData = [NSString stringWithFormat:@"%@:%@",_batchID,vendorName];
+    [act saveActivityToParse:@"Batch Started" : actData];
     
     AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     bappDelegate.batchID = _batchID; //This way everyone can see the batch
@@ -200,7 +201,7 @@ static BatchObject *sharedInstance = nil;
         vendorIndex   = 0;
         runAllBatches = TRUE;
         [self startNextVendorBatch : FALSE];
-        NSLog(@" run ALL batches..."); //asdf
+        NSLog(@" run ALL batches...");
     }
 } //end runOneOrMoreBatches
 
@@ -208,19 +209,32 @@ static BatchObject *sharedInstance = nil;
 // Get next vendor with staged files and start batch
 -(void) startNextVendorBatch : (BOOL) preIncrement
 {
-    if (!runAllBatches) [self completeBatch : 0]; //Bail on single batch only...
+    if (!runAllBatches) //Single vendor ? Complete batch / bail
+    {
+        [self completeBatch : 0]; //Bail on single batch only...
+        return;
+    }
     if (preIncrement) vendorIndex++;
     int vfcsize = (int)vv.vFileCounts.count;
-    if (vendorIndex >= vfcsize) [self completeBatch : 1];
+    int vfnsize = (int)vv.vNames.count;
+    NSLog(@" vfcsize %d vs vfnsize %d",vfcsize,vfnsize);
+    //NOTE filecounts can be larger than vendor counts!
+    if (vendorIndex >= vfnsize) [self completeBatch : 1];
     //Find next vendor with staged files...
     BOOL found = FALSE;
-    while (vendorIndex < vfcsize && !found)
+    while (vendorIndex < vfnsize && !found)
     {
+        NSLog(@" vendorIndex %d vs vfnsize %d",vendorIndex,vfnsize);
         if ([self getVendorFileCount : vv.vNames[vendorIndex]] > 0) found = TRUE;
         else vendorIndex++;
     } //End while...
-    if (vendorIndex >= vfcsize) [self completeBatch : 2];               //End of vendors? Done!
-    else                        [self startBatchForCurrentVendor]; //More? Run next batch!
+    //Hmm vendorindex never gets to vfnsize? 1/27
+    if (vendorIndex >= vfnsize) [self completeBatch : 2];               //End of vendors? Done!
+    else //Next vendor? Only if running all batches!
+    {
+        if (runAllBatches) [self startBatchForCurrentVendor]; //More? Run next batch!
+        else               [self completeBatch : 3];
+    }
 } //end StartNextVendorBatch
 
 //=============(BatchObject)=====================================================
@@ -231,7 +245,7 @@ static BatchObject *sharedInstance = nil;
     vendorFolderName = vv.vFolderNames[vendorIndex];
     vendorRotation   = vv.vRotations[vendorIndex];  //For templates: portrait / landscape orient
     [self updateParse];
-    [self updateBatchProgress : [NSString stringWithFormat:@"Next Vendor:%@",vendorName]];
+    [self updateBatchProgress : [NSString stringWithFormat:@"Get Template:%@",vendorName] : FALSE];
     gotTemplate = FALSE;
     //After template comes through THEN dropbox is queued up to start downloading!
     [ot readFromParse:vendorName]; //Get our template, delegate return continues processing
@@ -241,10 +255,12 @@ static BatchObject *sharedInstance = nil;
 //=============(BatchObject)=====================================================
 -(void) completeBatch : (int) wherefrom
 {
+    if (![batchStatus isEqualToString: BATCH_STATUS_RUNNING]) return; //In case of multiple completes?
     if ([batchStatus isEqualToString: BATCH_STATUS_COMPLETED]) return; //No dupes
     batchStatus = BATCH_STATUS_COMPLETED;
     [self updateParse];
-    [self updateBatchProgress : @"Batch Completed"];
+    NSString *actData = [NSString stringWithFormat:@"%@:%@",_batchID,vendorName];
+    [act saveActivityToParse:@"Batch Completed" : actData];
     [self.delegate didCompleteBatch];
     [self writeBatchReport];
 }
@@ -260,18 +276,20 @@ static BatchObject *sharedInstance = nil;
 
 //=============(BatchObject)=====================================================
 // Given a list of PDF's in one vendor folder, download pDF and
-//  run OCR on all pages...
+//  run OCR on all pages... assumes template loaded and dbt.getBatchList was called....
 -(void) startProcessingFiles
 {
     batchTotal = (int)pdfEntries.count;
+    NSLog(@" start processing for vendor %@ count %d",vendorName,batchTotal);
+    [self updateBatchProgress : [NSString stringWithFormat:@"Process Files:%@",vendorName] : FALSE];
     batchCount = 0;
-    [self processNextFile];
+    [self processNextFile : 4];
 } //end startProcessingFiles
 
 
 //=============(BatchObject)=====================================================
 // Major step in batch process, gets repeatedly called for each OCR job
--(void) processNextFile
+-(void) processNextFile : (int) whereFrom
 {
     // Rename last processed file...
 #ifdef RENAME_FILES_AFTER_PROCESSING
@@ -289,24 +307,32 @@ static BatchObject *sharedInstance = nil;
 #endif
     batchCount++;
     //Last file? Time for next vendor!
-    if (batchCount > batchTotal)  [self startNextVendorBatch : TRUE];
+    if (batchCount > batchTotal) //1/28 bail when done, don't go below here
+    {
+        //This should be AFTER we are done with invoices!
+        [self startNextVendorBatch : TRUE];
+        return;
+    }
 
     int i = batchCount-1; //Batch Count is 1...n
     if (i < 0 || i >= pdfEntries.count) return; //Out of bounds!
     DBFILESMetadata *entry = pdfEntries[i];
     lastFileProcessed = [NSString stringWithFormat:@"%@/%@",dbt.prefix,entry.name];
-    NSLog(@" processing %@",lastFileProcessed);
+    NSLog(@" processing %@ ... (%d)",lastFileProcessed,whereFrom);
     //Check for "skip" string, ignore file if so...
     if ([lastFileProcessed.lowercaseString containsString:@"skip"]) //Skip this file?
     {
-        [self processNextFile];  //Re-entrant call, should be OK
+        NSLog(@" ...skip %@",lastFileProcessed);//asdf
+        [self updateBatchProgress : [NSString stringWithFormat:@"   skip:%@",lastFileProcessed] : FALSE];
+
+        [self processNextFile : 0];  //Re-entrant call, should be OK
     }
     else if ([lastFileProcessed.lowercaseString containsString:@".csv"]) // CSV File?
     {
         //remember the filename...comma on 2nd... file
         if (batchCount > 1) batchFiles = [batchFiles stringByAppendingString:@","];
         batchFiles = [batchFiles stringByAppendingString:lastFileProcessed];
-        [self updateBatchProgress : @"Download CSV..."];
+        [self updateBatchProgress : @"Download CSV..." : TRUE];
         [dbt downloadCSV : lastFileProcessed : vendorName];
     }
     else
@@ -314,10 +340,13 @@ static BatchObject *sharedInstance = nil;
         //remember the filename...comma on 2nd... file
         if (batchCount > 1) batchFiles = [batchFiles stringByAppendingString:@","];
         batchFiles = [batchFiles stringByAppendingString:lastFileProcessed];
-        [self updateBatchProgress : @"Download PDF..."];
-        if ([pc imageExistsByID:lastFileProcessed : 1])  // 1/19 pdf cache more logical
+        [self updateBatchProgress : @"Download PDF..." : TRUE];
+        //if ([pc imageExistsByID:lastFileProcessed : 1])  // 1/19 pdf cache more logical
+        //If we use the PDF cache, it's possible that the file images came down but the OCR did NOT.
+        //  in that case the OCR never goes through, it gets a nil file reference and fails
+        if ([oc txtExistsByID : lastFileProcessed ])  // Use OCR Cache!
         {
-            NSLog(@" PDF Cache HIT! %@",lastFileProcessed);
+            NSLog(@" OCR Cache HIT! %@",lastFileProcessed);
             if (!gotTemplate) //Handle obvious errors
             {
                 NSLog(@" ERROR: tried to process images w/o template");
@@ -357,9 +386,11 @@ static BatchObject *sharedInstance = nil;
 //=============(BatchObject)=====================================================
 -(int) getVendorFileCount : (NSString *)vfn
 {
+    //1/28 vendorname files have underbars, NOT spaces
+    NSString *vcompare = [vfn stringByReplacingOccurrencesOfString:@" " withString:@"_"];
     for (NSDictionary *d in vendorFileCounts)
     {
-        if ([d[@"Vendor"] isEqualToString:vfn])
+        if ([d[@"Vendor"] isEqualToString:vcompare])
         {
             NSNumber *n = d[@"Count"];
             return n.intValue;
@@ -396,11 +427,11 @@ static BatchObject *sharedInstance = nil;
                 ii = [it rotate90CCW:ii];
             //UIImage *deskewedImage = [it deskew:ii];
             //OUCH! THis has to be decoupled to handle the OCR returning on each image!
-            [oto performOCROnImage:@"test.png" :ii :ot];
+            [oto performOCROnImage:@"test.png" : ii : ot];
         }
 
     }
-    else //OLD PDF DATA, potentially skewed! asdf
+    else //OLD PDF DATA, potentially skewed!
     {
         NSData *data = dbt.batchImageData[0];  //Raw PDF data, need to process...
         //NSString *ipath = dbt.batchFileList[0]; //[paths objectAtIndex:batchPage];
@@ -458,12 +489,12 @@ static BatchObject *sharedInstance = nil;
 }
 
 //=============(BatchObject)=====================================================
--(void) updateBatchProgress : (NSString *)message
+-(void) updateBatchProgress : (NSString *)message : (BOOL) saveActivity
 {
     [self.delegate batchUpdate : message]; //Should update UI if possible
     NSString* arg2 = @"";
     if (lastFileProcessed != nil) arg2 = lastFileProcessed;
-    [act saveActivityToParse : message : arg2];
+    if (saveActivity) [act saveActivityToParse : message : arg2];
 }
 
 
@@ -661,10 +692,11 @@ static BatchObject *sharedInstance = nil;
     NSLog(@" didDownloadCSVFile: %@ %@",vendor,result);
     [oto loadCSVValuesFromString : vendor : result]; //This does EXP writes...
     //Since there is no big wait for a file fetch, consider this step done ...
-    if (batchPage >= batchTotalPages)
-    {
-        [self processNextFile];
-    }
+    //DHS 1/28: We must wait until invoice is done!
+//    if (batchPage >= batchTotalPages)
+//    {
+//        [self processNextFile];
+//    }
 
 
 }
@@ -709,6 +741,7 @@ static BatchObject *sharedInstance = nil;
     NSLog(@" got template...");
     gotTemplate = TRUE;
     // This performs handoff to the actual running ...
+    [self updateBatchProgress : [NSString stringWithFormat:@"Get Files:%@",vendorName] : FALSE];
     [dbt getBatchList : batchFolder : vendorFolderName];
 
 }
@@ -739,19 +772,21 @@ static BatchObject *sharedInstance = nil;
 {
     NSLog(@" OCR OK page %d tp %d  count %d total %d",batchPage,batchTotalPages,batchCount,batchTotal);
     batchPage++;
-    if (batchPage >= batchTotalPages)
-    {
-        [self processNextFile];
-    }
+//DHS 1/28 Only do next file AFTER invoice is ok. but what about page count?
+//    if (batchPage >= batchTotalPages)
+//    {
+//        [self processNextFile : 1];
+//    }
 }
 
 //===========<OCRTopObjectDelegate>================================================
 - (void)errorPerformingOCR : (NSString *) errMsg
 {
     [self addError : errMsg : @"n/a": @"n/a"];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self processNextFile];
-    });
+    //1/28 NON-fatal? Don't do next file yet!
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        [self processNextFile];
+//    });
 }
 
 //===========<OCRTopObjectDelegate>================================================
@@ -759,7 +794,7 @@ static BatchObject *sharedInstance = nil;
 {
     [self addError : errMsg : @"n/a": @"n/a"];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self processNextFile];
+        [self processNextFile : 2];
     });
 }
 
@@ -769,7 +804,7 @@ static BatchObject *sharedInstance = nil;
 {
     NSLog(@" OK: vendor OCR -> DB done, invoice %@",s);
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self processNextFile];
+        [self processNextFile : 3];
     });
 }
 
