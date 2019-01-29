@@ -11,6 +11,7 @@
 //  Created by Dave Scruton on 1/4/19.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  1/28 move cache to PDFCache sub-folder
 
 #import "PDFCache.h"
 
@@ -41,6 +42,7 @@ static PDFCache *sharedInstance = nil;
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         cachesDirectory = [paths objectAtIndex:0];
         NSLog(@"PDF CACHEPATH[%@]",cachesDirectory);
+        [self createCacheFolder];
         [self loadMasterCacheFile];
         [self loadCache];
     }
@@ -70,20 +72,29 @@ static PDFCache *sharedInstance = nil;
     // DHS 2/8/18 Remove each cache jpg imagefile...
     if (cacheNames != nil) for (NSString* workID in cacheNames)
     {
-        NSString *filepath  = [NSString stringWithFormat:@"%@/%@.jpg",cachesDirectory,workID];
+        NSString *filepath  = [NSString stringWithFormat:@"%@/%@.jpg",cacheFolderPath,workID];
         if ([fileManager fileExistsAtPath:filepath])
         {
             [fileManager removeItemAtPath: filepath error:NULL];
         }
     }
     
-    path = [NSString stringWithFormat:@"%@/%@",cachesDirectory,cacheMasterFile];
+    path = [NSString stringWithFormat:@"%@/%@",cacheFolderPath,cacheMasterFile];
     if ([fileManager fileExistsAtPath:path])
     {
         [fileManager removeItemAtPath: path error:NULL];
     }
     
 } //end clearHardCore
+
+//=====(PDFCache)======================================================================
+-(void) createCacheFolder
+{
+    cacheFolderPath  = [NSString stringWithFormat:@"%@/PDFCache",cachesDirectory];
+    NSFileManager *NSFm= [NSFileManager defaultManager];
+    [NSFm createDirectoryAtPath:cacheFolderPath
+        withIntermediateDirectories:YES attributes:nil error:nil];
+} //end createCacheFolder
 
 //=====(PDFCache)======================================================================
 // Garbage collection: called if memory gets tight;
@@ -137,7 +148,7 @@ static PDFCache *sharedInstance = nil;
     NSError *error;
     
     //File is .../Library/Caches/pdfCacheList.txt
-    path = [NSString stringWithFormat:@"%@/%@",cachesDirectory,cacheMasterFile];
+    path = [NSString stringWithFormat:@"%@/%@",cacheFolderPath,cacheMasterFile];
     NSLog(@"pdfcache loadMasterFile...%@",path);
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager fileExistsAtPath:path])
@@ -163,7 +174,7 @@ static PDFCache *sharedInstance = nil;
 // Tacks on new filename as ascii record at end of master file
 -(void) updateMasterFile : (NSString *)latestFilename
 {
-    NSString *path = [NSString stringWithFormat:@"%@/%@",cachesDirectory,cacheMasterFile];
+    NSString *path = [NSString stringWithFormat:@"%@/%@",cacheFolderPath,cacheMasterFile];
     NSFileHandle *file;
     NSString *recordToWrite = [NSString stringWithFormat:@"%@\n",latestFilename];
     //Prepare filename for appending to master file...
@@ -200,7 +211,7 @@ static PDFCache *sharedInstance = nil;
 {
     NSString *oid   = [self cleanupID : inoid : page];
     if ([_PDFids indexOfObject : oid] == NSNotFound) return nil;
-    NSString *path  = [NSString stringWithFormat:@"%@/%@.jpg",cachesDirectory,oid];
+    NSString *path  = [NSString stringWithFormat:@"%@/%@.jpg",cacheFolderPath,oid];
     NSData *data    = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:path]];
     return [UIImage imageWithData: data];
 }
@@ -238,7 +249,7 @@ static PDFCache *sharedInstance = nil;
 // Saves portrait in file named "id".txt
 -(void) saveCacheImage : (NSString *) oid : (UIImage *) pdfImage
 {
-    NSString *path = [NSString stringWithFormat:@"%@/%@.jpg",cachesDirectory,oid];
+    NSString *path = [NSString stringWithFormat:@"%@/%@.jpg",cacheFolderPath,oid];
     [UIImageJPEGRepresentation(pdfImage, 0.75) writeToFile:path atomically:YES];
     NSLog(@" ...savecache pdf %@",path);
 } //end saveCacheImage

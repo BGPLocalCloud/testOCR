@@ -396,7 +396,7 @@
         errorList = [NSMutableArray arrayWithArray:[bbb getErrors]];
     else
         errorList = [NSMutableArray arrayWithArray:[bbb getWarnings]];
-    NSLog(@" ok batch read %@:%@",oid,errorList);
+    //NSLog(@" ok batch read %@:%@",oid,errorList);
     [spv stop];
     [self loadAllExpObjects];
     [_table reloadData];
@@ -413,7 +413,7 @@
 //=============<batchObjectDelegate>=====================================================
 - (void)didUpdateBatchToParse
 {
-    NSLog(@" ok batch didUpdateBatchToParse");
+    NSLog(@" //ok batch didUpdateBatchToParse");
 
 }
 

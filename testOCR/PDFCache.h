@@ -19,10 +19,11 @@
 
 @interface PDFCache : NSObject
 {
-    NSString *cachesDirectory;
-    NSString *cacheMasterFile;
-    NSArray *cacheNames;
-    NSMutableDictionary *PDFDict;
+    NSString *cachesDirectory;         //Where all caches live
+    NSString *cacheFolderPath;        //Where our cache lives
+    NSString *cacheMasterFile;       //Where cache entry names are stored
+    NSArray *cacheNames;            //Array of cache filenames
+    NSMutableDictionary *PDFDict;  //Lookup table for filenames -> Images
 }
 
 @property (nonatomic, unsafe_unretained) id <PDFCacheDelegate> delegate; // receiver of completion messages

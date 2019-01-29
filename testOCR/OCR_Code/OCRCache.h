@@ -13,11 +13,12 @@
 
 @interface OCRCache : NSObject
 {
-    NSString *cachesDirectory;
-    NSString *cacheMasterFile;
-    NSArray *cacheNames;
-    NSMutableDictionary *OCRDict;
-    NSMutableDictionary *OCRRectDict;
+    NSString *cachesDirectory;         //Where all caches live
+    NSString *cacheFolderPath;        //Where our cache lives
+    NSString *cacheMasterFile;       //Where cache entry names are stored
+    NSArray *cacheNames;            //Array of cache filenames
+    NSMutableDictionary *OCRDict;  //Lookup table for filenames -> Txt
+    NSMutableDictionary *OCRRectDict;  //Lookup table for filenames -> Rects
 }
 
 @property (nonatomic, unsafe_unretained) id <OCRCacheDelegate> delegate; // receiver of completion messages

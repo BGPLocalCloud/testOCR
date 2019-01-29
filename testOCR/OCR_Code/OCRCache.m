@@ -36,6 +36,7 @@ static OCRCache *sharedInstance = nil;
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         cachesDirectory = [paths objectAtIndex:0];
         NSLog(@"CACHEPATH[%@]",cachesDirectory);
+        [self createCacheFolder];
         [self loadMasterCacheFile];
         [self loadCache];
     }
@@ -68,25 +69,35 @@ static OCRCache *sharedInstance = nil;
     // DHS 2/8/18 Remove each cache file...
     for (NSString* workID in cacheNames)
     {
-        NSString *filepath  = [NSString stringWithFormat:@"%@/%@.txt",cachesDirectory,workID];
+        NSString *filepath  = [NSString stringWithFormat:@"%@/%@.txt",cacheFolderPath,workID];
         if ([fileManager fileExistsAtPath:filepath])
         {
             [fileManager removeItemAtPath: filepath error:NULL];
         }
-        filepath  = [NSString stringWithFormat:@"%@/%@.rct",cachesDirectory,workID];
+        filepath  = [NSString stringWithFormat:@"%@/%@.rct",cacheFolderPath,workID];
         if ([fileManager fileExistsAtPath:filepath])
         {
             [fileManager removeItemAtPath: filepath error:NULL];
         }
     }
     
-    path = [NSString stringWithFormat:@"%@/%@",cachesDirectory,cacheMasterFile];
+    path = [NSString stringWithFormat:@"%@/%@",cacheFolderPath,cacheMasterFile];
     if ([fileManager fileExistsAtPath:path])
     {
         [fileManager removeItemAtPath: path error:NULL];
     }
     
 } //end clearHardCore
+
+//=====(OCRCache)======================================================================
+-(void) createCacheFolder
+{
+    cacheFolderPath  = [NSString stringWithFormat:@"%@/OCRCache",cachesDirectory];
+    NSFileManager *NSFm= [NSFileManager defaultManager];
+    [NSFm createDirectoryAtPath:cacheFolderPath
+    withIntermediateDirectories:YES attributes:nil error:nil];
+} //end createCacheFolder
+
 
 //=====(OCRCache)======================================================================
 // Garbage collection: called if memory gets tight;
@@ -142,7 +153,7 @@ static OCRCache *sharedInstance = nil;
     NSError *error;
     
     //File is .../Library/Caches/cacheList.txt"
-    path = [NSString stringWithFormat:@"%@/%@",cachesDirectory,cacheMasterFile];
+    path = [NSString stringWithFormat:@"%@/%@",cacheFolderPath,cacheMasterFile];
     NSLog(@"cache loadMasterFile...%@",path);
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager fileExistsAtPath:path])
@@ -167,7 +178,7 @@ static OCRCache *sharedInstance = nil;
 // Tacks on new filename as ascii record at end of master file
 -(void) updateMasterFile : (NSString *)latestFilename
 {
-    NSString *path = [NSString stringWithFormat:@"%@/%@",cachesDirectory,cacheMasterFile];
+    NSString *path = [NSString stringWithFormat:@"%@/%@",cacheFolderPath,cacheMasterFile];
     NSFileHandle *file;
     NSString *recordToWrite = [NSString stringWithFormat:@"%@\n",latestFilename];
     //Prepare filename for appending to master file...
@@ -238,7 +249,7 @@ static OCRCache *sharedInstance = nil;
     for (int i=0;i<ccount;i++) // it looks like ccount is one too big, not causing trouble yet...
     {
         ocrFile   = [cacheNames objectAtIndex:i];
-        path      = [NSString stringWithFormat:@"%@/%@.txt",cachesDirectory,ocrFile];
+        path      = [NSString stringWithFormat:@"%@/%@.txt",cacheFolderPath,ocrFile];
         NSString *fileContentsAscii;
         NSURL *url = [NSURL fileURLWithPath:path];
         fileContentsAscii = [NSString stringWithContentsOfURL:url encoding:NSASCIIStringEncoding error:&error];
@@ -248,7 +259,7 @@ static OCRCache *sharedInstance = nil;
             [OCRDict setObject:fileContentsAscii forKey:ocrFile];
         }
         //Get Rect file...
-        path = [NSString stringWithFormat:@"%@/%@.rct",cachesDirectory,ocrFile];
+        path = [NSString stringWithFormat:@"%@/%@.rct",cacheFolderPath,ocrFile];
         url  = [NSURL fileURLWithPath:path];
         fileContentsAscii = [NSString stringWithContentsOfURL:url encoding:NSASCIIStringEncoding error:&error];
         if (fileContentsAscii != nil) [OCRRectDict setObject:fileContentsAscii forKey:ocrFile];
@@ -261,7 +272,7 @@ static OCRCache *sharedInstance = nil;
 // Saves portrait in file named "id".txt
 -(void) saveCacheFile : (NSString *) oid : (NSString *) txt
 {
-    NSString *path = [NSString stringWithFormat:@"%@/%@.txt",cachesDirectory,oid];
+    NSString *path = [NSString stringWithFormat:@"%@/%@.txt",cacheFolderPath,oid];
     NSData *data =[txt dataUsingEncoding:NSUTF8StringEncoding];
     [data writeToFile:path atomically:YES];
     NSLog(@" ...savecache txt %@",path);
@@ -272,7 +283,7 @@ static OCRCache *sharedInstance = nil;
 // Saves portrait in file named "id".txt
 -(void) saveCacheRect : (NSString *) oid : (CGRect) r
 {
-    NSString *path = [NSString stringWithFormat:@"%@/%@.rct",cachesDirectory,oid];
+    NSString *path = [NSString stringWithFormat:@"%@/%@.rct",cacheFolderPath,oid];
     NSData *data =[NSStringFromCGRect(r) dataUsingEncoding:NSUTF8StringEncoding];
     [data writeToFile:path atomically:YES];
     NSLog(@" ...savecache rect %@",path);

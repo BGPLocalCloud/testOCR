@@ -180,7 +180,7 @@
 //=============<batchObjectDelegate>=====================================================
 - (void)didUpdateBatchToParse
 {
-    NSLog(@" ok batch didUpdateBatchToParse");
+    //NSLog(@" ok batch didUpdateBatchToParse");
 }
 
 
