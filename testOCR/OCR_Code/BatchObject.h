@@ -19,6 +19,7 @@
 #import "AppDelegate.h"
 #import "ActivityTable.h"
 #import "DropboxTools.h"
+#import "GenParse.h"
 #import "imageTools.h"
 #import "OCRTemplate.h"
 #import "Vendors.h"
@@ -35,30 +36,34 @@
 #define BATCH_STATUS_FAILED     @"Failed"
 #define BATCH_STATUS_COMPLETED  @"Completed"
 
-@interface BatchObject : NSObject <DropboxToolsDelegate,OCRTemplateDelegate,OCRTopObjectDelegate>
+@interface BatchObject : NSObject <DropboxToolsDelegate,OCRTemplateDelegate,
+                                    OCRTopObjectDelegate,GenParseDelegate>
 {
     DropboxTools *dbt;
     Vendors *vv;
     OCRTemplate *ot;
     ActivityTable *act;
     OCRTopObject *oto;
+    GenParse *gp;
 
     UIViewController *parent;
     
     BOOL gotTemplate;
     NSString *batchFolder;
     BOOL runAllBatches;
+    int selectedVendor; //Chosen vendor to run batch on, stays constant
     int vendorIndex;  //Index to vendors object for currentbatch
     NSString *vendorName; //Whose batch we're running
     NSString *vendorRotation; //Are pages rotated typically?
     NSString *vendorFolderName;  
     NSString *batchFiles; //CSV list of all files processed
-    NSString *batchStatus;
     NSString *batchProgress;
     NSString *batchErrors;
     NSString *batchWarnings;
     NSString *batchFixed;
     NSString *cachesDirectory;
+    NSString *cacheFolderPath;        //Where our cache lives
+
     NSString *lastFileProcessed;
     NSMutableArray *vendorFileCounts;
     NSMutableDictionary *vendorFolders;
@@ -84,12 +89,14 @@
 @property (nonatomic , strong) NSString* batchID;
 @property (nonatomic , assign) BOOL authorized;
 @property (nonatomic , strong) NSString* versionNumber;
+@property (nonatomic , strong) NSString* batchStatus;
 
 @property (nonatomic, unsafe_unretained) id <batchObjectDelegate> delegate; // receiver of completion messages
 
 + (id)sharedInstance;
 
 -(void) addError : (NSString *) errDesc : (NSString *) objectID : (NSString*) productName;
+-(void) clearAndRunBatches : (int) vindex;
 -(void) fixError : (int) index;
 -(void) fixWarning : (int) index;
 -(BOOL) isErrorFixed :(NSString *)errStr;
@@ -98,6 +105,7 @@
 -(NSMutableArray *) getErrors;
 -(NSMutableArray *) getWarnings;
 -(NSString *) getVendor;
+-(void) haltBatch;
 -(int)  getVendorFileCount : (NSString *)vfn;
 -(void) readFromParseByID : (NSString *) bID;
 -(void) readFromParseByIDs : (NSArray *) bIDs;

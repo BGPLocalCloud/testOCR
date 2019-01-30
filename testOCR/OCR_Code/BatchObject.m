@@ -17,6 +17,7 @@
 //  1/12 add OCRCache check to avoid download
 //  1/24 add all vendors support, updateBatchProgress
 //  1/25 add reports folder for batch reports on dropbox
+//  1/29 add table deletes for batch run
 #import "BatchObject.h"
 
 @implementation BatchObject
@@ -50,6 +51,9 @@ static BatchObject *sharedInstance = nil;
         oc                = [OCRCache sharedInstance];
         pc                = [PDFCache sharedInstance];
 
+        gp                = [[GenParse alloc] init];
+        gp.delegate = self;
+
         dbt = [[DropboxTools alloc] init];
         dbt.delegate = self;
         [dbt setParent:parent];
@@ -69,7 +73,8 @@ static BatchObject *sharedInstance = nil;
         //Uses caches folder for batch reports...
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         cachesDirectory = [paths objectAtIndex:0];
-
+        [self createBatchFolder];
+        
         tableName = @"Batch";
         
         _authorized = FALSE;
@@ -102,6 +107,51 @@ static BatchObject *sharedInstance = nil;
     NSString *errStr2 = [NSString stringWithFormat:@"%@:%@",errDesc,productName];
     [warningReportList addObject:errStr2];
 } //end addWarning
+
+
+//=============(BatchObject)=====================================================
+// Does table clear, and the activity table clear callback continues batch.
+//   Convoluted enuf?
+-(void) clearAndRunBatches : (int) vindex
+{
+    [self.delegate batchUpdate : @"Clear old tables..."];
+    selectedVendor = vindex;
+    NSString *vname = @"*";
+    if (vindex != -1 && vindex < vv.vNames.count) vname = vv.vNames[vindex];
+    [self clearTables:vname];
+} //end clearAndRunBatches
+
+
+
+//=============(BatchObject)=====================================================
+-(void) clearTables : (NSString *) vendor
+{
+    [gp deleteAllByTableAndKey:@"Batch"    :@"*" :@"*"];
+    [gp deleteAllByTableAndKey:@"EXP"      :@"*" :@"*"];
+    if ([vendor isEqualToString:@"*"]) //All vendors?
+    {
+        for (NSString *vn in vv.vNames)
+        {
+            NSString *tableName = [NSString stringWithFormat:@"I_%@",vn];
+            [gp deleteAllByTableAndKey:tableName : @"*" : @"*"];
+        }
+    }
+    else
+    {
+        NSString *tableName = [NSString stringWithFormat:@"I_%@",vendor];
+        [gp deleteAllByTableAndKey:tableName : @"*" : @"*"];
+    }
+} //end clearTables
+
+//=============(BatchObject)=====================================================
+-(void) createBatchFolder
+{
+    cacheFolderPath  = [NSString stringWithFormat:@"%@/Batches",cachesDirectory];
+    NSFileManager *NSFm= [NSFileManager defaultManager];
+    [NSFm createDirectoryAtPath:cacheFolderPath
+    withIntermediateDirectories:YES attributes:nil error:nil];
+} //end createCacheFolder
+
 
 
 //=============(BatchObject)=====================================================
@@ -160,6 +210,8 @@ static BatchObject *sharedInstance = nil;
 }
 
 
+
+
 //=============(BatchObject)=====================================================
 // vendor vindex -1 means run ALL
 -(void) runOneOrMoreBatches : (int) vindex
@@ -176,7 +228,7 @@ static BatchObject *sharedInstance = nil;
     
     AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     bappDelegate.batchID = _batchID; //This way everyone can see the batch
-    batchStatus   = BATCH_STATUS_RUNNING;
+    _batchStatus   = BATCH_STATUS_RUNNING;
     batchErrors   = @"";
     batchFiles    = @"";
     batchProgress = @"";
@@ -211,7 +263,7 @@ static BatchObject *sharedInstance = nil;
 {
     if (!runAllBatches) //Single vendor ? Complete batch / bail
     {
-        [self completeBatch : 0]; //Bail on single batch only...
+        [self completeBatch : 0 : FALSE]; //Bail on single batch only...
         return;
     }
     if (preIncrement) vendorIndex++;
@@ -219,7 +271,7 @@ static BatchObject *sharedInstance = nil;
     int vfnsize = (int)vv.vNames.count;
     NSLog(@" vfcsize %d vs vfnsize %d",vfcsize,vfnsize);
     //NOTE filecounts can be larger than vendor counts!
-    if (vendorIndex >= vfnsize) [self completeBatch : 1];
+    if (vendorIndex >= vfnsize) [self completeBatch : 1 : FALSE];
     //Find next vendor with staged files...
     BOOL found = FALSE;
     while (vendorIndex < vfnsize && !found)
@@ -229,11 +281,11 @@ static BatchObject *sharedInstance = nil;
         else vendorIndex++;
     } //End while...
     //Hmm vendorindex never gets to vfnsize? 1/27
-    if (vendorIndex >= vfnsize) [self completeBatch : 2];               //End of vendors? Done!
+    if (vendorIndex >= vfnsize) [self completeBatch : 2 : FALSE];               //End of vendors? Done!
     else //Next vendor? Only if running all batches!
     {
         if (runAllBatches) [self startBatchForCurrentVendor]; //More? Run next batch!
-        else               [self completeBatch : 3];
+        else               [self completeBatch : 3 : FALSE];
     }
 } //end StartNextVendorBatch
 
@@ -253,14 +305,16 @@ static BatchObject *sharedInstance = nil;
 
 
 //=============(BatchObject)=====================================================
--(void) completeBatch : (int) wherefrom
+-(void) completeBatch : (int) wherefrom : (BOOL) haltFlag
 {
-    if (![batchStatus isEqualToString: BATCH_STATUS_RUNNING]) return; //In case of multiple completes?
-    if ([batchStatus isEqualToString: BATCH_STATUS_COMPLETED]) return; //No dupes
-    batchStatus = BATCH_STATUS_COMPLETED;
+    if (![_batchStatus isEqualToString: BATCH_STATUS_RUNNING]) return; //In case of multiple completes?
+    if ([_batchStatus  isEqualToString: BATCH_STATUS_COMPLETED]) return; //No dupes
+    _batchStatus = BATCH_STATUS_COMPLETED;
     [self updateParse];
-    NSString *actData = [NSString stringWithFormat:@"%@:%@",_batchID,vendorName];
-    [act saveActivityToParse:@"Batch Completed" : actData];
+    NSString *actData     = [NSString stringWithFormat:@"%@:%@",_batchID,vendorName];
+    NSString *lilStr      = @"Batch Completed";
+    if (haltFlag) lilStr  = @"Batch Halted";
+    [act saveActivityToParse : lilStr : actData];
     [self.delegate didCompleteBatch];
     [self writeBatchReport];
 }
@@ -322,7 +376,7 @@ static BatchObject *sharedInstance = nil;
     //Check for "skip" string, ignore file if so...
     if ([lastFileProcessed.lowercaseString containsString:@"skip"]) //Skip this file?
     {
-        NSLog(@" ...skip %@",lastFileProcessed);//asdf
+        NSLog(@" ...skip %@",lastFileProcessed);
         [self updateBatchProgress : [NSString stringWithFormat:@"   skip:%@",lastFileProcessed] : FALSE];
 
         [self processNextFile : 0];  //Re-entrant call, should be OK
@@ -340,7 +394,7 @@ static BatchObject *sharedInstance = nil;
         //remember the filename...comma on 2nd... file
         if (batchCount > 1) batchFiles = [batchFiles stringByAppendingString:@","];
         batchFiles = [batchFiles stringByAppendingString:lastFileProcessed];
-        [self updateBatchProgress : @"Download PDF..." : TRUE];
+        [self updateBatchProgress : [NSString stringWithFormat:@"Download %@",lastFileProcessed] : FALSE];
         //if ([pc imageExistsByID:lastFileProcessed : 1])  // 1/19 pdf cache more logical
         //If we use the PDF cache, it's possible that the file images came down but the OCR did NOT.
         //  in that case the OCR never goes through, it gets a nil file reference and fails
@@ -398,6 +452,14 @@ static BatchObject *sharedInstance = nil;
     }
     return 0;
 } //end getVendorFileCount
+
+//=============(BatchObject)=====================================================
+// Force-Halt Batch
+-(void) haltBatch
+{
+    [self completeBatch : 5 : TRUE];
+}
+
 
 //=============(BatchObject)=====================================================
 // We have to pre-process PDF pages, one by one, assuming a different
@@ -512,7 +574,7 @@ static BatchObject *sharedInstance = nil;
                 //Load internal fields...
                 self->vendorName       = pfo[PInv_Vendor_key];
                 self->batchFiles       = pfo[PInv_BatchFiles_key];
-                self->batchStatus      = pfo[PInv_BatchStatus_key];
+                self->_batchStatus     = pfo[PInv_BatchStatus_key];
                 self->batchProgress    = pfo[PInv_BatchProgress_key];
                 self->batchErrors      = pfo[PInv_BatchErrors_key];
                 self->batchWarnings    = pfo[PInv_BatchWarnings_key];
@@ -571,7 +633,7 @@ static BatchObject *sharedInstance = nil;
             else
                 pfo = [PFObject objectWithClassName:self->tableName];
             pfo[PInv_BatchID_key]       = self->_batchID;
-            pfo[PInv_BatchStatus_key]   = self->batchStatus;
+            pfo[PInv_BatchStatus_key]   = self->_batchStatus;
             pfo[PInv_Vendor_key]        = self->vendorName;
             pfo[PInv_BatchFiles_key]    = self->batchFiles;
             pfo[PInv_BatchProgress_key] = self->batchProgress;
@@ -602,7 +664,7 @@ static BatchObject *sharedInstance = nil;
 //   and in dropbox processedFiles area...
 -(void) writeBatchReport
 {
-    NSString *path = [NSString stringWithFormat:@"%@/%@.txt",cachesDirectory,_batchID];
+    NSString *path = [NSString stringWithFormat:@"%@/%@.txt",cacheFolderPath,_batchID];
     //Assemble output string:
     NSString *s = @"Batch Report\n";
     //if (batchCount > 1)
@@ -732,6 +794,28 @@ static BatchObject *sharedInstance = nil;
     [self finishSavingReportToDropbox : folderPath];
 }
 
+#pragma mark - GenParseDelegate
+
+//===========<GenParseDelegate>================================================
+- (void)didDeleteAllByTableAndKey : (NSString *)s1 : (NSString *)s2 : (NSString *)s3
+{
+    NSLog(@" delete OK %@/%@/%@",s1,s2,s3);
+    if ([s1 isEqualToString:@"EXP"]) //Usually the longest table..
+    {
+        //OK continue running batch...
+        [self runOneOrMoreBatches : selectedVendor];
+    }
+}
+
+//===========<GenParseDelegate>================================================
+- (void)errorDeletingAllByTableAndKey : (NSString *)s1 : (NSString *)s2 : (NSString *)s3
+{
+    NSLog(@" delete ERROR %@/%@/%@",s1,s2,s3);
+    //PUT UP ERROR MESSAGE? or continue?
+}
+
+
+
 
 #pragma mark - OCRTemplateDelegate
 
@@ -794,6 +878,7 @@ static BatchObject *sharedInstance = nil;
 {
     [self addError : errMsg : @"n/a": @"n/a"];
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self updateBatchProgress : [NSString stringWithFormat:@"Fatal OCR Error:%@",errMsg] : TRUE];
         [self processNextFile : 2];
     });
 }
@@ -807,6 +892,16 @@ static BatchObject *sharedInstance = nil;
         [self processNextFile : 3];
     });
 }
+
+//===========<OCRTopObjectDelegate>================================================
+- (void)errorSavingOCRDataToParse : (NSString *) s
+{
+    NSLog(@" ERROR Saving Invoice:%@",s);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self processNextFile : 3];
+    });
+}
+
 
 
 //===========<OCRTopObjectDelegate>================================================

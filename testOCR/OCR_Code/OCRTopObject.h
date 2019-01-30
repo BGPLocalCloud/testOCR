@@ -117,4 +117,6 @@
 - (void)fatalErrorPerformingOCR : (NSString *) errMsg;
 - (void)errorSavingEXP : (NSString *) errMsg : (NSString*) objectID : (NSString*) productName;
 - (void)didSaveOCRDataToParse : (NSString *) s;
+- (void)errorSavingOCRDataToParse : (NSString *) s;
+- (void)foundEmptyPage;
 @end

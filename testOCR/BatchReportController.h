@@ -29,8 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @property (weak, nonatomic) IBOutlet UILabel *errLabel;
 @property (weak, nonatomic) IBOutlet UILabel *warnLabel;
-@property (weak, nonatomic) IBOutlet UILabel *contents;
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
+@property (weak, nonatomic) IBOutlet UITextView *contents;
 
 - (IBAction)backSelect:(id)sender;
 

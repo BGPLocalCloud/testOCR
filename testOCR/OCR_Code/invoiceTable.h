@@ -53,7 +53,7 @@
 -(void) readFromParseAsStrings : (NSString *)vendor : batch;
 -(void) saveToParse;
 -(void) setupVendorTableName : (NSString *)vname;
--(void) updateInvoice : (NSString *)vendor : (NSString *)invoiceNumberstring;
+-(void) updateInvoice : (NSString *)vendor : (NSString *)invoiceNumberstring : (NSString *)batchID;
 
 
 @end
@@ -65,6 +65,7 @@
 - (void)didReadInvoiceTableAsStrings : (NSMutableArray*) a;
 - (void)didSaveInvoiceTable:(NSString *) s;
 - (void)didUpdateInvoiceTable:(NSString *) inum;
+- (void)errorSavingInvoiceTable:(NSString *) s;
 
 @end
 

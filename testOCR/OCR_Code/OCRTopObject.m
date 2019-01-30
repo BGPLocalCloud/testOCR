@@ -5,12 +5,18 @@
 //  Created by Dave Scruton on 12/22/18.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  Main OCR object. Designed to load and process one single page.
+//    Document is loaded in the od object, and Templates come in
+//    as arguments to applyTemplate. Together ot and od produce a set of
+//    line items saved to the EXP table and also to
+//    a corresponding invoice in the I_VendorName table (one table/vendor)
 //  This all revolves around OCR Space, an online free OCR system.
 //   At higher data rates there is a fee, need more details
 //   https://ocr.space/
 //
 //  12/28 integrated ocr cache
 //  1/27  added page arg to performOCR...
+//  1/30  handle empty pages
 
 #import "OCRTopObject.h"
 
@@ -54,6 +60,7 @@ static OCRTopObject *sharedInstance = nil;
 //=============(OCRTopObject)=====================================================
 // Loop over template, find stuff in document?
 // DOCUMENT MUST BE LOADED!!!
+// 1/30 only look for top of invoice items on page 0
 - (void)applyTemplate : (OCRTemplate *)ot : (int) page
 {
     [ot clearHeaders];
@@ -89,14 +96,14 @@ static OCRTopObject *sharedInstance = nil;
         NSLog(@" [%@] fieldname is [%@], %d items",_imageFileName,fieldName,(int)a.count);
         if (a.count > 0) //Found a match!
         {
-            if ([fieldName isEqualToString:INVOICE_NUMBER_FIELD]) //Looking for a number?
+            if (page == 0 && [fieldName isEqualToString:INVOICE_NUMBER_FIELD]) //Looking for a number?
             {
                 _invoiceNumber = [od findLongInArrayOfFields:a];
                 //This will have to be more robust
                 _invoiceNumberString = [NSString stringWithFormat:@"%ld",_invoiceNumber];
                 NSLog(@" invoice# %ld [%@]",_invoiceNumber,_invoiceNumberString);
             }
-            else if ([fieldName isEqualToString:INVOICE_DATE_FIELD]) //Looking for a date?
+            else if (page == 0 && [fieldName isEqualToString:INVOICE_DATE_FIELD]) //Looking for a date?
             {
                 NSDate* testDate = [od findDateInArrayOfFields:a]; //Find date-like string?
                 if (testDate == nil) //Bogus?  1/27 redid
@@ -106,12 +113,12 @@ static OCRTopObject *sharedInstance = nil;
                 else _invoiceDate = testDate;
                 NSLog(@" invoice date %@",_invoiceDate);
             }
-            else if ([fieldName isEqualToString:INVOICE_CUSTOMER_FIELD]) //Looking for Customer?
+            else if (page == 0 && [fieldName isEqualToString:INVOICE_CUSTOMER_FIELD]) //Looking for Customer?
             {
                 _invoiceCustomer = [od findTopStringInArrayOfFields:a]; //Just get first line of template area
                 NSLog(@" Customer %@",_invoiceCustomer);
             }
-            else if ([fieldName isEqualToString:INVOICE_SUPPLIER_FIELD]) //Looking for Supplier?
+            else if (page == 0 && [fieldName isEqualToString:INVOICE_SUPPLIER_FIELD]) //Looking for Supplier?
             {
                 _invoiceVendor = [od findTopStringInArrayOfFields:a]; //Just get first line of template area
                 BOOL matches = [ot isSupplierAMatch:_invoiceVendor]; //Check for rough match
@@ -121,8 +128,9 @@ static OCRTopObject *sharedInstance = nil;
             {
                 //headerY = [od autoFindHeader];
                 // 1/20 try fully automatic header finder
-                //[od dumpArrayFull:a];
-                headerY = [od findHeader:rr :100]; //Get header ypos (document coords!!)
+                [od dumpArrayFull:a];
+                // Get header ypos (document coords!!)
+                headerY = [od findHeader:rr :300]; //1/30 changed expandby to 300
                 if (headerY == -1)
                 {
                     [self->_delegate errorPerformingOCR:@"Missing Invoice Header"];
@@ -159,7 +167,7 @@ static OCRTopObject *sharedInstance = nil;
             //NSLog(@"templateRect %@",NSStringFromCGRect(rr));
             //NSLog(@"documentRect %@",NSStringFromCGRect(dr));
             //NSLog(@" column found==================");
-            //[od dumpArrayFull:a];  asdf
+            //[od dumpArrayFull:a];
             [ot addHeaderColumnToSortedArray : i : fieldName : headerY + od.glyphHeight];
         }
     }
@@ -457,13 +465,11 @@ static OCRTopObject *sharedInstance = nil;
 //  OCR handles multiple pages from PDF data!
 - (void)performOCROnData : (NSString *)fname : (NSData *)imageDataToOCR : (CGRect) r :  (OCRTemplate *)ot
 {
-    
-    if ([fname containsString:@"HFMDEcember"])
-        NSLog(@" duh HFMDEcember");
     //First, check cache: may already have downloaded OCR raw txt for this file...
     if ([oc txtExistsByID:fname])
     {
-        NSLog(@" OCR Cache HIT: perform OCR on cached file...%@",fname);
+        NSLog(@" OCR Cache HIT: %@",fname);
+        [self.delegate batchUpdate : [NSString stringWithFormat:@"OCR Cache HIT:%@",fname]];
         rawOCRResult  = [oc getTxtByID:fname];  //Raw OCR'ed text, needs to goto JSON
         r             = [oc getRectByID:fname]; //Get cached image size too...
         NSData *jsonData = [rawOCRResult dataUsingEncoding:NSUTF8StringEncoding];
@@ -521,7 +527,8 @@ static OCRTopObject *sharedInstance = nil;
                 case 4: errDesc = @"OCR internal error";break;
             }
             if (errDesc == nil)errDesc = error.localizedDescription;
-            [self->_delegate errorPerformingOCR:errDesc];
+            //DHS 1/28 fail OCR!
+            [self->_delegate fatalErrorPerformingOCR:[NSString stringWithFormat:@"%@ %@",errDesc,self->_imageFileName]];
         }
         else
         {
@@ -538,7 +545,7 @@ static OCRTopObject *sharedInstance = nil;
             if (isErr.boolValue)
             {
                 //1/27 pass fname AND error back...
-                [self->_delegate fatalErrorPerformingOCR:[NSString stringWithFormat:@"%@ %@",errMsg,_imageFileName]];
+                [self->_delegate fatalErrorPerformingOCR:[NSString stringWithFormat:@"%@ %@",errMsg,self->_imageFileName]];
             }
             else
             {
@@ -571,12 +578,18 @@ static OCRTopObject *sharedInstance = nil;
         {
             NSLog(@" Final OCR Page %d",page);
             //Hand progress up to parent for UI update...
-            [self.delegate batchUpdate : [NSString stringWithFormat:@"Page %d/%d -> OCR",page+1,od.numPages]];
+            [self.delegate batchUpdate : [NSString stringWithFormat:@"...Page %d/%d -> OCR",page+1,od.numPages]];
             [od setupPage:page];
             [self applyTemplate : ot : page];   //Does OCR analysis
             NSLog(@" Cleanup invoice...");
-            [self writeEXPToParse : page];      //Saves all EXP rows, then invoice as well
-        }
+            if (od.longestColumn != 0) //1/30 NOT Empty Page??
+               [self writeEXPToParse : page];      // asdf Saves all EXP rows, then invoice as well
+            else // 1/30 Empty Page? Tell delegate to continue...
+            {
+                NSLog(@" empty page %d/%d, jump to next page/document",page,pageCount);
+                [self->_delegate didSaveOCRDataToParse:_invoiceNumberString];  // -> BatchObject (bbb)
+            }
+        } //end for page
     }
     [self->_delegate didPerformOCR:@"OCR OK?"];
 
@@ -667,7 +680,7 @@ static OCRTopObject *sharedInstance = nil;
     smartCount  = 0;
     [et clear]; //Set up EXP for new entries...
     NSLog(@"  writeEXP/cleanup...");
-    if (page == pageCount-1) [self.delegate batchUpdate : [NSString stringWithFormat:@"Save EXP..."]];
+    if (page == pageCount-1) [self.delegate batchUpdate : [NSString stringWithFormat:@"Save EXP Records..."]];
 
     for (int i=0;i<od.longestColumn;i++) //OK this does multiple parse saves at once!
     {
@@ -773,10 +786,11 @@ static OCRTopObject *sharedInstance = nil;
         [it setupVendorTableName:_vendor];
         //Note: Total field is empty, we don't necessarily have it on first page!
         NSString *pcs = [NSString stringWithFormat:@"%d",pageCount];
+        if (_invoiceCustomer == nil) _invoiceCustomer = @"No Customer"; //DHS 1/28 no nils!
         [it setBasicFields:_invoiceDate : _invoiceNumberString : @"" : _vendor : _invoiceCustomer : _imageFileName : pcs];
     }
     pagesReturned++;
-    NSString *astr = [NSString stringWithFormat:@"...save EXP page %d of %d",pagesReturned,pageCount];
+    NSString *astr = [NSString stringWithFormat:@"...saved EXP page %d of %d",pagesReturned,pageCount];
     [act saveActivityToParse : astr : _invoiceNumberString];
 } //end didSaveEXPTable
 
@@ -787,12 +801,12 @@ static OCRTopObject *sharedInstance = nil;
 {
     for (NSString *objID in a) [it addInvoiceItemByObjectID : objID];
     NSLog(@" finished EXP saves, save invoice");
-    //For every page, add entries to invoice...
-    [self.delegate batchUpdate : [NSString stringWithFormat:@"Save Invoice %@",_invoiceNumberString]];
-    [act saveActivityToParse:@"...save Invoice" : _invoiceNumberString];
+    //For every page, add entries to invoice...asdf
+    [self.delegate batchUpdate : [NSString stringWithFormat:@"saved Invoice %@",_invoiceNumberString]];
+    [act saveActivityToParse:@"...saved Invoice" : _invoiceNumberString];
     NSString *its = [NSString stringWithFormat:@"%4.2f",_invoiceTotal];
     its = [od cleanupPrice:its]; //Make sure total is formatted!
-    [it updateInvoice : _vendor : _invoiceNumberString];
+    [it updateInvoice : _vendor : _invoiceNumberString : _batchID];
 //    [it saveToParse];
 
 }
@@ -820,6 +834,12 @@ static OCRTopObject *sharedInstance = nil;
 - (void)didSaveInvoiceTable:(NSString *) s
 {
     [self->_delegate didSaveOCRDataToParse:s];  // -> BatchObject (bbb)
+}
+
+//=============(invoiceTableDelegate)=====================================================
+- (void)errorSavingInvoiceTable:(NSString *) s
+{
+    [self->_delegate errorSavingOCRDataToParse:s];  // -> BatchObject (bbb)
 }
 
 //=============(invoiceTableDelegate)=====================================================

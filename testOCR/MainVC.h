@@ -15,6 +15,7 @@
 #import <UIKit/UIKit.h>
 #import <Crashlytics/Crashlytics.h>
 #import "ActivityTable.h"
+#import "GenParse.h"
 #import "activityCell.h"
 #import "DropboxTools.h"
 #import "BatchObject.h"
@@ -34,7 +35,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MainVC : UIViewController <NavButtonsDelegate,ActivityTableDelegate,
-                    UITableViewDelegate,UITableViewDataSource, batchObjectDelegate,DropboxToolsDelegate>
+                    UITableViewDelegate,UITableViewDataSource, batchObjectDelegate,DropboxToolsDelegate,
+                    GenParseDelegate>
 {
     NavButtons *nav;
     int viewWid,viewHit,viewW2,viewH2;

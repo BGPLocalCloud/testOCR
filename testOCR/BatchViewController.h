@@ -26,10 +26,11 @@
     BatchObject *bbb;
     UIViewController *parent;
     spinnerView *spv;
+    BOOL haltingBatchToExitVC;
 }
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *batchTableLabel;
 @property (weak, nonatomic) IBOutlet UIButton *runButton;
+@property (weak, nonatomic) IBOutlet UITextView *outputText;
 
 - (IBAction)cancelSelect:(id)sender;
 - (IBAction)runSelect:(id)sender;

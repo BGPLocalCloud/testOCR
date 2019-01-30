@@ -69,14 +69,11 @@
         NSMutableArray *chunks = (NSMutableArray*)[bItems[0] componentsSeparatedByString:@"/"];
         if (chunks.count >= 4)
         {
-            //Replace the top level folder with the "processed" folder name
+            ///outputFolder/reports/fname
             AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-            chunks[1] = bappDelegate.settings.outputFolder;
-            //Assemble report fname from batchID...
-            chunks[3] = [NSString stringWithFormat:@"%@_report.txt",_pfo[PInv_BatchID_key]];
-            //This should point to batch report now
-            NSString *iPath = [chunks componentsJoinedByString:@"/"];
-            [dbt downloadTextFile:iPath];
+            NSString *folderPath = [NSString stringWithFormat : @"/%@/reports",bappDelegate.settings.outputFolder];
+            NSString *reportPath = [NSString stringWithFormat:@"%@/%@_report.txt",folderPath,_pfo[PInv_BatchID_key]];
+            [dbt downloadTextFile:reportPath];
         }
     }
 

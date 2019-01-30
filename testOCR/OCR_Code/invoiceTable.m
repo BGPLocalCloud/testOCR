@@ -95,40 +95,6 @@
 } //end packInvoiceOids
 
 //=============(invoiceTable)=====================================================
-// Gets invoice, if not there creates object.
-//   if it exists, updates PInv_EXPObjectID_key field with new info and saves
--(void) updateInvoice : (NSString *)vendor : (NSString *)invoiceNumberstring
-{
-    NSLog(@" updateInvoice %@",invoiceNumberstring);
-    [self setupVendorTableName:vendor];
-    if (tableName.length < 1) return; //Error: no table name!
-    PFQuery *query = [PFQuery queryWithClassName:tableName];
-    [query whereKey:PInv_InvoiceNumber_key equalTo:invoiceNumberstring];
-    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        if (!error) { //Query came back...
-            if (objects.count == 0) [self saveToParse];  //Nothing? Just save
-            else for( PFObject *pfo in objects)         //Exists? Update first object
-            {
-                NSString *oldOIDs    = pfo[PInv_EXPObjectID_key];
-                NSString *newOIDs    = self->packedOIDs;
-                newOIDs              = [NSString stringWithFormat:@"%@,%@",oldOIDs,newOIDs];
-                pfo[PInv_EXPObjectID_key] = newOIDs;
-                NSLog(@" ...found, update Invoice:%@",newOIDs);
-                [pfo saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-                    if (succeeded) {
-                        NSLog(@" ...update save OKI");
-                        [self.delegate didUpdateInvoiceTable:invoiceNumberstring];
-                    } else {
-                        NSLog(@" ERROR: updating invoice: %@",error.localizedDescription);
-                    }
-                }];
-                break; //Done after one
-            } //end else
-        }    //end !error
-    }];     //end query
-} //end updateInvoice
-
-//=============(invoiceTable)=====================================================
 //Reads one invoice, using vendor and number
 -(void) readFromParse : (NSString *)vendor : (NSString *)invoiceNumberstring
 {
@@ -218,9 +184,46 @@
             [self.delegate didSaveInvoiceTable:self->_inumber];
         } else {
             NSLog(@" ERROR: saving invoice: %@",error.localizedDescription);
+            [self.delegate errorSavingInvoiceTable:error.localizedDescription];
         }
     }];
 } //end saveToParse
+
+//=============(invoiceTable)=====================================================
+// Gets invoice, if not there creates object.
+//   if it exists, updates PInv_EXPObjectID_key field with new info and saves
+-(void) updateInvoice : (NSString *)vendor : (NSString *)invoiceNumberstring : (NSString *)batchID
+{
+    NSLog(@" updateInvoice %@",invoiceNumberstring);
+    [self setupVendorTableName:vendor];
+    if (tableName.length < 1) return; //Error: no table name!
+    PFQuery *query = [PFQuery queryWithClassName:tableName];
+    [query whereKey:PInv_InvoiceNumber_key equalTo:invoiceNumberstring]; //Match invoice #
+    [query whereKey:PInv_BatchID_key equalTo:batchID]; //DHS 1/28 match batch too!
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) { //Query came back...
+            if (objects.count == 0) [self saveToParse];  //Nothing? Just save
+            else for( PFObject *pfo in objects)         //Exists? Update first object
+            {
+                NSString *oldOIDs    = pfo[PInv_EXPObjectID_key];
+                NSString *newOIDs    = self->packedOIDs;
+                newOIDs              = [NSString stringWithFormat:@"%@,%@",oldOIDs,newOIDs];
+                pfo[PInv_EXPObjectID_key] = newOIDs;
+                NSLog(@" ...found, update Invoice:%@",newOIDs);
+                [pfo saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                    if (succeeded) {
+                        NSLog(@" ...update save OKI");
+                        [self.delegate didUpdateInvoiceTable:invoiceNumberstring];
+                    } else {
+                        NSLog(@" ERROR: updating invoice: %@",error.localizedDescription);
+                    }
+                }];
+                break; //Done after one
+            } //end else
+        }    //end !error
+    }];     //end query
+} //end updateInvoice
+
 
 //=============(invoiceTable)=====================================================
 -(void) setBasicFields : (NSDate *) ddd : (NSString*)num : (NSString*)total :

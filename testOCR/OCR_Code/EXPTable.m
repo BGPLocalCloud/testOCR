@@ -53,8 +53,24 @@
     batchCounter = 0;
 }
 
-#define PInv_Local_key @"Local"
-#define PInv_LineNumber_key @"LineNumber"
+
+//=============(EXPTable)=====================================================
+// vendor = * means all
+-(void) deleteObjectsByVendor : (NSString *)vendor
+{
+    PFQuery *query = [PFQuery queryWithClassName:tableName];
+    //Wildcard? Don't select any vendor...
+    if (![vendor isEqualToString:@"*"]) [query whereKey:PInv_Vendor_key equalTo:vendor];
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            [PFObject deleteAllInBackground:objects];
+            NSLog(@" deleted all EXP for %@",vendor);
+        }
+        else {
+            NSLog(@"Error: %@ %@", error, [error userInfo]);
+        }
+    }];
+} //end deleteObjectsByVendor
 
 
 //=============(EXPTable)=====================================================

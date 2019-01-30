@@ -408,22 +408,6 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "testOCR/BatchViewController.m"
-            timestampString = "570430950.912156"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "108"
-            endingLineNumber = "108"
-            landmarkName = "-runSelect:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "testOCR/OCRTopObject.m"
             timestampString = "567556607.855801"
             startingColumnNumber = "9223372036854775807"
@@ -633,7 +617,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/EditTemplateVC.m"
-            timestampString = "570321669.439881"
+            timestampString = "570435254.351447"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "404"
@@ -665,7 +649,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/EditTemplateVC.m"
-            timestampString = "570321669.440473"
+            timestampString = "570435254.351673"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "974"
@@ -745,7 +729,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/EditTemplateVC.m"
-            timestampString = "570321669.440845"
+            timestampString = "570435254.351874"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "803"
@@ -761,7 +745,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/EditTemplateVC.m"
-            timestampString = "570321669.442988"
+            timestampString = "570435254.351933"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "521"
@@ -841,7 +825,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/MainVC.m"
-            timestampString = "570404815.0171371"
+            timestampString = "570564205.485548"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "436"
@@ -905,7 +889,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/EditTemplateVC.m"
-            timestampString = "570321669.443753"
+            timestampString = "570435254.352172"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "428"
@@ -921,7 +905,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/EditTemplateVC.m"
-            timestampString = "570321669.443843"
+            timestampString = "570435254.352352"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1240"
@@ -937,11 +921,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/invoiceTable.m"
-            timestampString = "570402299.25415"
+            timestampString = "570564205.486652"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "168"
-            endingLineNumber = "168"
+            startingLineNumber = "134"
+            endingLineNumber = "134"
             landmarkName = "-readFromParseAsStrings::"
             landmarkType = "7">
             <Locations>
@@ -1000,11 +984,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.036221"
+            timestampString = "570583660.461095"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "61"
-            endingLineNumber = "61"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
             landmarkName = "-init"
             landmarkType = "7">
          </BreakpointContent>
@@ -1048,7 +1032,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.445601"
+            timestampString = "570564205.487294"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "240"
@@ -1064,7 +1048,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.445796"
+            timestampString = "570564205.487631"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "262"
@@ -1080,7 +1064,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.445901"
+            timestampString = "570564205.487725"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "258"
@@ -1096,7 +1080,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.446004"
+            timestampString = "570564205.487816"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "254"
@@ -1192,11 +1176,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.234722"
+            timestampString = "570581602.336382"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "128"
-            endingLineNumber = "128"
+            startingLineNumber = "144"
+            endingLineNumber = "144"
             landmarkName = "-addRecord:::::::::::::::::::"
             landmarkType = "7">
          </BreakpointContent>
@@ -1208,11 +1192,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.23585"
+            timestampString = "570581602.34619"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "105"
-            endingLineNumber = "105"
+            startingLineNumber = "121"
+            endingLineNumber = "121"
             landmarkName = "-addRecord:::::::::::::::::::"
             landmarkType = "7">
          </BreakpointContent>
@@ -1288,7 +1272,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/EditTemplateVC.m"
-            timestampString = "570321669.446623"
+            timestampString = "570435254.35636"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "440"
@@ -1320,7 +1304,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/MainVC.m"
-            timestampString = "570404815.0511481"
+            timestampString = "570564205.488447"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "104"
@@ -1336,7 +1320,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/MainVC.m"
-            timestampString = "570404815.052043"
+            timestampString = "570564205.488574"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "102"
@@ -1432,11 +1416,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.057464"
+            timestampString = "570583660.4765919"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "142"
-            endingLineNumber = "142"
+            startingLineNumber = "192"
+            endingLineNumber = "192"
             landmarkName = "-getNewBatchID"
             landmarkType = "7">
          </BreakpointContent>
@@ -1448,11 +1432,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.060238"
+            timestampString = "570583660.477219"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "141"
-            endingLineNumber = "141"
+            startingLineNumber = "191"
+            endingLineNumber = "191"
             landmarkName = "BatchObject"
             landmarkType = "3">
          </BreakpointContent>
@@ -1623,22 +1607,6 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "testOCR/BatchViewController.m"
-            timestampString = "570430950.916273"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "48"
-            endingLineNumber = "48"
-            landmarkName = "-viewDidLoad"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "testOCR/AppDelegate.m"
             timestampString = "570137748.875716"
             startingColumnNumber = "9223372036854775807"
@@ -1672,7 +1640,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/MainVC.m"
-            timestampString = "570404815.069102"
+            timestampString = "570564205.489163"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "477"
@@ -1688,7 +1656,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/MainVC.m"
-            timestampString = "570404815.069669"
+            timestampString = "570564205.489244"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "486"
@@ -1720,7 +1688,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.081705"
+            timestampString = "570564205.489415"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "829"
@@ -1736,11 +1704,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.237523"
+            timestampString = "570581602.348233"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "146"
-            endingLineNumber = "146"
+            startingLineNumber = "162"
+            endingLineNumber = "162"
             landmarkName = "-addRecord:::::::::::::::::::"
             landmarkType = "7">
          </BreakpointContent>
@@ -1752,7 +1720,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.084353"
+            timestampString = "570564205.4896049"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "526"
@@ -1768,7 +1736,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.085153"
+            timestampString = "570564205.489669"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "573"
@@ -1784,11 +1752,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.237848"
+            timestampString = "570581602.349503"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "91"
-            endingLineNumber = "91"
+            startingLineNumber = "107"
+            endingLineNumber = "107"
             landmarkName = "-addRecord:::::::::::::::::::"
             landmarkType = "7">
          </BreakpointContent>
@@ -1800,7 +1768,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.450599"
+            timestampString = "570564205.489799"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "226"
@@ -1816,7 +1784,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.0867569"
+            timestampString = "570564205.489853"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "534"
@@ -1832,7 +1800,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.087676"
+            timestampString = "570564205.489939"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "749"
@@ -1976,7 +1944,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/MainVC.m"
-            timestampString = "570404815.097017"
+            timestampString = "570564205.490303"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "501"
@@ -1992,7 +1960,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/MainVC.m"
-            timestampString = "570404815.097675"
+            timestampString = "570564205.490504"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "277"
@@ -2008,7 +1976,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/BatchReportController.m"
-            timestampString = "570400762.362692"
+            timestampString = "570564205.4907219"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "49"
@@ -2024,7 +1992,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/BatchReportController.m"
-            timestampString = "570400762.362798"
+            timestampString = "570564205.490886"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "70"
@@ -2056,11 +2024,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.241217"
+            timestampString = "570581602.350849"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "275"
-            endingLineNumber = "275"
+            startingLineNumber = "291"
+            endingLineNumber = "291"
             landmarkName = "-fixPricesInObjectByID::::"
             landmarkType = "7">
          </BreakpointContent>
@@ -2072,11 +2040,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.24138"
+            timestampString = "570581602.35194"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "279"
-            endingLineNumber = "279"
+            startingLineNumber = "295"
+            endingLineNumber = "295"
             landmarkName = "-fixPricesInObjectByID::::"
             landmarkType = "7">
          </BreakpointContent>
@@ -2088,11 +2056,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.241581"
+            timestampString = "570581602.352803"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "271"
-            endingLineNumber = "271"
+            startingLineNumber = "287"
+            endingLineNumber = "287"
             landmarkName = "-fixPricesInObjectByID::::"
             landmarkType = "7">
             <Locations>
@@ -2279,11 +2247,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.242155"
+            timestampString = "570581602.35388"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "243"
-            endingLineNumber = "243"
+            startingLineNumber = "259"
+            endingLineNumber = "259"
             landmarkName = "-readFromParseByObjIDs:::"
             landmarkType = "7">
          </BreakpointContent>
@@ -2295,11 +2263,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.242382"
+            timestampString = "570581602.354468"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "305"
-            endingLineNumber = "305"
+            startingLineNumber = "321"
+            endingLineNumber = "321"
             landmarkName = "-getObjectsByIDs:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2311,11 +2279,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.242587"
+            timestampString = "570581602.3550659"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "308"
-            endingLineNumber = "308"
+            startingLineNumber = "324"
+            endingLineNumber = "324"
             landmarkName = "-getObjectsByIDs:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2343,11 +2311,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.2428"
+            timestampString = "570581602.355962"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "346"
-            endingLineNumber = "346"
+            startingLineNumber = "362"
+            endingLineNumber = "362"
             landmarkName = "-readFromParseAsStrings:::"
             landmarkType = "7">
          </BreakpointContent>
@@ -2359,11 +2327,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.242963"
+            timestampString = "570581602.356877"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "368"
-            endingLineNumber = "368"
+            startingLineNumber = "384"
+            endingLineNumber = "384"
             landmarkName = "-readFromParseAsStrings:::"
             landmarkType = "7">
             <Locations>
@@ -2422,11 +2390,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.24312"
+            timestampString = "570581602.357904"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "369"
-            endingLineNumber = "369"
+            startingLineNumber = "385"
+            endingLineNumber = "385"
             landmarkName = "-readFromParseAsStrings:::"
             landmarkType = "7">
          </BreakpointContent>
@@ -2598,7 +2566,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/EditTemplateVC.m"
-            timestampString = "570321669.452558"
+            timestampString = "570435254.359555"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1180"
@@ -2646,7 +2614,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/EditTemplateVC.m"
-            timestampString = "570321669.452662"
+            timestampString = "570435254.359672"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "422"
@@ -2662,7 +2630,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.45275"
+            timestampString = "570564205.492646"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "771"
@@ -2678,7 +2646,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.452836"
+            timestampString = "570564205.492756"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1501"
@@ -2694,11 +2662,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.243528"
+            timestampString = "570581602.358964"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "440"
-            endingLineNumber = "440"
+            startingLineNumber = "456"
+            endingLineNumber = "456"
             landmarkName = "-saveToParse::"
             landmarkType = "7">
             <Locations>
@@ -2757,13 +2725,45 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.2436301"
+            timestampString = "570581602.359607"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "415"
-            endingLineNumber = "415"
+            startingLineNumber = "431"
+            endingLineNumber = "431"
             landmarkName = "-saveToParse::"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "-[EXPTable saveToParse::]"
+                  moduleName = "testOCR"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/davescruton/Desktop/testOCR/testOCR/OCR_Code/EXPTable.m"
+                  timestampString = "570581602.87844"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "431"
+                  endingLineNumber = "431"
+                  offsetFromSymbolStart = "493">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "-[EXPTable saveToParse::]"
+                  moduleName = "testOCR"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/davescruton/Desktop/testOCR/testOCR/OCR_Code/EXPTable.m"
+                  timestampString = "570581602.898865"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "431"
+                  endingLineNumber = "431"
+                  offsetFromSymbolStart = "508">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -2773,7 +2773,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.452934"
+            timestampString = "570564205.493003"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "964"
@@ -2789,11 +2789,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.243765"
+            timestampString = "570581602.360285"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "72"
-            endingLineNumber = "72"
+            startingLineNumber = "88"
+            endingLineNumber = "88"
             landmarkName = "-TrackNilErrors::"
             landmarkType = "7">
          </BreakpointContent>
@@ -2805,7 +2805,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.4530129"
+            timestampString = "570564205.493203"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1305"
@@ -2821,7 +2821,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.45307"
+            timestampString = "570564205.493287"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1306"
@@ -2837,7 +2837,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.453127"
+            timestampString = "570564205.4933749"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1304"
@@ -2853,7 +2853,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.4531831"
+            timestampString = "570564205.4935"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "411"
@@ -2869,7 +2869,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.453265"
+            timestampString = "570564205.493608"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1363"
@@ -2885,7 +2885,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.119478"
+            timestampString = "570564205.493777"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "699"
@@ -2917,7 +2917,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/EditTemplateVC.m"
-            timestampString = "570321669.45346"
+            timestampString = "570435254.360074"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "350"
@@ -2933,7 +2933,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/EditTemplateVC.m"
-            timestampString = "570321669.453521"
+            timestampString = "570435254.3601561"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "366"
@@ -2949,7 +2949,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.1203901"
+            timestampString = "570564205.494035"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "685"
@@ -2965,7 +2965,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.120978"
+            timestampString = "570564205.49415"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "690"
@@ -2981,7 +2981,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.453724"
+            timestampString = "570564205.494216"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "634"
@@ -2997,7 +2997,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.453783"
+            timestampString = "570564205.494315"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "643"
@@ -3013,7 +3013,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.453882"
+            timestampString = "570564205.494435"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "706"
@@ -3029,7 +3029,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.453941"
+            timestampString = "570564205.49453"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "748"
@@ -3109,7 +3109,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.454213"
+            timestampString = "570564205.49476"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "555"
@@ -3125,7 +3125,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.4542921"
+            timestampString = "570564205.4948471"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "547"
@@ -3141,7 +3141,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.45436"
+            timestampString = "570564205.494972"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "672"
@@ -3157,7 +3157,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.122442"
+            timestampString = "570564205.495031"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "547"
@@ -3173,7 +3173,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.123088"
+            timestampString = "570564205.4951119"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "900"
@@ -3189,7 +3189,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.123908"
+            timestampString = "570564205.495186"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "903"
@@ -3205,11 +3205,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.2442909"
+            timestampString = "570581602.361285"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "403"
-            endingLineNumber = "403"
+            startingLineNumber = "419"
+            endingLineNumber = "419"
             landmarkName = "-saveToParse::"
             landmarkType = "7">
          </BreakpointContent>
@@ -3221,11 +3221,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.244418"
+            timestampString = "570581602.362114"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "410"
-            endingLineNumber = "410"
+            startingLineNumber = "426"
+            endingLineNumber = "426"
             landmarkName = "-saveToParse::"
             landmarkType = "7">
          </BreakpointContent>
@@ -3237,11 +3237,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.2445281"
+            timestampString = "570581602.362641"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "455"
-            endingLineNumber = "455"
+            startingLineNumber = "471"
+            endingLineNumber = "471"
             landmarkName = "-saveToParse::"
             landmarkType = "7">
          </BreakpointContent>
@@ -3253,11 +3253,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.244627"
+            timestampString = "570581602.36321"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "450"
-            endingLineNumber = "450"
+            startingLineNumber = "466"
+            endingLineNumber = "466"
             landmarkName = "-saveToParse::"
             landmarkType = "7">
          </BreakpointContent>
@@ -3269,44 +3269,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/EXPTable.m"
-            timestampString = "570421934.244738"
+            timestampString = "570581602.3637021"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "446"
-            endingLineNumber = "446"
+            startingLineNumber = "462"
+            endingLineNumber = "462"
             landmarkName = "-saveToParse::"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "testOCR/BatchViewController.m"
-            timestampString = "570430950.920061"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "42"
-            endingLineNumber = "42"
-            landmarkName = "-viewDidLoad"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "testOCR/BatchViewController.m"
-            timestampString = "570430950.92021"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "79"
-            endingLineNumber = "79"
-            landmarkName = "-dismiss"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -3317,11 +3285,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.13673"
+            timestampString = "570583660.483501"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "172"
-            endingLineNumber = "172"
+            startingLineNumber = "224"
+            endingLineNumber = "224"
             landmarkName = "-runOneOrMoreBatches:"
             landmarkType = "7">
          </BreakpointContent>
@@ -3349,7 +3317,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.456537"
+            timestampString = "570564205.495854"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "484"
@@ -3365,7 +3333,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.456692"
+            timestampString = "570564205.495929"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "491"
@@ -3381,7 +3349,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.456827"
+            timestampString = "570564205.496025"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "694"
@@ -3397,7 +3365,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/MainVC.m"
-            timestampString = "570404815.139359"
+            timestampString = "570564205.496104"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "96"
@@ -3413,11 +3381,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.140155"
+            timestampString = "570583660.484919"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "114"
-            endingLineNumber = "114"
+            startingLineNumber = "164"
+            endingLineNumber = "164"
             landmarkName = "-fixError:"
             landmarkType = "7">
          </BreakpointContent>
@@ -3525,7 +3493,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.4601541"
+            timestampString = "570564205.4964271"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "809"
@@ -3557,7 +3525,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.460355"
+            timestampString = "570564205.496555"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "737"
@@ -3573,7 +3541,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.460483"
+            timestampString = "570564205.496648"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "739"
@@ -3589,7 +3557,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.460605"
+            timestampString = "570564205.49674"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "658"
@@ -3605,7 +3573,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.460698"
+            timestampString = "570564205.4968179"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "657"
@@ -3669,11 +3637,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRTopObject.m"
-            timestampString = "570422763.831141"
+            timestampString = "570583660.486838"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "707"
-            endingLineNumber = "707"
+            startingLineNumber = "720"
+            endingLineNumber = "720"
             landmarkName = "-writeEXPToParse:"
             landmarkType = "7">
          </BreakpointContent>
@@ -3685,7 +3653,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.4614201"
+            timestampString = "570564205.497731"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "724"
@@ -3701,7 +3669,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRDocument.m"
-            timestampString = "570321669.461549"
+            timestampString = "570564205.497817"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "416"
@@ -3717,11 +3685,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.151504"
+            timestampString = "570583660.488081"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
+            startingLineNumber = "219"
+            endingLineNumber = "219"
             landmarkName = "-runOneOrMoreBatches:"
             landmarkType = "7">
          </BreakpointContent>
@@ -3765,11 +3733,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.158087"
+            timestampString = "570583660.488628"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "726"
-            endingLineNumber = "726"
+            startingLineNumber = "788"
+            endingLineNumber = "788"
             landmarkName = "-didCreateFolder:"
             landmarkType = "7">
          </BreakpointContent>
@@ -3781,11 +3749,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.164151"
+            timestampString = "570583660.488982"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "732"
-            endingLineNumber = "732"
+            startingLineNumber = "794"
+            endingLineNumber = "794"
             landmarkName = "-errorCreatingFolder:"
             landmarkType = "7">
          </BreakpointContent>
@@ -3797,11 +3765,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRTopObject.m"
-            timestampString = "570422763.8327121"
+            timestampString = "570583660.489235"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "774"
-            endingLineNumber = "774"
+            startingLineNumber = "787"
+            endingLineNumber = "787"
             landmarkName = "-didSaveEXPTable:"
             landmarkType = "7">
          </BreakpointContent>
@@ -3813,11 +3781,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/MainVC.m"
-            timestampString = "570404815.169788"
+            timestampString = "570564205.498842"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "675"
-            endingLineNumber = "675"
+            startingLineNumber = "685"
+            endingLineNumber = "685"
             landmarkName = "-testit"
             landmarkType = "7">
          </BreakpointContent>
@@ -3829,11 +3797,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/MainVC.m"
-            timestampString = "570404815.170431"
+            timestampString = "570564205.498955"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "676"
-            endingLineNumber = "676"
+            startingLineNumber = "686"
+            endingLineNumber = "686"
             landmarkName = "-testit"
             landmarkType = "7">
          </BreakpointContent>
@@ -3845,7 +3813,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.1711971"
+            timestampString = "570564205.49905"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "412"
@@ -3861,11 +3829,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/MainVC.m"
-            timestampString = "570404815.17196"
+            timestampString = "570564205.499117"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "674"
-            endingLineNumber = "674"
+            startingLineNumber = "684"
+            endingLineNumber = "684"
             landmarkName = "-testit"
             landmarkType = "7">
          </BreakpointContent>
@@ -3877,7 +3845,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.172618"
+            timestampString = "570564205.49921"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "405"
@@ -3893,7 +3861,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.173448"
+            timestampString = "570564205.499269"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "559"
@@ -3941,11 +3909,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRTopObject.m"
-            timestampString = "570422763.8335741"
+            timestampString = "570583660.4919831"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "695"
-            endingLineNumber = "695"
+            startingLineNumber = "708"
+            endingLineNumber = "708"
             landmarkName = "-writeEXPToParse:"
             landmarkType = "7">
          </BreakpointContent>
@@ -3957,7 +3925,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/smartProducts.m"
-            timestampString = "570404815.175916"
+            timestampString = "570564205.500029"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "659"
@@ -3973,7 +3941,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/MainVC.m"
-            timestampString = "570404815.177434"
+            timestampString = "570564205.500156"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "488"
@@ -4037,12 +4005,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.189805"
+            timestampString = "570583660.4935009"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "259"
-            endingLineNumber = "259"
-            landmarkName = "-completeBatch:"
+            startingLineNumber = "311"
+            endingLineNumber = "311"
+            landmarkName = "-completeBatch::"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -4053,11 +4021,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.191963"
+            timestampString = "570583660.494018"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "218"
-            endingLineNumber = "218"
+            startingLineNumber = "270"
+            endingLineNumber = "270"
             landmarkName = "-startNextVendorBatch:"
             landmarkType = "7">
          </BreakpointContent>
@@ -4069,11 +4037,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.19517"
+            timestampString = "570583660.4943939"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "283"
-            endingLineNumber = "283"
+            startingLineNumber = "337"
+            endingLineNumber = "337"
             landmarkName = "-startProcessingFiles"
             landmarkType = "7">
          </BreakpointContent>
@@ -4085,11 +4053,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.197544"
+            timestampString = "570583660.494763"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "225"
-            endingLineNumber = "225"
+            startingLineNumber = "277"
+            endingLineNumber = "277"
             landmarkName = "-startNextVendorBatch:"
             landmarkType = "7">
          </BreakpointContent>
@@ -4101,11 +4069,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.1993099"
+            timestampString = "570583660.495083"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "662"
-            endingLineNumber = "662"
+            startingLineNumber = "724"
+            endingLineNumber = "724"
             landmarkName = "-didGetBatchList:"
             landmarkType = "7">
          </BreakpointContent>
@@ -4117,11 +4085,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.200766"
+            timestampString = "570583660.495983"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "308"
-            endingLineNumber = "308"
+            startingLineNumber = "362"
+            endingLineNumber = "362"
             landmarkName = "-processNextFile:"
             landmarkType = "7">
          </BreakpointContent>
@@ -4133,11 +4101,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.2026089"
+            timestampString = "570583660.496401"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "396"
-            endingLineNumber = "396"
+            startingLineNumber = "450"
+            endingLineNumber = "450"
             landmarkName = "-getVendorFileCount:"
             landmarkType = "7">
          </BreakpointContent>
@@ -4149,11 +4117,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.204096"
+            timestampString = "570583660.496714"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "251"
-            endingLineNumber = "251"
+            startingLineNumber = "303"
+            endingLineNumber = "303"
             landmarkName = "-startBatchForCurrentVendor"
             landmarkType = "7">
          </BreakpointContent>
@@ -4165,11 +4133,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.205398"
+            timestampString = "570583660.49709"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "785"
-            endingLineNumber = "785"
+            startingLineNumber = "869"
+            endingLineNumber = "869"
             landmarkName = "-errorPerformingOCR:"
             landmarkType = "7">
          </BreakpointContent>
@@ -4181,11 +4149,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRTopObject.m"
-            timestampString = "570422763.835912"
+            timestampString = "570583660.4975311"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "541"
-            endingLineNumber = "541"
+            startingLineNumber = "548"
+            endingLineNumber = "548"
             landmarkName = "-performOCROnData::::"
             landmarkType = "7">
          </BreakpointContent>
@@ -4197,28 +4165,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.209796"
+            timestampString = "570583660.499357"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "258"
-            endingLineNumber = "258"
-            landmarkName = "-completeBatch:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "testOCR/OCR_Code/invoiceTable.m"
-            timestampString = "570402299.288697"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "120"
-            endingLineNumber = "120"
-            landmarkName = "-updateInvoice::"
+            startingLineNumber = "310"
+            endingLineNumber = "310"
+            landmarkName = "-completeBatch::"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -4229,11 +4181,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.212135"
+            timestampString = "570583660.499634"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "235"
-            endingLineNumber = "235"
+            startingLineNumber = "287"
+            endingLineNumber = "287"
             landmarkName = "-startNextVendorBatch:"
             landmarkType = "7">
          </BreakpointContent>
@@ -4245,11 +4197,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.215053"
+            timestampString = "570583660.500064"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "247"
-            endingLineNumber = "247"
+            startingLineNumber = "299"
+            endingLineNumber = "299"
             landmarkName = "-startBatchForCurrentVendor"
             landmarkType = "7">
          </BreakpointContent>
@@ -4261,11 +4213,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.216398"
+            timestampString = "570583660.500442"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "227"
-            endingLineNumber = "227"
+            startingLineNumber = "279"
+            endingLineNumber = "279"
             landmarkName = "-startNextVendorBatch:"
             landmarkType = "7">
          </BreakpointContent>
@@ -4277,11 +4229,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRTopObject.m"
-            timestampString = "570422763.836596"
+            timestampString = "570583660.500742"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "829"
-            endingLineNumber = "829"
+            startingLineNumber = "849"
+            endingLineNumber = "849"
             landmarkName = "-didUpdateInvoiceTable:"
             landmarkType = "7">
          </BreakpointContent>
@@ -4293,11 +4245,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.218497"
+            timestampString = "570583660.501258"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "212"
-            endingLineNumber = "212"
+            startingLineNumber = "264"
+            endingLineNumber = "264"
             landmarkName = "-startNextVendorBatch:"
             landmarkType = "7">
          </BreakpointContent>
@@ -4309,11 +4261,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.219449"
+            timestampString = "570583660.5015399"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "328"
-            endingLineNumber = "328"
+            startingLineNumber = "382"
+            endingLineNumber = "382"
             landmarkName = "-processNextFile:"
             landmarkType = "7">
          </BreakpointContent>
@@ -4325,11 +4277,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/BatchObject.m"
-            timestampString = "570404815.220903"
+            timestampString = "570583660.501786"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "321"
-            endingLineNumber = "321"
+            startingLineNumber = "375"
+            endingLineNumber = "375"
             landmarkName = "-processNextFile:"
             landmarkType = "7">
          </BreakpointContent>
@@ -4341,11 +4293,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRTopObject.m"
-            timestampString = "570422763.838063"
+            timestampString = "570583660.502135"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "822"
-            endingLineNumber = "822"
+            startingLineNumber = "836"
+            endingLineNumber = "836"
             landmarkName = "-didSaveInvoiceTable:"
             landmarkType = "7">
          </BreakpointContent>
@@ -4357,27 +4309,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRTopObject.m"
-            timestampString = "570422763.838529"
+            timestampString = "570583660.502591"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "828"
             endingLineNumber = "828"
-            landmarkName = "-didUpdateInvoiceTable:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "testOCR/OCR_Code/OCRTopObject.m"
-            timestampString = "570422763.8388211"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "814"
-            endingLineNumber = "814"
             landmarkName = "-errorInEXPRecord:::"
             landmarkType = "7">
          </BreakpointContent>
@@ -4389,11 +4325,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testOCR/OCR_Code/OCRTopObject.m"
-            timestampString = "570422763.839089"
+            timestampString = "570583660.5031019"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "788"
-            endingLineNumber = "788"
+            startingLineNumber = "802"
+            endingLineNumber = "802"
             landmarkName = "-didFinishAllEXPRecords:"
             landmarkType = "7">
             <Locations>
@@ -4405,7 +4341,7 @@
                   moduleName = "testOCR"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/davescruton/Desktop/testOCR/testOCR/OCR_Code/OCRTopObject.m"
-                  timestampString = "570421732.053915"
+                  timestampString = "570440068.747733"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "788"
@@ -4420,7 +4356,7 @@
                   moduleName = "testOCR"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/davescruton/Desktop/testOCR/testOCR/OCR_Code/OCRTopObject.m"
-                  timestampString = "570421732.058278"
+                  timestampString = "570440068.7511359"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "788"
@@ -4491,6 +4427,374 @@
             startingLineNumber = "231"
             endingLineNumber = "231"
             landmarkName = "-txtExistsByID:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRTopObject.m"
+            timestampString = "570583660.50424"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "518"
+            endingLineNumber = "518"
+            landmarkName = "-performOCROnData::::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/BatchReportController.m"
+            timestampString = "570564205.51027"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "75"
+            endingLineNumber = "75"
+            landmarkName = "-viewWillAppear:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/MainVC.m"
+            timestampString = "570564205.510357"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "37"
+            endingLineNumber = "37"
+            landmarkName = "-initWithCoder:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/invoiceTable.m"
+            timestampString = "570564205.510489"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "165"
+            endingLineNumber = "165"
+            landmarkName = "-saveToParse"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/invoiceTable.m"
+            timestampString = "570564205.510617"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "197"
+            endingLineNumber = "197"
+            landmarkName = "-updateInvoice:::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/invoiceTable.m"
+            timestampString = "570564205.510695"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "205"
+            endingLineNumber = "205"
+            landmarkName = "-updateInvoice:::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRTopObject.m"
+            timestampString = "570583660.505164"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "809"
+            endingLineNumber = "809"
+            landmarkName = "-didFinishAllEXPRecords:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/BatchObject.m"
+            timestampString = "570583660.505529"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "136"
+            endingLineNumber = "136"
+            landmarkName = "-clearTables:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRDocument.m"
+            timestampString = "570564205.511633"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "631"
+            endingLineNumber = "631"
+            landmarkName = "-findHeader::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRDocument.m"
+            timestampString = "570564205.511717"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "630"
+            endingLineNumber = "630"
+            landmarkName = "-findHeader::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRDocument.m"
+            timestampString = "570564205.511866"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "628"
+            endingLineNumber = "628"
+            landmarkName = "-findHeader::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRTopObject.m"
+            timestampString = "570583660.506102"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "583"
+            endingLineNumber = "583"
+            landmarkName = "-performFinalOCROnDocument::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRTopObject.m"
+            timestampString = "570583660.506635"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "90"
+            endingLineNumber = "90"
+            landmarkName = "-applyTemplate::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRTopObject.m"
+            timestampString = "570583660.507018"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "103"
+            endingLineNumber = "103"
+            landmarkName = "-applyTemplate::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRTopObject.m"
+            timestampString = "570583660.507521"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "113"
+            endingLineNumber = "113"
+            landmarkName = "-applyTemplate::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRTopObject.m"
+            timestampString = "570583660.5080251"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "119"
+            endingLineNumber = "119"
+            landmarkName = "-applyTemplate::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRTopObject.m"
+            timestampString = "570583660.508616"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "125"
+            endingLineNumber = "125"
+            landmarkName = "-applyTemplate::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRTopObject.m"
+            timestampString = "570583660.509063"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "104"
+            endingLineNumber = "104"
+            landmarkName = "-applyTemplate::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/BatchObject.m"
+            timestampString = "570583660.509455"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "813"
+            endingLineNumber = "813"
+            landmarkName = "-errorDeletingAllByTableAndKey:::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/BatchObject.m"
+            timestampString = "570583660.50977"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "802"
+            endingLineNumber = "802"
+            landmarkName = "-didDeleteAllByTableAndKey:::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRTopObject.m"
+            timestampString = "570583660.510082"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "131"
+            endingLineNumber = "131"
+            landmarkName = "-applyTemplate::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRTopObject.m"
+            timestampString = "570583660.510569"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "134"
+            endingLineNumber = "134"
+            landmarkName = "-applyTemplate::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "testOCR/OCR_Code/OCRTopObject.m"
+            timestampString = "570583660.513942"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "681"
+            endingLineNumber = "681"
+            landmarkName = "-writeEXPToParse:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

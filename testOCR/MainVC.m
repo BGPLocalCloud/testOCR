@@ -31,9 +31,9 @@
     act = [[ActivityTable alloc] init];
     act.delegate = self;
     
-    emptyIcon = [UIImage imageNamed:@"emptyDoc"];
-    dbIcon = [UIImage imageNamed:@"lildbGrey"];
-    batchIcon = [UIImage imageNamed:@"multiNOT"];
+    emptyIcon     = [UIImage imageNamed:@"emptyDoc"];
+    dbIcon        = [UIImage imageNamed:@"lildbGrey"];
+    batchIcon     = [UIImage imageNamed:@"multiNOT"];
     versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
     oc = [OCRCache sharedInstance];
     pc = [PDFCache sharedInstance];
@@ -314,7 +314,7 @@
     [alert addAction:noAction];
     [self presentViewController:alert animated:YES completion:nil];
     
-} //end menu
+} //end clearCacheMenu
 
 //=============OCR MainVC=====================================================
 // Yes/No for cache clear...
@@ -664,13 +664,23 @@
 int currentYear = 2019;
 
 
+- (void)didDeleteAllByTableAndKey : (NSString *)s1 : (NSString *)s2 : (NSString *)s3
+{
+    NSLog(@" delete OK");
+}
+- (void)errorDeletingAllByTableAndKey : (NSString *)s1 : (NSString *)s2 : (NSString *)s3
+{
+    NSLog(@" delete ERrr");
+}
 
 
 
 //=============OCR MainVC=====================================================
 -(void) testit
 {
- 
+    GenParse *gp = [[GenParse alloc] init];
+    [gp deleteAllByTableAndKey:@"activity" :@"*" :@"*"];
+    NSLog(@" deletit?");
    // smartProducts *smartp = [[smartProducts alloc] init];
    // [smartp saveBuiltinKeywordsToParse]; //ONLY CALL THIS ONCE!
    // NSLog(@" smart testit");

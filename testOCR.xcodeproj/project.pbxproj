@@ -58,9 +58,10 @@
 		724B4BB321E74BDE0086B933 /* multiHOT.png in Resources */ = {isa = PBXBuildFile; fileRef = 724B4BB221E74BDE0086B933 /* multiHOT.png */; };
 		724B4BB521E74BE50086B933 /* multiNOT.png in Resources */ = {isa = PBXBuildFile; fileRef = 724B4BB421E74BE50086B933 /* multiNOT.png */; };
 		724F9DB421C9C2A40022C829 /* meadow.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 724F9DB321C9C2A40022C829 /* meadow.jpg */; };
+		725145ED220037E40074EDBF /* lildbGrey.png in Resources */ = {isa = PBXBuildFile; fileRef = 725145EC220037E40074EDBF /* lildbGrey.png */; };
+		725145F02200B9860074EDBF /* GenParse.m in Sources */ = {isa = PBXBuildFile; fileRef = 725145EF2200B9860074EDBF /* GenParse.m */; };
 		725DA97D21CB53BC0024ECF7 /* EXPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 725DA97C21CB53BC0024ECF7 /* EXPViewController.m */; };
 		726F0A4921DF092F007656FD /* dbGrey.png in Resources */ = {isa = PBXBuildFile; fileRef = 726F0A4821DF092E007656FD /* dbGrey.png */; };
-		726F0A4B21DF105D007656FD /* lildbGrey.png in Resources */ = {isa = PBXBuildFile; fileRef = 726F0A4A21DF105D007656FD /* lildbGrey.png */; };
 		7272C5ED21D5EE050094D7D1 /* bgpBkgd.png in Resources */ = {isa = PBXBuildFile; fileRef = 7272C5EC21D5EE050094D7D1 /* bgpBkgd.png */; };
 		7272C5F021D6ABFE0094D7D1 /* OCRCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 7272C5EF21D6ABFE0094D7D1 /* OCRCache.m */; };
 		7279498E21D041670067B636 /* UIImageExtras.m in Sources */ = {isa = PBXBuildFile; fileRef = 7279498D21D041670067B636 /* UIImageExtras.m */; };
@@ -189,10 +190,12 @@
 		724B4BB221E74BDE0086B933 /* multiHOT.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = multiHOT.png; path = Resources/multiHOT.png; sourceTree = SOURCE_ROOT; };
 		724B4BB421E74BE50086B933 /* multiNOT.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = multiNOT.png; path = Resources/multiNOT.png; sourceTree = SOURCE_ROOT; };
 		724F9DB321C9C2A40022C829 /* meadow.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = meadow.jpg; sourceTree = "<group>"; };
+		725145EC220037E40074EDBF /* lildbGrey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = lildbGrey.png; path = Resources/lildbGrey.png; sourceTree = SOURCE_ROOT; };
+		725145EE2200B9860074EDBF /* GenParse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GenParse.h; sourceTree = "<group>"; };
+		725145EF2200B9860074EDBF /* GenParse.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GenParse.m; sourceTree = "<group>"; };
 		725DA97B21CB53BC0024ECF7 /* EXPViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXPViewController.h; sourceTree = "<group>"; };
 		725DA97C21CB53BC0024ECF7 /* EXPViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EXPViewController.m; sourceTree = "<group>"; };
 		726F0A4821DF092E007656FD /* dbGrey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dbGrey.png; path = Resources/dbGrey.png; sourceTree = SOURCE_ROOT; };
-		726F0A4A21DF105D007656FD /* lildbGrey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = lildbGrey.png; path = Resources/lildbGrey.png; sourceTree = SOURCE_ROOT; };
 		7272C5EC21D5EE050094D7D1 /* bgpBkgd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bgpBkgd.png; path = Resources/bgpBkgd.png; sourceTree = SOURCE_ROOT; };
 		7272C5EE21D6ABFE0094D7D1 /* OCRCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCRCache.h; sourceTree = "<group>"; };
 		7272C5EF21D6ABFE0094D7D1 /* OCRCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OCRCache.m; sourceTree = "<group>"; };
@@ -361,6 +364,7 @@
 		7209609021B81E4A00D49C63 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				725145EC220037E40074EDBF /* lildbGrey.png */,
 				72A4FDCA21F2633E00203A50 /* grecoShrunk3.png */,
 				72C90B9E21F450050032875D /* bgpspin.png */,
 				7234DF5021EFEE1500049128 /* gordon.png */,
@@ -369,7 +373,6 @@
 				72B787B421ED30DA00459AD4 /* redX.png */,
 				72F394FE21E91AD3009E59C4 /* lilGreenCheck.png */,
 				729E92C021DC1CC100048DAF /* barnIcon.png */,
-				726F0A4A21DF105D007656FD /* lildbGrey.png */,
 				726F0A4821DF092E007656FD /* dbGrey.png */,
 				729E92B721DBE38E00048DAF /* bigbuxIcon.png */,
 				729E92B421DBE38C00048DAF /* centIcon.png */,
@@ -456,6 +459,8 @@
 				72435B3321C8C7C600620F4B /* EXPObject.m */,
 				72435B3521C8C8EA00620F4B /* EXPTable.h */,
 				72435B3621C8C8EA00620F4B /* EXPTable.m */,
+				725145EE2200B9860074EDBF /* GenParse.h */,
+				725145EF2200B9860074EDBF /* GenParse.m */,
 				72ECD04421C88A1000DBD08E /* invoiceObject.h */,
 				72ECD04521C88A1000DBD08E /* invoiceObject.m */,
 				729B7A3C21C886590075486C /* invoiceTable.h */,
@@ -614,13 +619,13 @@
 				72C90B9F21F450050032875D /* bgpspin.png in Resources */,
 				7206009F21B640E2000B26DC /* hawaiiBeefInvoice.jpg in Resources */,
 				72B8DEB221C370FB004ADD79 /* hfm90.jpg in Resources */,
-				726F0A4B21DF105D007656FD /* lildbGrey.png in Resources */,
 				72183DED21C5FA86005627AB /* squareMask.png in Resources */,
 				7206009021B64052000B26DC /* Main.storyboard in Resources */,
 				7204B10221D6FB7F007366C3 /* mg.png in Resources */,
 				72A4FDCB21F2633E00203A50 /* grecoShrunk3.png in Resources */,
 				729E92BB21DBE3A000048DAF /* centIcon.png in Resources */,
 				724B4BB321E74BDE0086B933 /* multiHOT.png in Resources */,
+				725145ED220037E40074EDBF /* lildbGrey.png in Resources */,
 				729E92C121DC1CC100048DAF /* barnIcon.png in Resources */,
 				72B787B521ED30DA00459AD4 /* redX.png in Resources */,
 				72435B3B21C96E8E00620F4B /* loves.jpg in Resources */,
@@ -726,6 +731,7 @@
 				729C592C21C1D08900F4C695 /* smartProducts.m in Sources */,
 				721D9C2421CB13E500D1E78A /* CatObject.m in Sources */,
 				721C296621F56DD100631570 /* documentBox.m in Sources */,
+				725145F02200B9860074EDBF /* GenParse.m in Sources */,
 				728EECC821ED1DDB00F83129 /* invoiceCell.m in Sources */,
 				7272C5F021D6ABFE0094D7D1 /* OCRCache.m in Sources */,
 				72435B3721C8C8EA00620F4B /* EXPTable.m in Sources */,
