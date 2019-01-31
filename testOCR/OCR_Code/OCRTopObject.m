@@ -70,10 +70,13 @@ static OCRTopObject *sharedInstance = nil;
     CGRect trTemplate = [ot getTROriginalRect];
     [od computeScaling : tlTemplate : trTemplate];
     
-    _invoiceNumber   = 0L;
-    _invoiceDate     = nil;
-    _invoiceCustomer = nil;
-    _invoiceVendor   = nil;
+    if (page == 0) //DHS 1/31 ONLY clear on first page!
+    {
+        _invoiceNumber   = 0L;
+        _invoiceDate     = nil;
+        _invoiceCustomer = nil;
+        _invoiceVendor   = nil;
+    }
     
     //First add any boxes of content to ignore...
     for (int i=0;i<[ot getBoxCount];i++) //Loop over our boxes...
@@ -105,6 +108,7 @@ static OCRTopObject *sharedInstance = nil;
             }
             else if (page == 0 && [fieldName isEqualToString:INVOICE_DATE_FIELD]) //Looking for a date?
             {
+                [od dumpArrayFull:a];
                 NSDate* testDate = [od findDateInArrayOfFields:a]; //Find date-like string?
                 if (testDate == nil) //Bogus?  1/27 redid
                 {
@@ -143,7 +147,7 @@ static OCRTopObject *sharedInstance = nil;
                 headerRect = rr; //Save our header rect for later...
                 NSLog(@"1: on headery...%d",(int)rr.origin.y);
                 NSLog(@" HEADER DUMP BEFORE parseHeaderColumns:");
-                //[od dumpArrayFull:a];
+                [od dumpArrayFull:a];
                 //[od dumpArray:a];
                 _columnHeaders = [od getHeaderNames];
                 NSLog(@" _columnHeaders %@",_columnHeaders);
@@ -799,6 +803,7 @@ static OCRTopObject *sharedInstance = nil;
 // called when Allll exps are saved in one invoice from all the pages
 - (void)didFinishAllEXPRecords : (NSArray *)a;
 {
+    //Compile list of invoice ptrs -> EXP table...
     for (NSString *objID in a) [it addInvoiceItemByObjectID : objID];
     NSLog(@" finished EXP saves, save invoice");
     //For every page, add entries to invoice...asdf
@@ -807,7 +812,6 @@ static OCRTopObject *sharedInstance = nil;
     NSString *its = [NSString stringWithFormat:@"%4.2f",_invoiceTotal];
     its = [od cleanupPrice:its]; //Make sure total is formatted!
     [it updateInvoice : _vendor : _invoiceNumberString : _batchID];
-//    [it saveToParse];
 
 }
 

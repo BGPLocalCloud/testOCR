@@ -126,7 +126,7 @@ static BatchObject *sharedInstance = nil;
 //=============(BatchObject)=====================================================
 -(void) clearTables : (NSString *) vendor
 {
-    [gp deleteAllByTableAndKey:@"Batch"    :@"*" :@"*"];
+   // [gp deleteAllByTableAndKey:@"Batch"    :@"*" :@"*"];
     [gp deleteAllByTableAndKey:@"EXP"      :@"*" :@"*"];
     if ([vendor isEqualToString:@"*"]) //All vendors?
     {
@@ -368,6 +368,8 @@ static BatchObject *sharedInstance = nil;
         return;
     }
 
+    [self updateBatchProgress : [NSString stringWithFormat:@"Fetch File %d of %d",batchCount,batchTotal] : FALSE];
+
     int i = batchCount-1; //Batch Count is 1...n
     if (i < 0 || i >= pdfEntries.count) return; //Out of bounds!
     DBFILESMetadata *entry = pdfEntries[i];
@@ -378,8 +380,9 @@ static BatchObject *sharedInstance = nil;
     {
         NSLog(@" ...skip %@",lastFileProcessed);
         [self updateBatchProgress : [NSString stringWithFormat:@"   skip:%@",lastFileProcessed] : FALSE];
-
-        [self processNextFile : 0];  //Re-entrant call, should be OK
+        [self processNextFile : 0];  //Re-entrant call...
+        //DHS 1/31                      may result in batch being completed!
+        if ([_batchStatus  isEqualToString: BATCH_STATUS_COMPLETED]) return;
     }
     else if ([lastFileProcessed.lowercaseString containsString:@".csv"]) // CSV File?
     {
@@ -767,10 +770,6 @@ static BatchObject *sharedInstance = nil;
 - (void)didDownloadImages
 {
     NSLog(@" ...downloaded all images? got %d",(int)dbt.batchImages.count);
-    batchProgress = [NSString stringWithFormat:@"Fetch File %d of %d",batchCount,batchTotal];
-    //At this point we have all the images for a file, ready to process!
-    [self.delegate batchUpdate : batchProgress];
-    [self updateParse];
     [self processPDFPages];
 }  //end didDownloadImages
 

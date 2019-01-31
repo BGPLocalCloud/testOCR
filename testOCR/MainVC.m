@@ -678,9 +678,9 @@ int currentYear = 2019;
 //=============OCR MainVC=====================================================
 -(void) testit
 {
-    GenParse *gp = [[GenParse alloc] init];
-    [gp deleteAllByTableAndKey:@"activity" :@"*" :@"*"];
-    NSLog(@" deletit?");
+//    GenParse *gp = [[GenParse alloc] init];
+//    [gp deleteAllByTableAndKey:@"activity" :@"*" :@"*"];
+//    NSLog(@" deletit?");
    // smartProducts *smartp = [[smartProducts alloc] init];
    // [smartp saveBuiltinKeywordsToParse]; //ONLY CALL THIS ONCE!
    // NSLog(@" smart testit");

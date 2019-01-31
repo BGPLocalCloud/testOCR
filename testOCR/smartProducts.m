@@ -300,7 +300,9 @@
                      @"lemons",
                      @"lettuce",
                      @"mango",
+                     @"melon",
                      @"melons",
+                     @"mushroom",
                      @"mushrooms",
                      @"onions",
                      @"oranges",  //confusion w/ orange juice?
