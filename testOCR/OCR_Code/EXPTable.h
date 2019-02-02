@@ -34,7 +34,8 @@
     NSString *workPDFFile;
     NSNumber *workPage;
     NSString *errorsByLineNumber[256];  // 256 invoice items?
-    
+    NSMutableArray* internalPFOs;
+
     int batchCounter;
 }
 
@@ -50,18 +51,29 @@
 -(void) clear;
 
 -(void) addRecord : (NSDate*) fdate : (NSString *) category : (NSString *) month : (NSString *) item : (NSString *) uom : (NSString *) bulk : (NSString *) vendor : (NSString *) productName : (NSString *) processed : (NSString *) local : (NSString *) lineNumber : (NSString *) invoiceNumber : (NSString *) quantity : (NSString *) pricePerUOM : (NSString *) total : (NSString *) batch : (NSString *) errStatus : (NSString *) PDFFile : (NSNumber *) page ;
+-(void) addRecordFromArrays : (NSDate*) fdate : (NSArray *) fields : (NSArray*) values;
 -(void) clearBatchCounter;
 -(void) deleteObjectsByVendor : (NSString *)vendor;
 -(void) getObjectsByIDs : (NSArray *)oids;
 -(void) getObjectByID : (NSString *)oid;
 -(void) fixPricesInObjectByID : (NSString *)oid : (NSString *)qt : (NSString *)pt : (NSString *)tt;
 -(void) fixFieldInObjectByID : (NSString *)oid : (NSString *)key : (NSString *)value;
-
+-(void) saveEXPOs;
 -(void) saveToParse : (int) page : (BOOL) lastPage;
 -(void) readFromParse : (NSString *) invoiceNumberstring;
 -(void) readFromParseByObjIDs : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)soids;
 -(void) readFromParseAsStrings : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)batch;
+-(void) setTableName : (NSString *)newName;
+-(void) writeRecordFromArrays : (NSDate*) fdate : (NSMutableArray *) fields : (NSMutableArray*) values;
 -(NSString *) dumpToCSV;
+
+//Gettors .... assume expos table allll loaded
+-(int)  getAmount : (int) index;
+-(BOOL) getLocal : (int) index;
+-(BOOL) getProcessed : (int) index;
+-(NSString *) getVendor : (int) index;
+-(NSString *) getCategory : (int) index;
+
 
 
 @end
@@ -77,5 +89,7 @@
 - (void)didFinishAllEXPRecords : (NSArray *)a;
 - (void)didFixPricesInObjectByID : (NSString *)oid;
 - (void)errorInEXPRecord : (NSString *)err : (NSString *)oid : (NSString *)productName;
+- (void)didSaveEXPOs ;
+- (void)errorSavingEXPOs : (NSString *)err;
 @end
 

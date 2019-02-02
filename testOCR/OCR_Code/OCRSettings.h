@@ -26,6 +26,7 @@
     NSString *rejectFolderDefault;
     NSString *outputFolderDefault;
     NSString *templateFolderDefault;
+    NSString *comparisonFolderDefault;
     double PhotoJPEGQualityDefault;
     BOOL loaded;
     
@@ -37,6 +38,7 @@
 @property (nonatomic , strong) NSString *rejectFolder;
 @property (nonatomic , strong) NSString *outputFolder;
 @property (nonatomic , strong) NSString *templateFolder;
+@property (nonatomic , strong) NSString *comparisonFolder;
 @property (nonatomic , assign) double   PhotoJPEGQuality;
 
 @property (nonatomic, unsafe_unretained) id <OCRSettingsDelegate> delegate;

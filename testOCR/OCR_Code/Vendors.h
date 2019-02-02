@@ -22,7 +22,7 @@
 
 @interface Vendors : NSObject
 {
-    
+    NSMutableArray* vNamesLC;
 }
 @property (nonatomic , strong) NSMutableArray* vNames;
 @property (nonatomic , strong) NSMutableArray* vFolderNames;
@@ -34,6 +34,7 @@
 
 + (id)sharedInstance;
 -(NSString *) getFolderName : (NSString *)vmatch;
+-(int)  getVendorIndex : (NSString *)vname;
 -(void) readFromParse;
 -(int) stringHasVendorName : (NSString *)s;
 -(NSString *) getRotationByVendorName : (NSString *)vname;

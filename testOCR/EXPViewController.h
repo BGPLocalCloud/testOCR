@@ -60,6 +60,9 @@ NS_ASSUME_NONNULL_BEGIN
     UIRefreshControl *refreshControl;
     spinnerView *spv;
     
+    NSArray *sortOptions;
+
+    
 }
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UITableView *table;

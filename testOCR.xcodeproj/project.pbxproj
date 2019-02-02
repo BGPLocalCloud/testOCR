@@ -105,6 +105,7 @@
 		72C90B9D21F447510032875D /* spinnerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C90B9C21F447510032875D /* spinnerView.m */; };
 		72C90B9F21F450050032875D /* bgpspin.png in Resources */ = {isa = PBXBuildFile; fileRef = 72C90B9E21F450050032875D /* bgpspin.png */; };
 		72CA1A6A21CADE7200F908A0 /* SessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 72CA1A6921CADE7200F908A0 /* SessionManager.m */; };
+		72D6516D2204DA97009E2057 /* ComparisonVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D6516C2204DA97009E2057 /* ComparisonVC.m */; };
 		72DB332021CDC35F00AA44C0 /* DropboxTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DB331F21CDC35F00AA44C0 /* DropboxTools.m */; };
 		72E5D31121B6DE4C005AF869 /* txt in Resources */ = {isa = PBXBuildFile; fileRef = 72E5D31021B6DE4C005AF869 /* txt */; };
 		72E785AC21CCBFC600EEEF1F /* AddTemplateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E785AB21CCBFC600EEEF1F /* AddTemplateViewController.m */; };
@@ -258,6 +259,8 @@
 		72C90B9E21F450050032875D /* bgpspin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bgpspin.png; sourceTree = "<group>"; };
 		72CA1A6821CADE1300F908A0 /* SessionManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SessionManager.h; sourceTree = "<group>"; };
 		72CA1A6921CADE7200F908A0 /* SessionManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SessionManager.m; sourceTree = "<group>"; };
+		72D6516B2204DA97009E2057 /* ComparisonVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ComparisonVC.h; sourceTree = "<group>"; };
+		72D6516C2204DA97009E2057 /* ComparisonVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ComparisonVC.m; sourceTree = "<group>"; };
 		72DB331E21CDC35F00AA44C0 /* DropboxTools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DropboxTools.h; sourceTree = "<group>"; };
 		72DB331F21CDC35F00AA44C0 /* DropboxTools.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DropboxTools.m; sourceTree = "<group>"; };
 		72E5D31021B6DE4C005AF869 /* txt */ = {isa = PBXFileReference; lastKnownFileType = folder; path = txt; sourceTree = "<group>"; };
@@ -321,8 +324,8 @@
 				7206008921B64052000B26DC /* AppDelegate.m */,
 				7283813421C4A60000A2954B /* MainVC.h */,
 				7283813521C4A60000A2954B /* MainVC.m */,
-				72C90B9B21F447510032875D /* spinnerView.h */,
-				72C90B9C21F447510032875D /* spinnerView.m */,
+				72D6516B2204DA97009E2057 /* ComparisonVC.h */,
+				72D6516C2204DA97009E2057 /* ComparisonVC.m */,
 				72BA4D2321CE175000F432E9 /* BatchViewController.h */,
 				72BA4D2421CE175000F432E9 /* BatchViewController.m */,
 				720FB49E21EC679F00C0F320 /* BatchReportController.h */,
@@ -490,6 +493,8 @@
 		7283813721C4D83100A2954B /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				72C90B9B21F447510032875D /* spinnerView.h */,
+				72C90B9C21F447510032875D /* spinnerView.m */,
 				7290229A21D58FF900885EF9 /* activityCell.h */,
 				7290229B21D58FF900885EF9 /* activityCell.m */,
 				7209159421E0982A00F94258 /* errorCell.h */,
@@ -740,6 +745,7 @@
 				72C90B9D21F447510032875D /* spinnerView.m in Sources */,
 				7283813621C4A60000A2954B /* MainVC.m in Sources */,
 				7209608C21B8164F00D49C63 /* imageTools.m in Sources */,
+				72D6516D2204DA97009E2057 /* ComparisonVC.m in Sources */,
 				72F0D8C421D932BE005979D2 /* Vendors.m in Sources */,
 				72ECD04621C88A1000DBD08E /* invoiceObject.m in Sources */,
 				72CA1A6A21CADE7200F908A0 /* SessionManager.m in Sources */,

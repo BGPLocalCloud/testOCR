@@ -97,6 +97,7 @@
 
 -(void) addError : (NSString *) errDesc : (NSString *) objectID : (NSString*) productName;
 -(void) clearAndRunBatches : (int) vindex;
+-(int)  countCommas : (NSString *)s;
 -(void) fixError : (int) index;
 -(void) fixWarning : (int) index;
 -(BOOL) isErrorFixed :(NSString *)errStr;

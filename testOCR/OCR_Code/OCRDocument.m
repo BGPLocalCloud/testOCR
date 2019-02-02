@@ -632,8 +632,8 @@
             {
                 found = TRUE;
                 yTest  = ow.top.intValue;  //Document space!
-                int xt = ow.left.intValue;
-                NSLog(@" description found:index %d xy (%d,%d)",index,yTest,xt);
+                //int xt = ow.left.intValue;
+                //NSLog(@" description found:index %d xy (%d,%d)",index,yTest,xt);
                 break;
             }
           index++;
@@ -723,9 +723,9 @@
         CGRect cr = CGRectMake(rr.origin.x, thisY, rr.size.width, nextY-thisY);
         NSMutableArray *a = [self findAllWordsInRect:cr];
         CGRect docRect = [self  template2DocRect : cr];
-//        NSLog(@" getColumnString:(col %d row %d) rect %@ thisy %d nexty %d",
-//              column,i,NSStringFromCGRect(docRect),thisY,nextY);
-        //[self dumpArray:a];
+        NSLog(@" getColumnString:(col %d row %d) rect %@ thisy %d nexty %d",
+              column,i,NSStringFromCGRect(docRect),thisY,nextY);
+        [self dumpArrayFull:a];
         [resultStrings addObject:[self assembleWordFromArray : a : FALSE : 2]];
         lastYSize = nextY - thisY;
     }
@@ -743,8 +743,8 @@
         _priceColumn = column;
     if ([headerForThisColumn containsString:@"amount"] || [ctype.lowercaseString containsString:@"amount"])
         _amountColumn = column;
-    NSLog(@" column header[%d] %@ ic %d qc %d dc %d pc %d ac %d",column,headerForThisColumn,
-          _itemColumn,_quantityColumn,_descriptionColumn,_priceColumn,_amountColumn);
+    //NSLog(@" column header[%d] %@ ic %d qc %d dc %d pc %d ac %d",column,headerForThisColumn,
+    //      _itemColumn,_quantityColumn,_descriptionColumn,_priceColumn,_amountColumn);
     return resultStrings;
 } //end getColumnStrings
 
@@ -823,9 +823,14 @@
     {
         int dy = nextY.doubleValue - lastY.doubleValue;
         //DHS 1/23 NOTE: this sometimes makes duplicate items show up! (at least in HFM invoice)
-        if (dy > _glyphHeight) [finalYs addObject:nextY];
+        if (dy > _glyphHeight)
+        {
+            NSLog(@" add finalY %d",nextY.intValue);
+            [finalYs addObject:nextY];
+        }
         lastY = nextY;
     }
+    NSLog(@" got %d rows",(int)finalYs.count);
     return 0; //OK
 } //end getRowYpositions'
 
@@ -1286,7 +1291,7 @@
         NSLog(@" ERROR: parseHeaderColumns missing column boxes");
         return;
     }
-    NSLog(@" parseHeaderColumns: dump of bigrect:");
+    //NSLog(@" parseHeaderColumns: dump of bigrect:");
     //[self dumpArrayFull:[self findAllWordsInRect:hr]];
     //Let's get some header rects first, using colRectz...
     //NSMutableArray *cr = [[NSMutableArray alloc] init];
@@ -1525,8 +1530,7 @@
         hScale = vScale = hsizeDocument / hsizeTemplate;
         unitScale = FALSE;
     }
-    NSLog(@" templateWid %f docWid %f  hvScale %f",hsizeTemplate,hsizeDocument,hScale);
-    
+    //NSLog(@" templateWid %f docWid %f  hvScale %f",hsizeTemplate,hsizeDocument,hScale);
 } //end computeScaling
 
 

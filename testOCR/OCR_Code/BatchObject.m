@@ -127,7 +127,7 @@ static BatchObject *sharedInstance = nil;
 -(void) clearTables : (NSString *) vendor
 {
    // [gp deleteAllByTableAndKey:@"Batch"    :@"*" :@"*"];
-    [gp deleteAllByTableAndKey:@"EXP"      :@"*" :@"*"];
+    [gp deleteAllByTableAndKey:@"EXPFullTable"      :@"*" :@"*"];
     if ([vendor isEqualToString:@"*"]) //All vendors?
     {
         for (NSString *vn in vv.vNames)
@@ -142,6 +142,23 @@ static BatchObject *sharedInstance = nil;
         [gp deleteAllByTableAndKey:tableName : @"*" : @"*"];
     }
 } //end clearTables
+
+//=============(BatchObject)=====================================================
+-(int)countCommas : (NSString *)s
+{
+    if (s == nil) return 0;
+    NSScanner *mainScanner = [NSScanner scannerWithString:s];
+    NSString *temp;
+    int nc=0;
+    while(![mainScanner isAtEnd])
+    {
+        [mainScanner scanUpToString:@"," intoString:&temp];
+        nc++;
+        [mainScanner scanString:@"," intoString:nil];
+    }
+    return nc;
+} //end countCommas
+
 
 //=============(BatchObject)=====================================================
 -(void) createBatchFolder
@@ -311,8 +328,10 @@ static BatchObject *sharedInstance = nil;
     if ([_batchStatus  isEqualToString: BATCH_STATUS_COMPLETED]) return; //No dupes
     _batchStatus = BATCH_STATUS_COMPLETED;
     [self updateParse];
+    
     NSString *actData     = [NSString stringWithFormat:@"%@:%@",_batchID,vendorName];
-    NSString *lilStr      = @"Batch Completed";
+    NSString *lilStr      = [NSString stringWithFormat:@"Batch Completed E:%d W:%d",
+                             (int)errorList.count,(int)warningList.count];
     if (haltFlag) lilStr  = @"Batch Halted";
     [act saveActivityToParse : lilStr : actData];
     [self.delegate didCompleteBatch];
@@ -756,14 +775,13 @@ static BatchObject *sharedInstance = nil;
 {
     NSLog(@" didDownloadCSVFile: %@ %@",vendor,result);
     [oto loadCSVValuesFromString : vendor : result]; //This does EXP writes...
-    //Since there is no big wait for a file fetch, consider this step done ...
-    //DHS 1/28: We must wait until invoice is done!
-//    if (batchPage >= batchTotalPages)
-//    {
-//        [self processNextFile];
-//    }
+}
 
-
+//===========<DropboxToolDelegate>================================================
+- (void)errorDownloadingCSV : (NSString *)s
+{
+    NSLog(@" Error Downloading CSV %@",s);
+    NSLog(@" what next????");
 }
 
 //===========<DropboxToolDelegate>================================================
@@ -799,7 +817,7 @@ static BatchObject *sharedInstance = nil;
 - (void)didDeleteAllByTableAndKey : (NSString *)s1 : (NSString *)s2 : (NSString *)s3
 {
     NSLog(@" delete OK %@/%@/%@",s1,s2,s3);
-    if ([s1 isEqualToString:@"EXP"]) //Usually the longest table..
+    if ([s1 isEqualToString:@"EXPFullTable"]) //Usually the longest table..
     {
         //OK continue running batch...
         [self runOneOrMoreBatches : selectedVendor];
@@ -904,18 +922,18 @@ static BatchObject *sharedInstance = nil;
 
 
 //===========<OCRTopObjectDelegate>================================================
+// Called w/ bad product ID, or from errorInEXPRecord in EXP write
 - (void)errorSavingEXP  : (NSString *) errMsg : (NSString*) objectID : (NSString*) productName
 {
-    //Record this error , gets saved with batch record
-    NSString *secondArg = objectID;
-    if (objectID== nil) secondArg = _batchID; //Got no DB oid? use batchID for lookup
     //Assume only 2 types for now...
-    NSLog(@" exp error %@ : %@",errMsg,objectID);
-    if ([[errMsg substringToIndex:2] containsString:@"E"])
+    if ([[errMsg substringToIndex:2] containsString:@"E"]) //Error?
+    {
+        NSLog(@" exp error %@ : %@",errMsg,objectID);
         [self addError : errMsg : objectID : productName];
-    else
+    }
+    else //Warning?
         [self addWarning : errMsg : objectID : productName];
-}
+} //end errorSavingEXP
 
 
 

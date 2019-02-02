@@ -170,18 +170,22 @@
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self performSegueWithIdentifier:@"templateSegue" sender:@"mainVC"];
                                                           }];
-    UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Clear OCR Cache",nil)
+    UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Load Comparison EXP File...",nil)
+                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                              [self performSegueWithIdentifier:@"comparisonSegue" sender:@"mainVC"];
+                                                          }];
+    UIAlertAction *fourthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Clear OCR Cache",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self clearCacheMenu];
                                                           }];
-    UIAlertAction *fourthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Clear PDF Cache",nil)
+    UIAlertAction *fifthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Clear PDF Cache",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self clearPDFCacheMenu];
                                                           }];
     NSString* t = @"Minimum Activity Logging";
     AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     if (mappDelegate.verbose) t = @"Verbose Activity Logging";
-    UIAlertAction *fifthAction = [UIAlertAction actionWithTitle:NSLocalizedString(t,nil)
+    UIAlertAction *sixthAction = [UIAlertAction actionWithTitle:NSLocalizedString(t,nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               mappDelegate.verbose = !mappDelegate.verbose;
                                                           }];
@@ -194,6 +198,7 @@
     [alert addAction:thirdAction];
     [alert addAction:fourthAction];
     [alert addAction:fifthAction];
+    [alert addAction:sixthAction];
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
 
@@ -438,21 +443,6 @@
 
 #pragma mark - UITableViewDelegate
 
-//=============OCR MainVC=====================================================
--(int)countCommas : (NSString *)s
-{
-    if (s == nil) return 0;
-    NSScanner *mainScanner = [NSScanner scannerWithString:s];
-    NSString *temp;
-    int nc=0;
-    while(![mainScanner isAtEnd])
-    {
-        [mainScanner scanUpToString:@"," intoString:&temp];
-        nc++;
-        [mainScanner scanString:@"," intoString:nil];
-    }
-    return nc;
-} //end countCommas
 
 //=============OCR MainVC=====================================================
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -485,8 +475,8 @@
             {
                 if ([pfo[PInv_BatchID_key] isEqualToString:batchID]) //Batch Match? Look for errors
                 {
-                    int bcount = [self countCommas:pfo[PInv_BatchErrors_key]];
-                    int fcount = [self countCommas:pfo[PInv_BatchFixed_key]];;
+                    int bcount = [bbb countCommas:pfo[PInv_BatchErrors_key]];
+                    int fcount = [bbb countCommas:pfo[PInv_BatchFixed_key]];;
                     int errCount = bcount - fcount;  //# errs = total errs - fixed errs
                     if (errCount > 0)
                     {
@@ -498,8 +488,8 @@
                     }
                     else{ //No errors, show checkmark
                     }
-                    bcount = [self countCommas:pfo[PInv_BatchWarnings_key]];
-                    fcount = [self countCommas:pfo[PInv_BatchWFixed_key]];;
+                    bcount = [bbb countCommas:pfo[PInv_BatchWarnings_key]];
+                    fcount = [bbb countCommas:pfo[PInv_BatchWFixed_key]];;
                     int wCount = bcount - fcount;  //# errs = total errs - fixed errs
                     if (wCount > 0)
                     {
@@ -610,8 +600,8 @@
     }
     else if (which == 2) //Templates / settings?
     {
-        [self testit];
-        return;
+       // [self testit];
+       // return;
         [self performSegueWithIdentifier:@"templateSegue" sender:@"mainVC"];
     }
     if (which == 3) //batch
@@ -678,6 +668,8 @@ int currentYear = 2019;
 //=============OCR MainVC=====================================================
 -(void) testit
 {
+    [self performSegueWithIdentifier:@"comparisonSegue" sender:@"mainVC"];
+
 //    GenParse *gp = [[GenParse alloc] init];
 //    [gp deleteAllByTableAndKey:@"activity" :@"*" :@"*"];
 //    NSLog(@" deletit?");

@@ -195,7 +195,7 @@
     headerColumns[whereToAdd] = ob.frame;   //OK add it
     headerTypes[whereToAdd]   = columnType; //OK add it
     headerColumnCount++;
-    NSLog(@" addhc %d , count %d",index,headerColumnCount);
+    //NSLog(@" addhc %d , count %d",index,headerColumnCount);
 
 } //end addHeaderColumnToSortedArray
 

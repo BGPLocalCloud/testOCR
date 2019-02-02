@@ -12,8 +12,9 @@
 //  Created by Dave Scruton on 12/30/18.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
-//  1/9 Add outputFolder
+//  1/9  Add outputFolder
 //  1/14 Add templateFolder
+//  2/1  Add comparisonFolder
 
 #import "OCRSettings.h"
 
@@ -28,6 +29,7 @@ NSString *const PS_OutputFolderKey          = @"OutputFolder";
 NSString *const PS_ErrorFolderKey           = @"ErrorFolder";
 NSString *const PS_RejectFolderKey          = @"RejectFolder";
 NSString *const PS_TemplateFolderKey        = @"TemplateFolder";
+NSString *const PS_ComparisonFolderKey      = @"ComparisonFolder";
 
 
 //=====<OCRSettings>======================================================================
@@ -58,6 +60,7 @@ NSString *const PS_TemplateFolderKey        = @"TemplateFolder";
         _PhotoJPEGQuality      = PhotoJPEGQualityDefault       = 0.8;
         _outputFolder          = outputFolderDefault           = @"processedBatch";
         _templateFolder        = templateFolderDefault         = @"templates";
+        _comparisonFolder      = comparisonFolderDefault       = @"comparison";
         [self readLocalSettings]; //Read local copy first before going to parse..
         [self loadFromParse];
     }
@@ -91,6 +94,7 @@ NSString *const PS_TemplateFolderKey        = @"TemplateFolder";
                 self->_rejectFolder            = [objectx objectForKey:PS_RejectFolderKey];
                 self->_outputFolder            = [objectx objectForKey:PS_OutputFolderKey];
                 self->_templateFolder          = [objectx objectForKey:PS_TemplateFolderKey];
+                self->_comparisonFolder        = [objectx objectForKey:PS_ComparisonFolderKey];
 
                 [self keepFieldsLegal];
                 [self saveLocalSettings]; //Save a copy locally...
@@ -215,6 +219,8 @@ NSString *const PS_TemplateFolderKey        = @"TemplateFolder";
                                               _outputFolder]];
     dumpit = [dumpit stringByAppendingString:[NSString stringWithFormat:@"   TemplateFolder    : %@\n" ,
                                               _templateFolder]];
+    dumpit = [dumpit stringByAppendingString:[NSString stringWithFormat:@"   ComparisonFolder  : %@\n" ,
+                                              _comparisonFolder]];
 
     return dumpit;
 }

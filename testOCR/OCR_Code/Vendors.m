@@ -37,6 +37,7 @@ static Vendors *sharedInstance = nil;
         _vFolderNames = [[NSMutableArray alloc] init]; //  and matching folder names
         _vRotations   = [[NSMutableArray alloc] init]; //  invoices rotated?
         _vFileCounts  = [[NSMutableArray alloc] init]; //  runtime filecounts of PDF/CSV's to process
+        vNamesLC      = [[NSMutableArray alloc] init]; // Vendor names
         _loaded       = FALSE;
         [self readFromParse];
     }
@@ -50,6 +51,20 @@ static Vendors *sharedInstance = nil;
     if (n != NSNotFound) return [_vFolderNames objectAtIndex:n];
     return @"";
 }
+
+//=============(Vendors)=====================================================
+-(int)  getVendorIndex : (NSString *)vname
+{
+    NSString *vlc = vname.lowercaseString;
+    int i=0;
+    for (NSString *vn in vNamesLC)
+    {
+        if ([vlc containsString:vn]) return i;//Match?
+        i++;
+    }
+    return 0;
+}
+
 
 //=============(Vendors)=====================================================
 -(NSString *) getRotationByVendorName : (NSString *)vname
@@ -80,6 +95,7 @@ static Vendors *sharedInstance = nil;
             {
                 NSString *s = [pfo objectForKey:PInv_Vendor_key];
                 [self->_vNames addObject:s];
+                [self-> vNamesLC addObject:s.lowercaseString]; //Strings to match by
                 //Generate a legal filename, too, no whitespace, dots, apostrophes or commas...
                 NSString *sf = [s  stringByReplacingOccurrencesOfString:@" " withString:@"_"];
                 sf = [sf stringByReplacingOccurrencesOfString:@"." withString:@"_"];

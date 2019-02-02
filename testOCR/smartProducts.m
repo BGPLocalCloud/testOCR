@@ -116,9 +116,12 @@
     nonProducts = @[  //CANNED stuff that never is a product
                     @"subtotal",
                     @"charge",
-                    @"surcharge",
+                    @"discount",
+                    @"dry items",
+                    @"frozen items",
+                    @"payment",
                     @"refrigerated",
-                    @"discount"
+                    @"surcharge"
                     ];
         
     beverageNames = @[
@@ -698,33 +701,33 @@
     //Missing 2 / 3 values is a failure...
     if ((pfloat == 0.0 && afloat == 0.0) || (qfloat == 0.0 && afloat == 0.0)  || (qfloat == 0.0 && pfloat == 0.0) )
     {
-        NSLog(@" ... 2 out of 3 price columns are zero!");
+        //NSLog(@" ... 2 out of 3 price columns are zero!");
         _majorError = ANALYZER_BAD_PRICE_COLUMNS;
     }
     else if (afloat != testAmount || qfloat == 0.0)
     {
-        NSLog(@" ...price err: q * p not equal to a!");
+        //NSLog(@" ...price err: q * p not equal to a!");
         if (afloat == 0.0 && qfloat != 0.0)
         {
-            NSLog(@" ...ZERO Amount: FIX");
+            //NSLog(@" ...ZERO Amount: FIX");
             amount = [self getDollarsAndCentsString:qfloat * pfloat];
             aerror = ANALYZER_ZERO_AMOUNT;
         }
         else if (afloat != 0.0 && qfloat == 0.0)
         {
-            NSLog(@" ...ZERO QUANTITY: FIX");
+            //NSLog(@" ...ZERO QUANTITY: FIX");
             qfloat = afloat / pfloat;
             aerror = ANALYZER_ZERO_QUANTITY;
         }
         else if (pfloat == 0.0)
         {
-            NSLog(@" ...ZERO PRICE: FIX");
+            //NSLog(@" ...ZERO PRICE: FIX");
             pfloat = afloat / qfloat;
             aerror = ANALYZER_ZERO_PRICE;
         }
         else //All fields present but still bad math? Assume quantity is wrong?
         {
-            NSLog(@" ...bad math?");
+            //NSLog(@" ...bad math?");
             if (qfloat == 1.0) //Check mismatch price/amount, defer to amount
             {
                 //1/18 This is a cluge! Greco Invoices are more likely to have a good price and a bad amount!
@@ -749,7 +752,7 @@
     _analyzedQuantity = quantity;
     _analyzedPrice    = price;
     _analyzedAmount   = amount;
-    NSLog(@" latest qpa %@ / %@ / %@",quantity,price,amount);
+    //NSLog(@" latest qpa %@ / %@ / %@",quantity,price,amount);
     //Handle flags...
     if (local) _analyzedLocal = @"Yes";
     else       _analyzedLocal = @"No";

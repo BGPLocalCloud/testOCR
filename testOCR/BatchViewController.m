@@ -195,9 +195,13 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self->_titleLabel.text = @"Batch Complete!";
-        [self addToOutputText:@"Batch Complete!"];
+        NSArray *eee = [self->bbb getErrors];
+        int ecount   = (int)eee.count;
+        NSArray *www = [self->bbb getWarnings];
+        int wcount   = (int)www.count;
+        [self addToOutputText : [NSString stringWithFormat:@"Batch Complete, Errors:%d Warnings:%d",ecount,wcount]];
         [self->spv stop];
-        if (haltingBatchToExitVC) [self dismiss];
+        if (self->haltingBatchToExitVC) [self dismiss];
 
     });
 

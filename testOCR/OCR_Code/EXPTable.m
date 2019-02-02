@@ -26,6 +26,8 @@
     {
         _expos        = [[NSMutableArray alloc] init]; //Invoice Objects
         objectIDs     = [[NSMutableArray alloc] init]; //saved object ids, for matching invoice
+        internalPFOs  = [[NSMutableArray alloc] init]; //saved object ids, for matching invoice
+
         _sortBy = @"*";
         _selectBy = @"*";
         tableName = @"EXPFullTable";
@@ -165,6 +167,41 @@
 } //end addRecord
 
 //=============(EXPTable)=====================================================
+// save everything in the expos table
+-(void) saveEXPOs
+{
+    [PFObject saveAllInBackground:_expos block:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+            [self.delegate didSaveEXPOs];
+        }
+        else{
+            [self.delegate errorSavingEXPOs :
+             [NSString stringWithFormat:@"saveEXPOs error:%@",error.localizedDescription]];
+        }
+    }];
+} //end saveEXPOs
+
+//asdf
+//=============(EXPTable)=====================================================
+// Add record to EXPOS, for saving later...
+-(void) addRecordFromArrays : (NSDate*) fdate : (NSMutableArray *) fields : (NSMutableArray*) values
+{
+    if (fields == nil || values == nil || fdate == nil) return;
+    int fcount = (int) fields.count;
+    int vcount = (int) values.count;
+    if (fcount == 0 || vcount == 0 || fcount != vcount) return;
+    PFObject *exoRecord = [PFObject objectWithClassName:tableName];
+    for (int i=0;i<fcount;i++)
+    {
+        exoRecord[fields[i]] = values[i];
+    }
+    exoRecord[PInv_Date_key] = fdate; //ONLY column that ain't a String!
+    [_expos addObject:exoRecord];
+} //end addRecordFromArrays
+
+
+
+//=============(EXPTable)=====================================================
 -(NSString *) stringFromKeyedItems : (PFObject *)pfo : (NSArray *)kitems
 {
     NSString *s = @"";
@@ -224,6 +261,64 @@
     e.objectId = pfo.objectId;
     return e;
 } //end getEXPObjectFromPFObject
+
+
+//=============(EXPTable)=====================================================
+-(PFObject *) getEXPO  : (int) index
+{
+    if (index < 0 || index >= _expos.count) return nil;
+    return [_expos objectAtIndex:index];
+}
+
+
+//=============(EXPTable)=====================================================
+// from expos, get amount at this index, in pennies
+-(int) getAmount : (int) index
+{
+    PFObject *pfo = [self getEXPO:index];
+    if (pfo == nil) return 0;
+    NSString *as = [pfo objectForKey:PInv_TotalPrice_key];
+    as = [as stringByReplacingOccurrencesOfString:@"$" withString:@""];
+    as = [as stringByReplacingOccurrencesOfString:@" " withString:@""];
+
+    int rint = (int)(100.0 * as.floatValue);
+    return rint;
+}
+
+//=============(EXPTable)=====================================================
+-(BOOL) getLocal : (int) index
+{
+    PFObject *pfo = [self getEXPO:index];
+    if (pfo == nil) return 0;
+    NSString *wstr = [pfo objectForKey:PInv_Local_key];
+    return ([wstr.lowercaseString isEqualToString:@"yes"]);
+} //End getLocal
+
+//=============(EXPTable)=====================================================
+-(BOOL) getProcessed : (int) index
+{
+    PFObject *pfo = [self getEXPO:index];
+    if (pfo == nil) return 0;
+    NSString *wstr = [pfo objectForKey:PInv_Local_key];
+    return ([wstr.lowercaseString isEqualToString:@"processed"]);
+}
+
+//=============(EXPTable)=====================================================
+-(NSString *) getVendor : (int) index
+{
+    PFObject *pfo = [self getEXPO:index];
+    if (pfo == nil) return @"";
+    return [pfo objectForKey:PInv_Vendor_key];
+}
+
+//=============(EXPTable)=====================================================
+-(NSString *) getCategory : (int) index
+{
+    PFObject *pfo = [self getEXPO:index];
+    if (pfo == nil) return @"";
+    return [pfo objectForKey:PInv_Category_key];
+}
+
 
 //=============(EXPTable)=====================================================
 -(NSString *) getCSVFromObject : (PFObject *)pfo
@@ -357,23 +452,24 @@
 {
     [self handleCSVInit:TRUE];
     PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
+    
     //Wildcards means get everything...
-    if (![vendor isEqualToString:@"*"]) [query whereKey:PInv_Vendor_key equalTo:vendor];
-    if (![batch isEqualToString:@"*"])  [query whereKey:@"Batch" equalTo:batch];
+    if (![vendor isEqualToString:@"*"]) [query whereKey:PInv_Vendor_key  equalTo:vendor];
+    if (![batch  isEqualToString:@"*"]) [query whereKey:PInv_BatchID_key equalTo:batch]; //1/31 bug fix wrong key
     if (![_sortBy isEqualToString:@""]) NSLog(@"...sort EXP by %@",_sortBy);
     NSString *sortkey = @"createdAt";
     if (_sortBy != nil)
     {
-        if ([_sortBy isEqualToString:@"Invoice Number"])    sortkey = PInv_InvoiceNumber_key;
-        else if ([_sortBy isEqualToString:@"Item"])         sortkey = PInv_Item_key;
-        else if ([_sortBy isEqualToString:@"Vendor"])       sortkey = PInv_Vendor_key;
-        else if ([_sortBy isEqualToString:@"Vendor"])       sortkey = PInv_Vendor_key;
-        else if ([_sortBy isEqualToString:@"Product Name"]) sortkey = PInv_ProductName_key;
-        else if ([_sortBy isEqualToString:@"Local"])        sortkey = PInv_Local_key;
-        else if ([_sortBy isEqualToString:@"Processed"])    sortkey = PInv_Processed_key;
-        else if ([_sortBy isEqualToString:@"Quantity"])     sortkey = PInv_Quantity_key;
-        else if ([_sortBy isEqualToString:@"Price"])        sortkey = PInv_PricePerUOM_key;
-        else if ([_sortBy isEqualToString:@"Total"])        sortkey = PInv_TotalPrice_key;
+        if ([_sortBy isEqualToString:@"Invoice Number"])     sortkey = PInv_InvoiceNumber_key;
+        else if ([_sortBy isEqualToString:@"Item"])          sortkey = PInv_Item_key;
+        else if ([_sortBy isEqualToString:@"Vendor"])        sortkey = PInv_Vendor_key;
+        else if ([_sortBy isEqualToString:@"Batch Counter"]) sortkey = PInv_BatchCounter_key;
+        else if ([_sortBy isEqualToString:@"Product Name"])  sortkey = PInv_ProductName_key;
+        else if ([_sortBy isEqualToString:@"Local"])         sortkey = PInv_Local_key;
+        else if ([_sortBy isEqualToString:@"Processed"])     sortkey = PInv_Processed_key;
+        else if ([_sortBy isEqualToString:@"Quantity"])      sortkey = PInv_Quantity_key;
+        else if ([_sortBy isEqualToString:@"Price"])         sortkey = PInv_PricePerUOM_key;
+        else if ([_sortBy isEqualToString:@"Total"])         sortkey = PInv_TotalPrice_key;
     }
     if (_sortAscending)
         [query orderByAscending:sortkey];  //Sort UP
@@ -482,6 +578,12 @@
     } //end for loop
 } //end saveToParse
 
+//=============(EXPTable)=====================================================
+// WARNING: overrides original table name!  
+-(void) setTableName : (NSString *)newName
+{
+    tableName = newName;
+}
 
 
 @end

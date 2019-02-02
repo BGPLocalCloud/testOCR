@@ -21,6 +21,7 @@
 
 @implementation EXPViewController
 
+
 //=============EXP VC=====================================================
 -(id)initWithCoder:(NSCoder *)aDecoder {
     if ( !(self = [super initWithCoder:aDecoder]) ) return nil;
@@ -50,7 +51,11 @@
 
     refreshControl = [[UIRefreshControl alloc] init];
 
-    sortAscending = TRUE;
+    
+    sortOptions = @[    @"Invoice Number",@"Batch Counter",@"Vendor",
+                        @"Product Name",@"Local",@"Processed"
+                        ];
+
     return self;
 }
 
@@ -90,7 +95,8 @@
             if (sitems[0] != nil) batchIDLookup = sitems[0];
             if (sitems[1] != nil) vendorLookup  = sitems[1];
         }
-        sortBy = @"";
+        sortBy        = sortOptions[1]; //Batch Counter, latest created -> earliest created
+        sortAscending = TRUE;
     }
     else
     {
@@ -98,7 +104,8 @@
         batchIDLookup = _actData;
     }
     [self loadEXP];
-}
+    [self updateUI];
+} //end viewWillAppear
 
 
 //=============EXP VC=====================================================
@@ -173,13 +180,6 @@
     [alert setValue:tatString forKey:@"attributedTitle"];
     int i=0;
     
-    NSArray *sortOptions = @[
-        @"Invoice Number",@"Item",@"Vendor",
-        @"Product Name",@"Local",@"Processed"
-        //NOTE: these don't sort well: they are numeric but stored as ASCII
-        //       so they get sorted as strings!
-        //        ,@"quantity",@"Price",@"Total"
-    ];
     for (NSString *s in sortOptions)
     {
         UIAlertAction *action = [UIAlertAction actionWithTitle:s
@@ -264,13 +264,10 @@
 //=============EXP VC=====================================================
 - (IBAction)sortDirSelect:(id)sender
 {
-    sortAscending = !sortAscending;
-    NSLog(@"ascending = %d",sortAscending);
-    if (sortAscending)
-        [_sortDirButton setBackgroundImage:[UIImage imageNamed:@"arrUp"] forState:UIControlStateNormal];
-    else
-        [_sortDirButton setBackgroundImage:[UIImage imageNamed:@"arrDown"] forState:UIControlStateNormal];
+    sortAscending    = !sortAscending;
     et.sortAscending = sortAscending;
+    NSLog(@"ascending = %d",sortAscending);
+    [self updateUI];
     [self loadEXP];
 
 }
@@ -339,7 +336,8 @@
 
     tableName = @"EXP";
     dbMode = DB_MODE_EXP;
-    et.sortBy = sortBy;
+    et.sortAscending = sortAscending;
+    et.sortBy        = sortBy;
     
 
     if (!_detailMode) //Normal EXP table examination?
@@ -419,6 +417,11 @@
 //=============EXP VC=====================================================
 -(void) updateUI
 {
+    if (sortAscending)
+        [_sortDirButton setBackgroundImage:[UIImage imageNamed:@"arrUp"] forState:UIControlStateNormal];
+    else
+        [_sortDirButton setBackgroundImage:[UIImage imageNamed:@"arrDown"] forState:UIControlStateNormal];
+
 //    NSString *vlab = @"";
 //    if ([vendor isEqualToString:@""] )
 //        vlab = @"Touch Menu to begin...";
@@ -513,7 +516,7 @@
 
 #pragma mark - EXPTableDelegate
 
-//=============EXP VC=====================================================
+//============<EXPTableDelegate>====================================================
 - (void)didReadEXPTableAsStrings : (NSString *)s
 {
     dispatch_async(dispatch_get_main_queue(), ^{
