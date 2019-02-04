@@ -18,6 +18,7 @@
 #import "ActivityTable.h"
 #import "AppDelegate.h"
 #import "DropboxTools.h"
+#import "EXPStats.h"
 #import "EXPTable.h"
 #import "smartProducts.h"
 #import "spinnerView.h"
@@ -44,20 +45,10 @@
     NSArray *pamKeywords;
     NSMutableArray *columnKeys;
     
-    //Is this really all I need?
-    int amounts[MAX_CVENDORS];
-    int counts[MAX_CVENDORS];
-    int lamounts[MAX_CVENDORS];
-    int pamounts[MAX_CVENDORS];
-    int lcounts[MAX_CVENDORS];
-    int pcounts[MAX_CVENDORS];
-    int processed[MAX_CVENDORS];
-    int local[MAX_CVENDORS];
-    NSArray *categories;  //DUPE of what's in smartproduts
-
-    int loadCount,writeCount,okCount,errCount;
-    int catAmounts[MAX_CVENDORS][MAX_CCATEGORIES];
-    int catCounts[MAX_CVENDORS][MAX_CCATEGORIES];
+    NSMutableArray *monthlyStats;
+    
+    
+    int writeCount,okCount,errCount,loadCount;
 
     
 }

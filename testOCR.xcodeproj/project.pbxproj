@@ -89,6 +89,7 @@
 		729E92C421DC1CCC00048DAF /* factoryIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 729E92C221DC1CCC00048DAF /* factoryIcon.png */; };
 		729E92C521DC1CCC00048DAF /* globeIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 729E92C321DC1CCC00048DAF /* globeIcon.png */; };
 		729E9A6421E02E0400F3FB5B /* EXPDetailVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 729E9A6321E02E0400F3FB5B /* EXPDetailVC.m */; };
+		72A4B0882206023E00B02F9F /* EXPStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 72A4B0872206023E00B02F9F /* EXPStats.m */; };
 		72A4FDCB21F2633E00203A50 /* grecoShrunk3.png in Resources */ = {isa = PBXBuildFile; fileRef = 72A4FDCA21F2633E00203A50 /* grecoShrunk3.png */; };
 		72A9828921CCAC7400D5EAC6 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72A9828821CCAC7300D5EAC6 /* WebKit.framework */; };
 		72AFBE9421D4AEA400B75388 /* CheckTemplateVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AFBE9321D4AEA400B75388 /* CheckTemplateVC.m */; };
@@ -235,6 +236,8 @@
 		729E92C321DC1CCC00048DAF /* globeIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = globeIcon.png; path = Resources/globeIcon.png; sourceTree = SOURCE_ROOT; };
 		729E9A6221E02E0400F3FB5B /* EXPDetailVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXPDetailVC.h; sourceTree = "<group>"; };
 		729E9A6321E02E0400F3FB5B /* EXPDetailVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EXPDetailVC.m; sourceTree = "<group>"; };
+		72A4B0862206023E00B02F9F /* EXPStats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXPStats.h; sourceTree = "<group>"; };
+		72A4B0872206023E00B02F9F /* EXPStats.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EXPStats.m; sourceTree = "<group>"; };
 		72A4FDCA21F2633E00203A50 /* grecoShrunk3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grecoShrunk3.png; sourceTree = "<group>"; };
 		72A9828821CCAC7300D5EAC6 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		72AFBE9221D4AEA400B75388 /* CheckTemplateVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CheckTemplateVC.h; sourceTree = "<group>"; };
@@ -460,6 +463,8 @@
 				722420F921C854F9002D02A4 /* DBKeys.h */,
 				72435B3221C8C7C600620F4B /* EXPObject.h */,
 				72435B3321C8C7C600620F4B /* EXPObject.m */,
+				72A4B0862206023E00B02F9F /* EXPStats.h */,
+				72A4B0872206023E00B02F9F /* EXPStats.m */,
 				72435B3521C8C8EA00620F4B /* EXPTable.h */,
 				72435B3621C8C8EA00620F4B /* EXPTable.m */,
 				725145EE2200B9860074EDBF /* GenParse.h */,
@@ -721,6 +726,7 @@
 				72BA4D2E21CF644B00F432E9 /* OCRTopObject.m in Sources */,
 				729E92B121DBE25B00048DAF /* EXPCell.m in Sources */,
 				7206008D21B64052000B26DC /* EditTemplateVC.m in Sources */,
+				72A4B0882206023E00B02F9F /* EXPStats.m in Sources */,
 				72435AB621E697290048846A /* Reachability.m in Sources */,
 				7283812021C4A17300A2954B /* NavButtons.m in Sources */,
 				7209159321E0908C00F94258 /* ErrorViewController.m in Sources */,

@@ -18,6 +18,7 @@
 //  1/24 add all vendors support, updateBatchProgress
 //  1/25 add reports folder for batch reports on dropbox
 //  1/29 add table deletes for batch run
+//  2/4  add batch month
 #import "BatchObject.h"
 
 @implementation BatchObject
@@ -75,8 +76,9 @@ static BatchObject *sharedInstance = nil;
         cachesDirectory = [paths objectAtIndex:0];
         [self createBatchFolder];
         
-        tableName = @"Batch";
-        
+        tableName   = @"Batch";
+        _batchMonth = @"01-JUL";
+
         _authorized = FALSE;
         
         _versionNumber    = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
@@ -257,6 +259,7 @@ static BatchObject *sharedInstance = nil;
     [warningReportList removeAllObjects];
     [self.delegate batchUpdate : @"Started Batch..."];
     oto.batchID      = _batchID; //Make sure OCR toplevel has batchID...
+    oto.batchMonth   = _batchMonth;
     [oto clearEXPBatchCounter]; //for sorting EXP records on final output
     //Run just one vendor...
     if (vindex >= 0)

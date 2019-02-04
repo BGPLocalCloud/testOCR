@@ -29,9 +29,24 @@
     [bbb setParent:self];
     vv  = [Vendors sharedInstance];
     authorized = FALSE;
+    // 2/4 add months control / options
+    fiscalMonths = @[  //Month chooser...
+                     @"01-JUL",
+                     @"02-AUG",
+                     @"03-SEP",
+                     @"04-OCT",
+                     @"05-NOV",
+                     @"06-DEC",
+                     @"07-JAN",
+                     @"08-FEB",
+                     @"09-MAR",
+                     @"10-APR",
+                     @"11-MAY",
+                     @"12-JUN"
+                   ];
+
     return self;
 }
-
 
 
 //=============Batch VC=====================================================
@@ -99,6 +114,13 @@
 } //end updateUI
 
 //=============Batch VC=====================================================
+// 2/4 new button: fiscal month
+- (IBAction)monthSelect:(id)sender
+{
+    [self monthMenu];
+}
+
+//=============Batch VC=====================================================
 - (IBAction)cancelSelect:(id)sender
 {
     if ([bbb.batchStatus isEqualToString:BATCH_STATUS_RUNNING])
@@ -113,6 +135,7 @@
 - (IBAction)runSelect:(id)sender {
     if (!authorized) return ; //can't get at dropbox w/o login! 
 
+    bbb.batchMonth = batchMonth;
     NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:@"Run Batches..."];
     [tatString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:25] range:NSMakeRange(0, tatString.length)];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:
@@ -172,7 +195,37 @@
     [alert addAction:noAction];
     [self presentViewController:alert animated:YES completion:nil];
     
-} //end menu
+} //end exitBatchMenu
+
+//=============Batch VC=====================================================
+// For selecting fiscal month
+-(void) monthMenu
+{
+    NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:@"Select Fiscal Month"];
+    [tatString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:25] range:NSMakeRange(0, tatString.length)];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:
+                                NSLocalizedString(@"Select Database Table",nil)
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    [alert setValue:tatString forKey:@"attributedTitle"];
+    
+    for (NSString *month in fiscalMonths)
+    {
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(month,nil)
+                                 style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                     self->batchMonth = month;
+                                     [self->_monthButton setTitle:month forState:UIControlStateNormal];
+                                 }]];
+    }
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
+                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                           }];
+    [alert addAction:cancelAction];
+    [self presentViewController:alert animated:YES completion:nil];
+    
+} //end monthMenu
 
 
 #pragma mark - batchObjectDelegate

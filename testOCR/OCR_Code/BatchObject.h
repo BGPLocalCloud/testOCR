@@ -90,6 +90,7 @@
 @property (nonatomic , assign) BOOL authorized;
 @property (nonatomic , strong) NSString* versionNumber;
 @property (nonatomic , strong) NSString* batchStatus;
+@property (nonatomic , strong) NSString* batchMonth;
 
 @property (nonatomic, unsafe_unretained) id <batchObjectDelegate> delegate; // receiver of completion messages
 

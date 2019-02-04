@@ -73,6 +73,7 @@
 -(BOOL) getProcessed : (int) index;
 -(NSString *) getVendor : (int) index;
 -(NSString *) getCategory : (int) index;
+-(NSString *) getMonth : (int) index;
 
 
 

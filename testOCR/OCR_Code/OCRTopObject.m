@@ -18,6 +18,7 @@
 //  1/27  added page arg to performOCR...
 //  1/30  handle empty pages
 //  1/31  last minute check for 'quest' as bad product
+//  2/4  add batch month
 
 #import "OCRTopObject.h"
 
@@ -51,7 +52,7 @@ static OCRTopObject *sharedInstance = nil;
         et.delegate = self;
         act = [[ActivityTable alloc] init];
 
-
+        _batchMonth = @"01-JUL";
     }
     return self;
 }
@@ -408,7 +409,7 @@ static OCRTopObject *sharedInstance = nil;
                         NSString *lineString = [NSString stringWithFormat:@"%3.3d",(_totalLines + smartCount)];
                         //CSV: Tons of args: adds allll this shit to the next EXP table entry for saving to parse...
                         //vendor invoice# pdffile batch all nil!
-                        [et addRecord:smartp.invoiceDate : smartp.analyzedCategory : smartp.analyzedShortDateString :
+                        [et addRecord:smartp.invoiceDate : smartp.analyzedCategory : _batchMonth :
                               liItem : smartp.analyzedUOM : smartp.analyzedBulkOrIndividual :
                               avendor : smartp.analyzedProductName : smartp.analyzedProcessed :
                               smartp.analyzedLocal : lineString : @"docparser" :
@@ -717,7 +718,7 @@ static OCRTopObject *sharedInstance = nil;
             //Format line count to triple digits, max 999
             NSString *lineString = [NSString stringWithFormat:@"%3.3d",(_totalLines + smartCount)];
             //OCR: Tons of args: adds allll this shit to the next EXP table entry for saving to parse...
-            [et addRecord:smartp.invoiceDate : smartp.analyzedCategory : smartp.analyzedShortDateString :
+            [et addRecord:smartp.invoiceDate : smartp.analyzedCategory : _batchMonth :
              ac[od.itemColumn] : smartp.analyzedUOM : smartp.analyzedBulkOrIndividual :
              _vendor : smartp.analyzedProductName : smartp.analyzedProcessed :
              smartp.analyzedLocal : lineString : _invoiceNumberString :

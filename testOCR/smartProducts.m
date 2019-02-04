@@ -13,6 +13,7 @@
 //
 //  12/31 add typos
 //  1/10  add analyze, get rid of old analyze stuff...
+//  2/4   remove _analyzedShortDateString
 #import "smartProducts.h"
 
 @implementation smartProducts
@@ -376,7 +377,6 @@
     _analyzedProductName = @"";
     _analyzedVendor = @"";
     _analyzedAmount = @"";
-    _analyzedShortDateString = @"";
     _analyzedDateString = @"";
 
 }
@@ -771,7 +771,6 @@
     }
     
     _analyzedDateString = [self getDateAsString:_invoiceDate];
-    _analyzedShortDateString = [self getDateAsShortString:_invoiceDate];
     _analyzedLineNumber = [NSString stringWithFormat:@"%d",lineNumber];
     //Just pass across from private -> public here
     _analyzedVendor = vendor;
@@ -810,14 +809,6 @@
     return @"EMPTY";
 }
 
-//=============(smartProducts)=====================================================
--(NSString *)getDateAsShortString : (NSDate *) ndate
-{
-    NSDateFormatter * formatter =  [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"dd-MMM"];
-    return [formatter stringFromDate:ndate]; 
-
-}
 
 //=============(smartProducts)=====================================================
 -(NSString *)getDateAsString : (NSDate *) ndate

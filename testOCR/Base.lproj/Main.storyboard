@@ -675,12 +675,28 @@
                                     <action selector="runSelect:" destination="wXV-b1-k9X" eventType="touchUpInside" id="w1W-9Y-mfm"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VBT-up-lBu">
+                                <rect key="frame" x="153.5" y="608" width="68" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="65" id="1YD-Ll-ass"/>
+                                    <constraint firstAttribute="height" constant="40" id="apg-bI-GOh"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <state key="normal" title="Month">
+                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="monthSelect:" destination="wXV-b1-k9X" eventType="touchUpInside" id="AHL-dE-Pl0"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="dep-IC-9Ts" firstAttribute="top" secondItem="Jdd-jB-2mF" secondAttribute="bottom" constant="8" id="1x2-uH-Re0"/>
                             <constraint firstItem="dep-IC-9Ts" firstAttribute="top" secondItem="gvF-Lp-2yq" secondAttribute="top" constant="35" id="AvO-ai-dTZ"/>
                             <constraint firstItem="cdZ-yI-dnc" firstAttribute="leading" secondItem="gvF-Lp-2yq" secondAttribute="leading" constant="20" id="LBt-p8-5ui"/>
+                            <constraint firstItem="VBT-up-lBu" firstAttribute="centerX" secondItem="gvF-Lp-2yq" secondAttribute="centerX" id="UYo-dm-nuo"/>
+                            <constraint firstItem="gvF-Lp-2yq" firstAttribute="bottom" secondItem="VBT-up-lBu" secondAttribute="bottom" constant="19" id="XB8-ft-4mI"/>
                             <constraint firstItem="PNz-pc-lU6" firstAttribute="leading" secondItem="cdZ-yI-dnc" secondAttribute="trailing" constant="200" id="cWy-cD-5MX"/>
                             <constraint firstItem="Jdd-jB-2mF" firstAttribute="top" secondItem="gvF-Lp-2yq" secondAttribute="top" id="ggX-1h-Bcz"/>
                             <constraint firstItem="gvF-Lp-2yq" firstAttribute="bottom" secondItem="cdZ-yI-dnc" secondAttribute="bottom" constant="25" id="kqg-u3-Ioe"/>
@@ -693,6 +709,7 @@
                         <viewLayoutGuide key="safeArea" id="gvF-Lp-2yq"/>
                     </view>
                     <connections>
+                        <outlet property="monthButton" destination="VBT-up-lBu" id="N6T-Gt-QbT"/>
                         <outlet property="outputText" destination="dep-IC-9Ts" id="nCR-Af-ey1"/>
                         <outlet property="runButton" destination="PNz-pc-lU6" id="U40-SJ-fBC"/>
                         <outlet property="titleLabel" destination="Jdd-jB-2mF" id="vYC-fN-37g"/>

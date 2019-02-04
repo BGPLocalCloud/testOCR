@@ -71,7 +71,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 //These props get set by analyze for public access...
 @property (nonatomic , strong) NSString* analyzedDateString;
-@property (nonatomic , strong) NSString* analyzedShortDateString;
 @property (nonatomic , strong) NSString* analyzedCategory;
 @property (nonatomic , strong) NSString* analyzedUOM;
 @property (nonatomic , strong) NSString* analyzedBulkOrIndividual;

@@ -281,7 +281,7 @@
     as = [as stringByReplacingOccurrencesOfString:@"$" withString:@""];
     as = [as stringByReplacingOccurrencesOfString:@" " withString:@""];
 
-    int rint = (int)(100.0 * as.floatValue);
+    int rint = floor((100.0 * as.floatValue) + 0.5);
     return rint;
 }
 
@@ -299,8 +299,16 @@
 {
     PFObject *pfo = [self getEXPO:index];
     if (pfo == nil) return 0;
-    NSString *wstr = [pfo objectForKey:PInv_Local_key];
+    NSString *wstr = [pfo objectForKey:PInv_Processed_key];
     return ([wstr.lowercaseString isEqualToString:@"processed"]);
+}
+
+//=============(EXPTable)=====================================================
+-(NSString *) getMonth : (int) index
+{
+    PFObject *pfo = [self getEXPO:index];
+    if (pfo == nil) return @"";
+    return [pfo objectForKey:PInv_Month_key];
 }
 
 //=============(EXPTable)=====================================================

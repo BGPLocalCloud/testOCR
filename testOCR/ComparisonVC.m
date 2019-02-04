@@ -40,11 +40,16 @@
     vv  = [Vendors sharedInstance];
 
     smartp = [[smartProducts alloc] init];
+
     
     csvEntries  = [[NSArray alloc] init];
     pamHeaders  = [[NSArray alloc] init];
     pamKeywords = [[NSArray alloc] init];
     columnKeys  = [[NSMutableArray alloc] init];
+
+    //Month-by-month array of EXPStats...
+    monthlyStats  = [[NSMutableArray alloc] init];
+    
     //[self stripCommasFromQuotedStrings:@"abc\"duh ,guk\"de,fg"];
     [self loadConstants]; //populates pamHeaders / pamKeywords arrays
     return self;
@@ -83,28 +88,6 @@
     [self dismiss];
 }
 
-//=============Comparison VC=====================================================
--(void) clear
-{
-    for (int i=0;i<MAX_CVENDORS;i++)
-    {
-        amounts[i] = 0;
-        counts[i] = 0;
-        processed[i] = 0;
-        local[i] = 0;
-        amounts[i] = 0;
-        lcounts[i] = 0;
-        lamounts[i] = 0;
-        pcounts[i] = 0;
-        pamounts[i] = 0;
-        for (int j=0;j<MAX_CVENDORS;j++)
-        {
-            catAmounts[i][j] = 0;
-            catCounts[i][j] = 0;
-        }
-    }
-
-} //end clear
 
 //=============Comparison VC=====================================================
 -(void) getComparisonFolderList
@@ -143,20 +126,7 @@
                     PInv_PricePerUOM_key,PInv_Processed_key,PInv_Local_key,PInv_Date_key,
                     PInv_LineNumber_key
                    ];
-    categories = @[
-                   @"beverage",
-                   @"bread",
-                   @"dairy",
-                   @"drygoods",
-                   @"labor",
-                   @"misc",
-                   @"papergoods",
-                   @"protein",
-                   @"produce",
-                   @"snacks",
-                   @"supplement",
-                   @"supplies"
-                   ];
+
 
 } //end loadConstants
 
@@ -227,7 +197,7 @@
     BOOL firstRecord = TRUE;
     writeCount = okCount = errCount = 0;
     loadCount  = (int)csvItems.count;
-    [et clear]; //Set up new EXPTable...
+    [et clear];
     for (NSString *nextLine in csvItems)
     {
         if (!firstRecord) //Skip 1st record...
@@ -272,86 +242,68 @@
 
 } //end processCSV
 
-//=============Comparison VC=====================================================
--(NSUInteger) getCategoryIndex : (NSString*) catstr
-{
-    return [categories indexOfObject:catstr.lowercaseString];
-}
 
 //=============Comparison VC=====================================================
 -(void) getStats
 {
-    [self clear]; //Clear stats...
     int rcount = (int)et.expos.count;  //expos record count
-    for (int i=0;i<rcount;i++)            //loop over exp objects
+    
+    [monthlyStats removeAllObjects];
+    
+    for (int month = 1; month<=2;month++) //Loop over the year
     {
-        NSString *vendor   = [et getVendor:i];
-        NSString *category = [et getCategory:i];
-        category = [category stringByReplacingOccurrencesOfString:@" " withString:@""]; //Trim!
-        NSUInteger catIndex = [self getCategoryIndex : category];
-        //asdf
-        if (catIndex == NSNotFound) //Wups!
+        EXPStats *estats   = [[EXPStats alloc] init];
+        NSString *monthStr = [estats getMonthName:month];
+        NSLog(@"%@===========================================",monthStr );
+        [estats clear]; //Clear stats...
+        //loop over allll exp objects
+        for (int i=0;i<rcount;i++)
         {
-            NSLog(@" cat [%@] not found!",category);
-        }
-        int  vindex     = [vv getVendorIndex:vendor]; //this is dimensioned by all possible vendors!
-        int  amount     = [et getAmount:i];
-        BOOL locFlag    = [et getLocal:i];
-        BOOL proFlag    = [et getAmount:i];
-        
-        amounts[vindex] += amount;
-        counts[vindex]++;
-        if (locFlag)
-        {
-            local[vindex]++;
-            lcounts[vindex]++;
-            lamounts[vindex]+= amount;
-        }
-        if (proFlag)
-        {
-            processed[vindex]++;
-            pcounts[vindex]++;
-            pamounts[vindex]+= amount;
-        }
-        
-        //Update category info too
-        catAmounts[vindex][(int)catIndex]+=amount;
-        catCounts[vindex][(int)catIndex]++;
-    }
-    //Dumpit
-    for (int i=0;i<MAX_CVENDORS;i++)
-    {
-        if (amounts[i] > 0) //Got somethign for this vendor?
-        {
-            NSLog(@"Vendor: %@",vv.vNames[i]);
-            float ftotal = (float)amounts[i] / 100.0;
-            NSString *tstr = [smartp getDollarsAndCentsString:ftotal];
-            NSLog(@" Total $%@",tstr);
-            int lct = lcounts[i];
-            int pct = pcounts[i];
-            int lam = (float)lamounts[i] / 100.0;
-            int pam = (float)pamounts[i] / 100.0;
-            tstr = [smartp getDollarsAndCentsString:lam];
-            NSLog(@" Local     %d vs NonLocal     %d : $%@",lct,counts[i]-lct,tstr);
-            tstr = [smartp getDollarsAndCentsString:pam];
-            NSLog(@" Processed %d vs NonProcessed %d : $%@",pct,counts[i]-pct,tstr);
-            float ctotal = 0.0;
-            for (int j=0;j<(int)categories.count;j++)
+            NSString *rmonth = [et getMonth:i];
+            if ([rmonth isEqualToString:monthStr]) //Match?
             {
-                ftotal = (float)catAmounts[i][j]/ 100.0;
-                ctotal += ftotal;
-                if (ftotal > 0)
+                NSString *vendor   = [et getVendor:i];
+                NSString *category = [et getCategory:i];
+                category = [category stringByReplacingOccurrencesOfString:@" " withString:@""]; //Trim!
+                NSUInteger catIndex = [estats getCategoryIndex : category];
+                //asdf
+                if (catIndex == NSNotFound) //Wups!
                 {
-                    tstr = [smartp getDollarsAndCentsString:ftotal];
-                    NSLog(@"  ...Cat[%@] amount $%@",categories[j],tstr);
+                    NSLog(@" cat [%@] not found!",category);
                 }
-            } //end for j
-            tstr = [smartp getDollarsAndCentsString:ctotal];
-            NSLog(@"  Total: $%@",tstr);
-
-        }    //end if amounts..
-    }       //end for i
-    NSLog(@" duhhh ");
+                int  vindex     = [vv getVendorIndex:vendor]; //this is dimensioned by all possible vendors!
+//                if ([category.lowercaseString containsString:@"protein"])
+//                {
+//                    NSLog(@" protein %d",i);
+//                }
+                int  amount     = [et getAmount:i];
+                BOOL locFlag    = [et getLocal:i];
+                BOOL proFlag    = [et getProcessed:i];
+                
+                [estats addAmount :vindex :amount ];
+                if (locFlag)
+                {
+                    [estats addLAmount :vindex :amount ];
+                }
+                if (proFlag)
+                {
+                    [estats addPAmount :vindex :amount ];
+                }
+                
+                if ([estats isFoodItem : category])
+                {
+                    [estats addFAmount : vindex : amount];
+                }
+                
+                //Update category info too
+                [estats addCatAmount :vindex :(int)catIndex :amount : proFlag];
+            } //end if rmonth
+        }    //end for i
+        [estats dump];
+        [monthlyStats addObject:estats];
+    }       //end for month
+    
+    NSLog(@" got allll stats ");
 
 } //end getStats
 

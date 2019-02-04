@@ -77,6 +77,7 @@
 @property (nonatomic , strong) NSString* vendorFileName;
 @property (nonatomic , strong) NSString* imageFileName;
 @property (nonatomic , strong) NSString* batchID;
+@property (nonatomic , strong) NSString* batchMonth;
 
 //INvoice-read-in fields
 @property (nonatomic , strong) NSDate* invoiceDate;
