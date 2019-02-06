@@ -85,6 +85,9 @@
                                           }];
     } //End need auth
     haltingBatchToExitVC = FALSE;
+    //Canned month for now...
+    batchMonth = @"07-JAN";
+    [self->_monthButton setTitle:batchMonth forState:UIControlStateNormal];
 
 } //end viewDidAppear
 

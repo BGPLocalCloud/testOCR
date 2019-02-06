@@ -92,7 +92,7 @@ static BatchObject *sharedInstance = nil;
 -(void) addError : (NSString *) errDesc : (NSString *) objectID : (NSString*) productName
 {
     //Format error and add it to array
-    NSLog(@" ..batch addError %@:%@",errDesc,productName);
+    //NSLog(@" ..batch addError %@:%@",errDesc,productName);
     NSString *errStr = [NSString stringWithFormat:@"%@:%@",errDesc,objectID];
     [errorList addObject:errStr];
     NSString *errStr2 = [NSString stringWithFormat:@"%@:%@",errDesc,productName];
@@ -103,7 +103,7 @@ static BatchObject *sharedInstance = nil;
 -(void) addWarning : (NSString *) errDesc : (NSString *) objectID : (NSString*) productName
 {
     //Format error and add it to array
-    NSLog(@" ..batch addWarning %@:%@",errDesc,productName);
+    //NSLog(@" ..batch addWarning %@:%@",errDesc,productName);
     NSString *errStr = [NSString stringWithFormat:@"%@:%@",errDesc,objectID];
     [warningList addObject:errStr];
     NSString *errStr2 = [NSString stringWithFormat:@"%@:%@",errDesc,productName];
@@ -260,6 +260,7 @@ static BatchObject *sharedInstance = nil;
     [self.delegate batchUpdate : @"Started Batch..."];
     oto.batchID      = _batchID; //Make sure OCR toplevel has batchID...
     oto.batchMonth   = _batchMonth;
+    oto.oldInvoiceNumberString = @""; //Clear old invoice # (used to discover new invoices)
     [oto clearEXPBatchCounter]; //for sorting EXP records on final output
     //Run just one vendor...
     if (vindex >= 0)
@@ -419,7 +420,8 @@ static BatchObject *sharedInstance = nil;
         //remember the filename...comma on 2nd... file
         if (batchCount > 1) batchFiles = [batchFiles stringByAppendingString:@","];
         batchFiles = [batchFiles stringByAppendingString:lastFileProcessed];
-        [self updateBatchProgress : [NSString stringWithFormat:@"Download %@",lastFileProcessed] : FALSE];
+        [self updateBatchProgress : [NSString stringWithFormat:@"Download %@",
+                                     [self getStrippedFilename:lastFileProcessed]] : FALSE];
         //if ([pc imageExistsByID:lastFileProcessed : 1])  // 1/19 pdf cache more logical
         //If we use the PDF cache, it's possible that the file images came down but the OCR did NOT.
         //  in that case the OCR never goes through, it gets a nil file reference and fails
@@ -435,7 +437,8 @@ static BatchObject *sharedInstance = nil;
 
             oto.vendor = vendorName;
             oto.imageFileName = lastFileProcessed;
-            [oto performOCROnData : lastFileProcessed : nil : CGRectZero : ot];
+            oto.ot = ot; //Hand template down to oto
+            [oto performOCROnData : lastFileProcessed : nil : CGRectZero ];
         }
         else
         {
@@ -478,6 +481,18 @@ static BatchObject *sharedInstance = nil;
     return 0;
 } //end getVendorFileCount
 
+//=============(OCRTopObject)=====================================================
+-(NSString*) getStrippedFilename : (NSString*) fname
+{
+    NSString* sfname = fname;
+    NSArray *fItems    = [fname componentsSeparatedByString:@"/"];
+    if (fItems.count > 1) //divided name w/ folders? just get last bit...
+        sfname = fItems[fItems.count-1];
+    return sfname;
+} //end getStrippedFilename
+
+
+
 //=============(BatchObject)=====================================================
 // Force-Halt Batch
 -(void) haltBatch
@@ -514,7 +529,9 @@ static BatchObject *sharedInstance = nil;
                 ii = [it rotate90CCW:ii];
             //UIImage *deskewedImage = [it deskew:ii];
             //OUCH! THis has to be decoupled to handle the OCR returning on each image!
-            [oto performOCROnImage:@"test.png" : ii : ot];
+             //Hand template down to oto
+            oto.ot = ot; //Hand template down to oto
+            [oto performOCROnImage:@"test.png" : ii];
         }
 
     }
@@ -529,7 +546,8 @@ static BatchObject *sharedInstance = nil;
               (int)imageFrame.size.width,(int)imageFrame.size.height);
         oto.vendor = vendorName;
         oto.imageFileName = lastFileProcessed; // DHS 1/22 was using wrong filename!
-        [oto performOCROnData : lastFileProcessed : data : imageFrame : ot];
+        oto.ot = ot; //Hand template down to oto
+        [oto performOCROnData : lastFileProcessed : data : imageFrame];
     } //end else
 
 } //end processPDFPages
@@ -559,7 +577,8 @@ static BatchObject *sharedInstance = nil;
           (int)imageFrame.size.width,(int)imageFrame.size.height);
     oto.vendor = vendorName;
     oto.imageFileName = ipath; //@"hawaiiBeefInvoice.jpg"; //ipath;
-    [oto performOCROnData : ipath : data : imageFrame : ot];
+    oto.ot = ot;
+    [oto performOCROnData : ipath : data : imageFrame ];
     //  [oto stubbedOCR : oto.imageFileName : [UIImage imageNamed:oto.imageFileName]  : ot];
 } //end processPDFPages
 
@@ -876,21 +895,12 @@ static BatchObject *sharedInstance = nil;
 {
     NSLog(@" OCR OK page %d tp %d  count %d total %d",batchPage,batchTotalPages,batchCount,batchTotal);
     batchPage++;
-//DHS 1/28 Only do next file AFTER invoice is ok. but what about page count?
-//    if (batchPage >= batchTotalPages)
-//    {
-//        [self processNextFile : 1];
-//    }
 }
 
 //===========<OCRTopObjectDelegate>================================================
 - (void)errorPerformingOCR : (NSString *) errMsg
 {
     [self addError : errMsg : @"n/a": @"n/a"];
-    //1/28 NON-fatal? Don't do next file yet!
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        [self processNextFile];
-//    });
 }
 
 //===========<OCRTopObjectDelegate>================================================

@@ -427,7 +427,9 @@
     else{   //Better make sure template is set up here!!!
         [self loadStubbedOCRDataLite]; //asdf
         oto.imageFileName = selectFnameForTemplate;
-        [oto performOCROnImage : selectFnameForTemplate : [UIImage imageNamed:selectFnameForTemplate] : ot ];
+        oto.ot = ot; //Hand template down to oto
+
+        [oto performOCROnImage : selectFnameForTemplate : [UIImage imageNamed:selectFnameForTemplate]];
     }
     
     //    [self callOCRSpace : @"hawaiiBeefInvoice.jpg"];
@@ -1216,7 +1218,7 @@
 {
     NSLog(@" EXP TABLE SAVED (OCR VC)");
     //Time to setup invoice object too!
-    [it clear];
+    [it clearObjectIds];
     [it setupVendorTableName : supplierName];
     NSString *its = [NSString stringWithFormat:@"%4.2f",invoiceTotal];
     its = [od cleanupPrice:its]; //Make sure total is formatted!

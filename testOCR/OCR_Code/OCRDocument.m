@@ -276,11 +276,13 @@
     //Need a cleanup?
     NSMutableArray *aout = [[NSMutableArray alloc] init];
     //Cleanup dollar amounts... 1/23 added new column types...
-    if ([ctype isEqualToString:@"INVOICE_COLUMN_PRICE"] || [ctype isEqualToString:@"INVOICE_COLUMN_TOTAL"])
+    //DHS 2/5 wups forgot about built-in column numbers!
+    if ([ctype isEqualToString:@"INVOICE_COLUMN_PRICE"] || [ctype isEqualToString:@"INVOICE_COLUMN_TOTAL"] ||
+        index == _priceColumn || index == _amountColumn)
     {
         for (NSString * s in a) [aout addObject:[self cleanupPrice:s]];
     }
-    else if ([ctype isEqualToString:@"INVOICE_COLUMN_QUANTITY"]) //quantity
+    else if ([ctype isEqualToString:@"INVOICE_COLUMN_QUANTITY"] || index == _quantityColumn) //quantity
     {
         for (NSString * s in a) [aout addObject:[self cleanUpNumberString : s]];
     }
@@ -723,9 +725,9 @@
         CGRect cr = CGRectMake(rr.origin.x, thisY, rr.size.width, nextY-thisY);
         NSMutableArray *a = [self findAllWordsInRect:cr];
         CGRect docRect = [self  template2DocRect : cr];
-        NSLog(@" getColumnString:(col %d row %d) rect %@ thisy %d nexty %d",
-              column,i,NSStringFromCGRect(docRect),thisY,nextY);
-        [self dumpArrayFull:a];
+        //NSLog(@" getColumnString:(col %d row %d) rect %@ thisy %d nexty %d",
+        //      column,i,NSStringFromCGRect(docRect),thisY,nextY);
+        //[self dumpArrayFull:a];
         [resultStrings addObject:[self assembleWordFromArray : a : FALSE : 2]];
         lastYSize = nextY - thisY;
     }
@@ -825,12 +827,12 @@
         //DHS 1/23 NOTE: this sometimes makes duplicate items show up! (at least in HFM invoice)
         if (dy > _glyphHeight)
         {
-            NSLog(@" add finalY %d",nextY.intValue);
+            //NSLog(@" add finalY %d",nextY.intValue);
             [finalYs addObject:nextY];
         }
         lastY = nextY;
     }
-    NSLog(@" got %d rows",(int)finalYs.count);
+    //NSLog(@" got %d rows",(int)finalYs.count);
     return 0; //OK
 } //end getRowYpositions'
 

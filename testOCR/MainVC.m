@@ -16,7 +16,7 @@
 //  1/6 add pull to refresh
 //  1/9 Make sure batch gets created AFTER parse DB is up!
 //  1/14 Add invoiceVC hookup, bold menu titles too!
-
+//  2/5  Add vendors, make sure loaded b4 batch segue
 #import "MainVC.h"
 
 @interface MainVC ()
@@ -34,10 +34,16 @@
     emptyIcon     = [UIImage imageNamed:@"emptyDoc"];
     dbIcon        = [UIImage imageNamed:@"lildbGrey"];
     batchIcon     = [UIImage imageNamed:@"multiNOT"];
+    errIcon       = [UIImage imageNamed:@"redX"];
     versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
     oc = [OCRCache sharedInstance];
     pc = [PDFCache sharedInstance];
-
+    // 1/4 add genparse to clear activities
+    gp = [[GenParse alloc] init];
+    gp.delegate = self;
+    
+    vv = [Vendors sharedInstance];
+    
     refreshControl = [[UIRefreshControl alloc] init];
     batchPFObjects = nil;
     
@@ -101,7 +107,7 @@
 //=============OCR MainVC=====================================================
 -(void)refreshIt
 {
-    NSLog(@" pull to refresh...");
+    //NSLog(@" pull to refresh...");
     [act readActivitiesFromParse:nil :nil];
 }
 
@@ -182,10 +188,14 @@
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self clearPDFCacheMenu];
                                                           }];
+    UIAlertAction *sixthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Clear Activities",nil)
+                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                              [self clearActivityMenu];
+                                                          }];
     NSString* t = @"Minimum Activity Logging";
     AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     if (mappDelegate.verbose) t = @"Verbose Activity Logging";
-    UIAlertAction *sixthAction = [UIAlertAction actionWithTitle:NSLocalizedString(t,nil)
+    UIAlertAction *seventhAction = [UIAlertAction actionWithTitle:NSLocalizedString(t,nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               mappDelegate.verbose = !mappDelegate.verbose;
                                                           }];
@@ -199,6 +209,7 @@
     [alert addAction:fourthAction];
     [alert addAction:fifthAction];
     [alert addAction:sixthAction];
+    [alert addAction:seventhAction];
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
 
@@ -321,6 +332,7 @@
     
 } //end clearCacheMenu
 
+
 //=============OCR MainVC=====================================================
 // Yes/No for cache clear...
 -(void) clearPDFCacheMenu
@@ -332,6 +344,28 @@
     UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"YES",nil)
                                                         style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                             [self->pc clearHardCore];
+                                                        }];
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"NO",nil)
+                                                       style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                       }];
+    //DHS 3/13: Add owner's ability to delete puzzle
+    [alert addAction:yesAction];
+    [alert addAction:noAction];
+    [self presentViewController:alert animated:YES completion:nil];
+} //end menu
+
+//=============OCR MainVC=====================================================
+// Yes/No for activity table clear...
+-(void) clearActivityMenu
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:
+                                NSLocalizedString(@"Clear Activities? (Cannot be undone!)",nil)
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"YES",nil)
+                                                        style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                            [spv start:@"Clear Activities..."];
+                                                            [gp deleteAllByTableAndKey:@"activity" :@"*" :@"*"];
                                                         }];
     UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"NO",nil)
                                                        style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -456,13 +490,23 @@
     }
 
     NSString *atype = [act getType:row];
+    NSString *atypeMatch = atype.lowercaseString;
     NSString *adata = [act getData:row];
+    NSString *firstRowOutput  = atype;
+    NSString *secondRowOutput = adata;
 
     UIImage *ii = emptyIcon;
-    cell.badgeLabel.hidden = TRUE;
+    cell.badgeLabel.hidden  = TRUE;
+    cell.checkmark.hidden   = TRUE; //No checkmarks!
+    cell.badgeLabel.hidden  = TRUE;
+    cell.badgeWLabel.hidden = TRUE;
+
+    if ([atypeMatch containsString:@"error"]) //Errors get big red X
+    {
+        ii = errIcon;
+    }
     //Batch Acdtivity:Batch cell has a badge(errorcount) and custom color...
-    //     (NEEDS TO COMPUTE ERRORS< CPU EATER?)
-    if ([atype.lowercaseString containsString:@"batch"] && (batchPFObjects != nil))
+    else if ([atypeMatch containsString:@"batch"] && (batchPFObjects != nil))
     {
         ii = batchIcon;
         NSArray  *adItems = [adata componentsSeparatedByString:@":"]; //Break up batch data
@@ -502,15 +546,22 @@
             } //end for (PFOb....)
         }    //end aditems...
     }       //end type.lower
-    else //Non-batch activity?
+    else //Non-batch and non-error activity?
     {
-        cell.checkmark.hidden   = TRUE; //No checkmarks!
-        cell.badgeLabel.hidden  = TRUE;
-        cell.badgeWLabel.hidden = TRUE;
-    }
-    //...other activity types... invoice, exp, etc...
-    if ([atype.lowercaseString containsString:@"invoice"]) ii = dbIcon;
-    if ([atype.lowercaseString containsString:@"exp"])     ii = dbIcon;
+        //For invoice, exp, etc... make sure invoice number is indicated
+        if ([atypeMatch containsString:@"invoice"])
+        {
+            ii = dbIcon;
+            secondRowOutput = [NSString stringWithFormat:@"Invoice:%@",adata];
+        }
+        
+        if ([atypeMatch containsString:@"exp"])
+        {
+            ii = dbIcon;
+            secondRowOutput = [NSString stringWithFormat:@"Invoice:%@",adata];
+        }
+
+    } //end else
     //Date -> String, why isn't this in just one call???
     NSDate *activityDate = [act getDate:row];
     NSDateFormatter * formatter =  [[NSDateFormatter alloc] init];
@@ -519,9 +570,9 @@
     
     //Fill out Cell UI
     //Top Bold label in the cell...
-    cell.topLabel.text    = atype;
+    cell.topLabel.text    = firstRowOutput;
     // ..next row, normal text (info etc...)
-    cell.bottomLabel.text = adata;
+    cell.bottomLabel.text = secondRowOutput;
     // LH batch icon, db icon, etc...
     cell.icon.image       = ii;
     // small grey label bottom cell
@@ -604,10 +655,9 @@
        // return;
         [self performSegueWithIdentifier:@"templateSegue" sender:@"mainVC"];
     }
-    if (which == 3) //batch
+    if (which == 3 && vv.loaded) //batch? (2/5 make sure vendors are there first!)
     {
         [self performSegueWithIdentifier:@"batchSegue" sender:@"mainVC"];
-        
     }
 
 } //end didSelectNavButton
@@ -652,17 +702,6 @@
 }
 
 int currentYear = 2019;
-
-
-- (void)didDeleteAllByTableAndKey : (NSString *)s1 : (NSString *)s2 : (NSString *)s3
-{
-    NSLog(@" delete OK");
-}
-- (void)errorDeletingAllByTableAndKey : (NSString *)s1 : (NSString *)s2 : (NSString *)s3
-{
-    NSLog(@" delete ERrr");
-}
-
 
 
 //=============OCR MainVC=====================================================
@@ -760,6 +799,24 @@ int currentYear = 2019;
 - (void)errorReadingActivities : (NSString *)errmsg
 {
     NSLog(@" act table err %@",errmsg);
+}
+
+#pragma mark - GenParseDelegate
+//=============<GenParseDelegate>=====================================================
+- (void)didDeleteAllByTableAndKey : (NSString *)s1 : (NSString *)s2 : (NSString *)s3
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self refreshIt];
+    });
+}
+
+//=============<GenParseDelegate>=====================================================
+- (void)errorDeletingAllByTableAndKey : (NSString *)s1 : (NSString *)s2 : (NSString *)s3
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self refreshIt];
+    });
+
 }
 
 

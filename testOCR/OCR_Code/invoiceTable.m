@@ -34,7 +34,7 @@
 }
 
 //=============(invoiceTable)=====================================================
--(void) clear
+-(void) clearObjectIds
 {
     [iobjs removeAllObjects];
 }
@@ -160,7 +160,8 @@
 
 
 //=============(invoiceTable)=====================================================
--(void) saveToParse
+// Saves first page of new invoice...
+-(void) saveToParse : (BOOL)lastPage
 {
     if (tableName.length < 1) return; //No table name!
     [self packInvoiceOids]; //Set up packedOIDs string
@@ -181,10 +182,10 @@
         if (succeeded) {
             NSLog(@" ...invoice [vendor:%@]->parse",self->_ivendor);
             //NSString *objID = iRecord.objectId;
-            [self.delegate didSaveInvoiceTable:self->_inumber];
+            [self.delegate didSaveInvoiceTable:self->_inumber : lastPage];
         } else {
             NSLog(@" ERROR: saving invoice: %@",error.localizedDescription);
-            [self.delegate errorSavingInvoiceTable:error.localizedDescription];
+            [self.delegate errorSavingInvoiceTable:error.localizedDescription : lastPage];
         }
     }];
 } //end saveToParse
@@ -192,9 +193,9 @@
 //=============(invoiceTable)=====================================================
 // Gets invoice, if not there creates object.
 //   if it exists, updates PInv_EXPObjectID_key field with new info and saves
--(void) updateInvoice : (NSString *)vendor : (NSString *)invoiceNumberstring : (NSString *)batchID
+-(void) updateInvoice : (NSString *)vendor : (NSString *)invoiceNumberstring : (NSString *)batchID : (BOOL)lastPage
 {
-    NSLog(@" updateInvoice %@",invoiceNumberstring);
+    NSLog(@" updateInvoice %@ lastpage %d",invoiceNumberstring,lastPage);
     [self setupVendorTableName:vendor];
     if (tableName.length < 1) return; //Error: no table name!
     PFQuery *query = [PFQuery queryWithClassName:tableName];
@@ -202,20 +203,25 @@
     [query whereKey:PInv_BatchID_key equalTo:batchID]; //DHS 1/28 match batch too!
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) { //Query came back...
-            if (objects.count == 0) [self saveToParse];  //Nothing? Just save
+            if (objects.count == 0) [self saveToParse : lastPage];  //Nothing? Just save
             else for( PFObject *pfo in objects)         //Exists? Update first object
             {
+                NSString *pcs = pfo[PInv_PageCount_key];
+                int newCount = pcs.intValue + 1;                                      //Update pagecount;
+                pfo[PInv_PageCount_key] = [NSString stringWithFormat:@"%d",newCount];//  and save it!
+                NSLog(@" update invoice %@ count %d",invoiceNumberstring,newCount);
+                [self packInvoiceOids]; //Set up packedOIDs string
                 NSString *oldOIDs    = pfo[PInv_EXPObjectID_key];
                 NSString *newOIDs    = self->packedOIDs;
                 newOIDs              = [NSString stringWithFormat:@"%@,%@",oldOIDs,newOIDs];
                 pfo[PInv_EXPObjectID_key] = newOIDs;
-                NSLog(@" ...found, update Invoice:%@",newOIDs);
                 [pfo saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
                     if (succeeded) {
                         NSLog(@" ...update save OKI");
-                        [self.delegate didUpdateInvoiceTable:invoiceNumberstring];
+                        [self.delegate didUpdateInvoiceTable:invoiceNumberstring : lastPage];
                     } else {
                         NSLog(@" ERROR: updating invoice: %@",error.localizedDescription);
+                        [self.delegate errorSavingInvoiceTable:error.localizedDescription : lastPage];
                     }
                 }];
                 break; //Done after one

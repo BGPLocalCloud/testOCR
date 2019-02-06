@@ -24,6 +24,7 @@
 #import "BatchReportController.h"
 #import "ErrorViewController.h"
 #import "EXPViewController.h"
+#import "GenParse.h"
 #import "NavButtons.h"
 #import "SessionManager.h"
 #import "OCRCache.h"
@@ -45,6 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
     UIImage *emptyIcon;
     UIImage *dbIcon;
     UIImage *batchIcon;
+    UIImage *errIcon;
     int selectedRow;
     NSString* stype;
     NSString* sdata;
@@ -56,6 +58,8 @@ NS_ASSUME_NONNULL_BEGIN
     BOOL fixingErrors;
     spinnerView *spv;
     DropboxTools *dbt;
+    GenParse *gp;
+    Vendors *vv;
 
 
 }

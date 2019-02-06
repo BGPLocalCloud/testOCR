@@ -48,7 +48,7 @@
 
     smartProducts *smartp;
     int smartCount;
-    int pagesReturned,pageCount;
+    int currentPage,pagesReturned,pageCount;
     //OCR'ed results...
     NSString *fieldName;
     NSString *fieldNameShort;
@@ -82,12 +82,14 @@
 //INvoice-read-in fields
 @property (nonatomic , strong) NSDate* invoiceDate;
 @property (nonatomic , strong) NSString* invoiceNumberString;
+@property (nonatomic , strong) NSString* oldInvoiceNumberString;
 @property (nonatomic , strong) NSString* invoiceCustomer;
 @property (nonatomic , strong) NSString* invoiceVendor;
 @property (nonatomic , assign) float invoiceTotal;
 @property (nonatomic , assign) long invoiceNumber;
 @property (nonatomic , strong) NSArray* columnHeaders;
 @property (nonatomic , assign) int totalLines;
+@property (nonatomic , strong) OCRTemplate* ot;
 
 @property (nonatomic, unsafe_unretained) id <OCRTopObjectDelegate> delegate; // receiver of completion messages
 
@@ -97,8 +99,8 @@
 -(void) clearEXPBatchCounter;
 - (void) loadCSVFileFromDocParser : (NSString *)fname : (NSString *)vendor;
 - (void) loadCSVValuesFromString : (NSString *)avendor : (NSString *)s;
-- (void)performOCROnImage : (NSString *)fname : (UIImage *)imageToOCR : (OCRTemplate *)ot;
-- (void)performOCROnData : (NSString *)fname : (NSData *)imageDataToOCR : (CGRect) r : (OCRTemplate *)ot;
+- (void)performOCROnImage : (NSString *)fname : (UIImage *)imageToOCR ;
+- (void)performOCROnData : (NSString *)fname : (NSData *)imageDataToOCR : (CGRect) r  ;
 -(void) stubbedOCR: (NSString*)imageName : (UIImage *)imageToOCR : (OCRTemplate *)ot;
 -(void) setupTestDocumentJSON : (NSDictionary *) json;  //FOR TESTING ONLY
 -(void) setupDocumentFrameAndParseJSON : (CGRect) r;

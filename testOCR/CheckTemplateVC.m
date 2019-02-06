@@ -53,7 +53,8 @@
     _imageView.image = _photo;
     _scrollView.delegate=self;
     oto.imageFileName = _fileName; //1/15
-    [oto performOCROnImage : oto.imageFileName : _photo : nil];
+    oto.ot = nil; //Hand template down to oto
+    [oto performOCROnImage : oto.imageFileName : _photo ];
 } //end viewDidLoad
 
 //=============CheckTemplate VC=====================================================

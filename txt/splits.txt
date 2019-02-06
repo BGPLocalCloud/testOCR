@@ -1,6 +1,13 @@
 #Common OCR Split word fixes
+amer ecan=american
+bus ness=business
 mi x=mix
 hawai ian=hawaiian
+mayonnai be=mayonnaise
+ma ise=mayonnaise
+on ione=onions
+or ink=drink
 sw ftener=sweetener
 saus lk=sausage links
 1 x=mix
+sl iced = sliced

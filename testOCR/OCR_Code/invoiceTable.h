@@ -47,13 +47,13 @@
 -(void) addInvoiceItemByObjectID:(NSString *)oid;
 -(void) setBasicFields : (NSDate *) ddd : (NSString*)num : (NSString*)total :
                 (NSString*)vendor : (NSString*)customer : (NSString*)PDFFile : (NSString*)pageCount;
--(void) clear;
+-(void) clearObjectIds;
 -(int) getItemCount;
 -(void) readFromParse : (NSString *)vendor : (NSString *)invoiceNumberstring;
 -(void) readFromParseAsStrings : (NSString *)vendor : batch;
 -(void) saveToParse;
 -(void) setupVendorTableName : (NSString *)vname;
--(void) updateInvoice : (NSString *)vendor : (NSString *)invoiceNumberstring : (NSString *)batchID;
+-(void) updateInvoice : (NSString *)vendor : (NSString *)invoiceNumberstring : (NSString *)batchID : (BOOL)lastPage;
 
 
 @end
@@ -63,9 +63,9 @@
 @optional
 - (void)didReadInvoiceTable;
 - (void)didReadInvoiceTableAsStrings : (NSMutableArray*) a;
-- (void)didSaveInvoiceTable:(NSString *) s;
-- (void)didUpdateInvoiceTable:(NSString *) inum;
-- (void)errorSavingInvoiceTable:(NSString *) s;
+- (void)didSaveInvoiceTable:(NSString *) s : (BOOL)lastPage;
+- (void)didUpdateInvoiceTable:(NSString *) inum : (BOOL)lastPage;
+- (void)errorSavingInvoiceTable:(NSString *) s : (BOOL)lastPage;
 
 @end
 

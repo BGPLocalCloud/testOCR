@@ -42,10 +42,10 @@
     NSLog(@" EXP Clear");
     [_expos removeAllObjects];
     //Clear EXP send/return counts...
+    [objectIDs removeAllObjects]; //2/5 back here again
+    //2/5
     totalSentCount = totalReturnCount = 0;
     allErrors = @"";
-    for (int i=0;i<32;i++)  returnCounts[i] = 0;
-    for (int i=0;i<256;i++) errorsByLineNumber[i] = @"";
 }
 
 
@@ -134,11 +134,11 @@
     batch       = [self TrackNilErrors : batch : PInv_BatchID_key];
     errStatus   = [self TrackNilErrors : errStatus : PInv_ErrStatus_key];
     PDFFile     = [self TrackNilErrors : PDFFile : PInv_PDFFile_key];
-    if (allErrors.length > 1) //Got error(s)?
-    {
-        NSLog(@"%@",allErrors);
-//        return;
-    }
+//    if (allErrors.length > 1) //Got error(s)?  2/5 no need for printout
+//    {
+//        NSLog(@"%@",allErrors);
+////        return;
+//    }
     
     EXPObject *exo = [[EXPObject alloc] init];
     exo.expdate         = fdate;
@@ -517,21 +517,31 @@
 //  then a delegate callback tells parent when all object ID's are ready for invoice
 -(void) saveToParse : (int) page :  (BOOL) lastPage
 {
-    if (_expos.count < 1) return; //Nothing to write!
+    NSLog(@" ET savetoparse page %d last %d etcount %d",page,lastPage,(int)_expos.count);
+    if (_expos.count < 1)
+    {
+        [self.delegate didSaveEXPTable : nil]; //Trigger next page..
+        return; //Nothing to write!
+    }
     int i=0;
     //Clear any old junk from past EXP save...
-    if (page == 0)
-    {
-        [objectIDs removeAllObjects];
-        for (int i=0;i<32;i++) sentCounts[i] = 0;
-    }
-    sentCounts[page]   = (int)_expos.count;
-    returnCounts[page] = 0;
-    if (lastPage) //Last page? Get a total of everything sent...
-    {
-        totalSentCount = 0;
-        for (int i=0;i<32;i++) totalSentCount+=sentCounts[i];
-    }
+//    if (page == 0)
+//    {
+////        [objectIDs removeAllObjects];
+//        for (int i=0;i<32;i++) //DHS 2/4 clear counts here instead of main clear
+//        {
+//            sentCounts[i]   = 0;
+//            returnCounts[i] = 0;
+//        }
+//        totalSentCount = totalReturnCount = 0;
+//    }
+//    sentCounts[page]   = (int)_expos.count;
+//    if (lastPage) //Last page? Get a total of everything sent...
+//    {
+//        totalSentCount = 0;
+//        for (int i=0;i<32;i++) totalSentCount+=sentCounts[i];
+//    }
+    NSLog(@" SENT count for page %d is %d total is %d lp %d",page,sentCounts[page],totalSentCount,lastPage);
     for (EXPObject *exo in _expos)
     {
         PFObject *exoRecord = [PFObject objectWithClassName:tableName];
@@ -556,24 +566,33 @@
         exoRecord[PInv_BatchID_key]             = exo.batch;
         exoRecord[PInv_BatchCounter_key]        = exo.batchCounter;
         exoRecord[PInv_VersionNumber]           = _versionNumber;
+        totalSentCount++; //DHS 2/5
+
         //NSLog(@"EXP ->parse [%@] %@ x %@ = %@",exo.productName,exo.quantity,exo.pricePerUOM,exo.total);
         [exoRecord saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
             if (succeeded) {
                 NSString *objID = exoRecord.objectId;
                 [self->objectIDs addObject:objID];
-                self->returnCounts[page]++;
+                //self->returnCounts[page]++;
                 self->totalReturnCount++;
                 NSLog(@" ...EXP[%d/%d] [%@/%@]->parse",self->totalReturnCount,self->totalSentCount,exo.vendor,exo.productName);
                 //NSLog(@" ...  EXP: ids %@",self->objectIDs);
                 //NSLog(@" for page[%d] sent %d return %d",page,self->sentCounts[page],self->returnCounts[page]);
                 //NSLog(@" for page[%d] totalsent %d totalreturn %d",page,self->totalSentCount,self->totalReturnCount);
-                if (self->returnCounts[page] == self->sentCounts[page]) //Finish this page?
-                    [self.delegate didSaveEXPTable : self->objectIDs];
-                if (lastPage)
+//2/5                if (self->returnCounts[page] == self->sentCounts[page]) //Finish this page?
+                if (self->totalReturnCount == self->totalSentCount)
                 {
-                    if (self->totalReturnCount == self->totalSentCount) //All done w/ everything?
-                        [self.delegate didFinishAllEXPRecords : self->objectIDs];
+                    [self.delegate didSaveEXPTable : self->objectIDs];
+                    if (lastPage)
+                        [self.delegate didFinishAllEXPRecords : self->totalSentCount : self->objectIDs];
+
                 }
+//2/5 
+//                if (lastPage)
+//                {
+//                    if (self->totalReturnCount == self->totalSentCount) //All done w/ everything?
+//                        [self.delegate didFinishAllEXPRecords : self->totalSentCount : self->objectIDs];
+//                }
                 NSString *fieldErr = [exoRecord objectForKey:PInv_ErrStatus_key];
                 if (fieldErr.length > 4) //may be blank or OK
                     [self.delegate errorInEXPRecord : fieldErr : objID :

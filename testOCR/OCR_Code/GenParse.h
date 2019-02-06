@@ -1,9 +1,15 @@
 //
+//    ____            ____
+//   / ___| ___ _ __ |  _ \ __ _ _ __ ___  ___
+//  | |  _ / _ \ '_ \| |_) / _` | '__/ __|/ _ \
+//  | |_| |  __/ | | |  __/ (_| | |  \__ \  __/
+//   \____|\___|_| |_|_|   \__,_|_|  |___/\___|
+//
 //  GenParse.h
 //  testOCR
 //
 //  Created by Dave Scruton on 1/29/19.
-//  Copyright © 2019 huedoku. All rights reserved.
+//  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

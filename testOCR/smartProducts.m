@@ -14,6 +14,7 @@
 //  12/31 add typos
 //  1/10  add analyze, get rid of old analyze stuff...
 //  2/4   remove _analyzedShortDateString
+//  2/5   redid q / p / a match check again
 #import "smartProducts.h"
 
 @implementation smartProducts
@@ -115,13 +116,14 @@
                     ];
 
     nonProducts = @[  //CANNED stuff that never is a product
-                    @"subtotal",
+                    @"business",
                     @"charge",
                     @"discount",
                     @"dry items",
                     @"frozen items",
                     @"payment",
                     @"refrigerated",
+                    @"subtotal",
                     @"surcharge"
                     ];
         
@@ -137,8 +139,8 @@
                       @"ginger ale",
                       @"grape juice",
                       @"juice",
-                      @"mg guava nectar",   // Need multiple words?",
-                      @"mg pass organic nectar",   // Multiple words?
+                      @"lemonade",
+                      @"nectar",   // Need multiple words?",
                       @"orange juice",
                       @"raspberry tea",
                       @"sprite",
@@ -160,6 +162,7 @@
                    @"waffle"
                   ];
     dairyNames = @[
+                   @"butter",
                    @"buttermilk",
                    @"cheese",
                    @"cream",
@@ -179,8 +182,7 @@
     dryGoodsNames = @[   //CANNED
                       @"applesauce",
                       @"apple sauce",
-                      @"beans, black",  //vs. green beans as produce?
-                      @"beans, kidney",  //vs. green beans as produce?
+                      @"beans",
                       @"beef base",
                       @"beef consume",
                       @"bread",
@@ -190,7 +192,9 @@
                       @"catsup",
                       @"cereal",
                       @"chicken base",
+                      @"chocolate",
                       @"chowder",
+                      @"cocktail",
                       @"coconut",
                       @"coconut milk",
                       @"condensed milk",
@@ -225,6 +229,7 @@
                       @"noodle",
                       @"oats",
                       @"oil",
+                      @"olive",
                       @"olives",
                       @"onion powder",
                       @"oranges, mandarin",
@@ -235,7 +240,7 @@
                       @"penne",
                       @"pepper",
                       @"peaches", //NEVER FRESH?
-                      @"pears, bartlett",
+                      @"pears",
                       @"pickle",
                       @"potato pearls",
                       @"powder",
@@ -255,10 +260,13 @@
                       @"tofu",
                       @"topping",
                       @"vanilla",
+                      @"vegetable",
                       @"vegetables",
                       @"vienna sausage", //WHY NOT PROTEIN?
                       @"vinegar",
-                      @"wafer"
+                      @"walnut",
+                      @"wafer",
+                      @"yeast"
                       ];
     miscNames = @[ //CANNED
                       @"charges",
@@ -280,6 +288,7 @@
                      @"salami",
                      @"spam",
                      @"steak",
+                     @"turkey",
                      @"tuna"    //here or dry goods?
                      ];
     produceNames = @[ //CANNED, need to check plurals too!
@@ -294,6 +303,7 @@
                      @"cantaloupes",
                      @"cabbage",
                      @"carrots",
+                     @"cauliflower",
                      @"celery",
                      @"corn IFQ",  //???WTF?
                      @"cranberry",
@@ -301,9 +311,11 @@
                      @"garlic",
                      @"green beans",
                      @"honeydew",
+                     @"iceberg",
                      @"lemons",
                      @"lettuce",
                      @"mango",
+                     @"mandarin",
                      @"melon",
                      @"melons",
                      @"mushroom",
@@ -313,6 +325,7 @@
                      @"papaya",
                      @"papayas",
                      @"peas",
+                     @"peppers",
                      @"pineapple",
                      @"pineapples",
                      @"potato",
@@ -324,6 +337,7 @@
                      @"strawberry",
                      @"tomato",
                      @"tomatoes",
+                     @"valencia",
                      @"vegetable blend",
                      @"watermelon"
                      ];
@@ -334,6 +348,8 @@
                     @"gelatin"
                     ];
     suppliesNames = @[
+                      @"apron",
+                      @"bowl",
                       @"cont",
                       @"cups",
                       @"degreaser",
@@ -353,6 +369,7 @@
                       @"rinse aid",
                       @"refill",
                       @"sanitizer",
+                      @"scrubber",
                       @"spoon",
                       @"teaspoon",
                       @"wiper"
@@ -395,7 +412,7 @@
             kwRecord[PInv_Category_key] = cat;
             NSString *keyword = [self getKeyword:cat :i];
             kwRecord[PInv_Name_key] = keyword;
-            NSLog(@" ...write [%@]%@",cat,keyword);
+            //NSLog(@" ...write [%@]%@",cat,keyword);
             [kwRecord saveEventually]; //Just save right off, don't care about return
         }
     }
@@ -414,7 +431,7 @@
                 NSString *cat     = pfo[PInv_Category_key];
                 [self->keywords setObject:cat forKey:keyword];
             }
-            NSLog(@" ...loaded keywords");
+            //NSLog(@" ...loaded keywords");
         }
     }];
      
@@ -541,7 +558,7 @@
     {
         if ([fullProductName.lowercaseString containsString:nps])
         {
-            NSLog(@" non product %@",fullProductName);
+            //NSLog(@" non product %@",fullProductName);
             _nonProduct = TRUE;
             return ANALYZER_NONPRODUCT;
         }
@@ -560,7 +577,7 @@
     NSArray *a = [occ matchCategory:fullProductName]; //Returns array[4] on matche...
     if (a != nil && a.count >=4)  //Hit?
     {
-        NSLog(@" OCC Cat match [%@]",fullProductName);
+        //NSLog(@" OCC Cat match [%@]",fullProductName);
         _analyzedCategory  = a[0]; //Get canned data out from array...
         _analyzedProcessed = a[2];
         _analyzedLocal     = a[3];
@@ -672,80 +689,89 @@
         local = TRUE;
     
     //Sanity Check: quantity * price = amount?
-    float qfloat     = [quantity floatValue];
+    int qint     = [quantity intValue];
     float pfloat     = [price floatValue];
     float afloat     = [amount floatValue];
     if (afloat > 10000.0) //Huge Amount? Assume decimal error
     {
-        NSLog(@" ERROR: amount over $10000!!");
+        //NSLog(@" ERROR: amount over $10000!!");
         afloat = afloat / 1000.0;
     }
     if (afloat > 1000.0) //Huge Amount? Assume decimal error
     {
-        NSLog(@" ERROR: amount over $1000!!");
+        //NSLog(@" ERROR: amount over $1000!!");
         afloat = afloat / 100.0;
     }
     if (pfloat > 10000.0) //Huge Price? Assume decimal error
     {
-        NSLog(@" ERROR: price over $10000!!");
+        //NSLog(@" ERROR: price over $10000!!");
         pfloat = pfloat / 1000.0;
     }
     if (pfloat > 1000.0) //Huge Price? Assume decimal error
     {
-        NSLog(@" ERROR: price over $1000!!");
+        //NSLog(@" ERROR: price over $1000!!");
         pfloat = pfloat / 100.0;
     }
-    float testAmount = qfloat * pfloat;
+    float testAmount = (float)qint * pfloat;
     
-    //NSLog(@" above [%@] priceFix q p a %d %f %f",fullProductName,qfloat,pfloat,afloat);
-    //Missing 2 / 3 values is a failure...
-    if ((pfloat == 0.0 && afloat == 0.0) || (qfloat == 0.0 && afloat == 0.0)  || (qfloat == 0.0 && pfloat == 0.0) )
+    //NSLog(@" above [%@] priceFix q p a %d %f %f",fullProductName,qint,pfloat,afloat);
+    //2/5 Missing 2 / 3 values is a failure...
+    if ((pfloat == 0.0 && afloat == 0.0) ||
+        (qint   == 0   && afloat == 0.0) ||
+        (qint   == 0   && pfloat == 0.0) )
     {
         //NSLog(@" ... 2 out of 3 price columns are zero!");
         _majorError = ANALYZER_BAD_PRICE_COLUMNS;
+        if (pfloat != 0.0)  //Got a price, assume quantity is 1...
+        {
+            qint   = 1;
+            afloat = pfloat;
+        }
+        else if (afloat != 0.0)  //Got an amount, assume quantity is 1...
+        {
+            qint   = 1;
+            pfloat = afloat;
+        }
     }
-    else if (afloat != testAmount || qfloat == 0.0)
+    else //2/5 check for one zero field, fixable!
     {
         //NSLog(@" ...price err: q * p not equal to a!");
-        if (afloat == 0.0 && qfloat != 0.0)
+        if (afloat == 0.0)
         {
             //NSLog(@" ...ZERO Amount: FIX");
-            amount = [self getDollarsAndCentsString:qfloat * pfloat];
+            afloat = (float)qint * pfloat;
             aerror = ANALYZER_ZERO_AMOUNT;
         }
-        else if (afloat != 0.0 && qfloat == 0.0)
+        else if (qint == 0)
         {
             //NSLog(@" ...ZERO QUANTITY: FIX");
-            qfloat = afloat / pfloat;
+            qint = (int)(afloat / pfloat);
+            if (qint == 0) qint = 1; //Handle roundoff errors...
             aerror = ANALYZER_ZERO_QUANTITY;
         }
         else if (pfloat == 0.0)
         {
             //NSLog(@" ...ZERO PRICE: FIX");
-            pfloat = afloat / qfloat;
+            pfloat = afloat / (float)qint;
             aerror = ANALYZER_ZERO_PRICE;
         }
-        else //All fields present but still bad math? Assume quantity is wrong?
+        else if (afloat != (float)qint * pfloat) //All fields present but still bad math? Assume quantity is wrong?
         {
+            if (afloat < 0.0) afloat = -1.0 * afloat; //Just negate any negatives!
+            if (pfloat < 0.0) pfloat = -1.0 * pfloat;
             //NSLog(@" ...bad math?");
-            if (qfloat == 1.0) //Check mismatch price/amount, defer to amount
+            if (qint == 1) //Check mismatch price/amount, defer to amount
             {
-                //1/18 This is a cluge! Greco Invoices are more likely to have a good price and a bad amount!
-                if ([vendor.lowercaseString isEqualToString:@"greco"])
-                {
-                    afloat = pfloat;
-                }
-                else //Most other vendors: defer to the amount column
-                    pfloat = afloat;
+                pfloat = afloat;
             }
             else //Bogus quantity maybe?
             {
-                qfloat = afloat / pfloat;
+                qint = (int)(afloat / pfloat);
             }
             _majorError = ANALYZER_BAD_MATH;
         }
     }
-    quantity = [NSString stringWithFormat:@"%4.2f", qfloat];
+    quantity = [NSString stringWithFormat:@"%d", qint];
     price    = [self getDollarsAndCentsString  : pfloat];
     amount   = [self getDollarsAndCentsString  : afloat];
     //pass to outputs...
@@ -892,7 +918,7 @@
 -(NSString*) removePunctuationFromString : (NSString *)s
 {
     NSArray *punctuationz = @[@",",@".",@":",@";",@"-",@"_",@"~",@"`",@"\"",
-                              @"!",@"@",@"#",@"$",@"%",@"^",@"&",@"*",@"(",@")",@"+",@"="];
+                              @"!",@"@",@"#",@"$",@"%",@"^",@"&",@"/",@"*",@"(",@")",@"+",@"=",@"\'"];
     NSString *sNoPunct = s;
     for (NSString *punc in punctuationz)
     {

@@ -1,9 +1,15 @@
 //
+//   _______  ______  ____  _        _
+//  | ____\ \/ /  _ \/ ___|| |_ __ _| |_ ___
+//  |  _|  \  /| |_) \___ \| __/ _` | __/ __|
+//  | |___ /  \|  __/ ___) | || (_| | |_\__ \
+//  |_____/_/\_\_|   |____/ \__\__,_|\__|___/
+//
 //  EXPStats.h
 //  testOCR
 //
 //  Created by Dave Scruton on 2/2/19.
-//  Copyright © 2019 huedoku. All rights reserved.
+//  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

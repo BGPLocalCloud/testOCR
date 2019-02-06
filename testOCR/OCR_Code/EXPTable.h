@@ -87,7 +87,7 @@
 - (void)didReadEXPTableAsStrings : (NSString *)s;
 - (void)didReadEXPObjectByID :(EXPObject *)e : (PFObject*)pfo;
 - (void)didSaveEXPTable : (NSArray *)a;
-- (void)didFinishAllEXPRecords : (NSArray *)a;
+- (void)didFinishAllEXPRecords : (int) count : (NSArray *)a;
 - (void)didFixPricesInObjectByID : (NSString *)oid;
 - (void)errorInEXPRecord : (NSString *)err : (NSString *)oid : (NSString *)productName;
 - (void)didSaveEXPOs ;
