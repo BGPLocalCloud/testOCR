@@ -24,6 +24,8 @@
 #import "BatchReportController.h"
 #import "ErrorViewController.h"
 #import "EXPViewController.h"
+#import "InvoiceViewController.h"
+#import "EXPTable.h"
 #import "GenParse.h"
 #import "NavButtons.h"
 #import "SessionManager.h"
@@ -60,6 +62,8 @@ NS_ASSUME_NONNULL_BEGIN
     DropboxTools *dbt;
     GenParse *gp;
     Vendors *vv;
+    EXPTable *et;
+    NSString *selVendor;
 
 
 }

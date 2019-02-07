@@ -25,21 +25,14 @@
 @interface invoiceTable : NSObject
 {
     NSMutableArray *recordStrings;
-
     NSMutableArray *iobjs;
     int dog;
     NSString *tableName;
     NSString *packedOIDs;
 }
-
-@property (nonatomic , strong) NSDate* idate;
-@property (nonatomic , strong) NSString* inumber;
-@property (nonatomic , strong) NSString* itotal;
 @property (nonatomic , strong) NSString* ivendor;
-@property (nonatomic , strong) NSString* icustomer;
+@property (nonatomic , strong) invoiceObject* iobj;
 @property (nonatomic , strong) NSString* versionNumber;
-@property (nonatomic , strong) NSString* PDFFile;
-@property (nonatomic , strong) NSString* pageCount;
 
 @property (nonatomic, unsafe_unretained) id <invoiceTableDelegate> delegate; // receiver of completion messages
 
@@ -48,10 +41,10 @@
 -(void) setBasicFields : (NSDate *) ddd : (NSString*)num : (NSString*)total :
                 (NSString*)vendor : (NSString*)customer : (NSString*)PDFFile : (NSString*)pageCount;
 -(void) clearObjectIds;
--(int) getItemCount;
+-(int)  getItemCount;
 -(void) readFromParse : (NSString *)vendor : (NSString *)invoiceNumberstring;
 -(void) readFromParseAsStrings : (NSString *)vendor : batch;
--(void) saveToParse;
+-(void) saveToParse : (BOOL)lastPage;
 -(void) setupVendorTableName : (NSString *)vname;
 -(void) updateInvoice : (NSString *)vendor : (NSString *)invoiceNumberstring : (NSString *)batchID : (BOOL)lastPage;
 

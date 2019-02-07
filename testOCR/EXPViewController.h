@@ -72,6 +72,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UIButton *sortButton;
 @property (weak, nonatomic) IBOutlet UIButton *sortDirButton;
 
+@property (weak, nonatomic) IBOutlet NSString *invoiceNumber;
+
 @property (nonatomic , assign) BOOL detailMode;
 
 - (IBAction)doneSelect:(id)sender;

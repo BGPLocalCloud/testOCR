@@ -27,7 +27,7 @@
         _expos        = [[NSMutableArray alloc] init]; //Invoice Objects
         objectIDs     = [[NSMutableArray alloc] init]; //saved object ids, for matching invoice
         internalPFOs  = [[NSMutableArray alloc] init]; //saved object ids, for matching invoice
-
+        csvList       = [[NSMutableArray alloc] init]; //saved object ids, for matching invoice
         _sortBy = @"*";
         _selectBy = @"*";
         tableName = @"EXPFullTable";
@@ -221,7 +221,7 @@
 
 
 //=============(EXPTable)=====================================================
--(void) handleCSVInit : (BOOL) dumptoCSV
+-(void) handleCSVInit : (BOOL) dumptoCSV : (BOOL) addErrStatus
 {
     if (dumptoCSV) EXPDumpCSVList = @"CATEGORY,Month,Item,Quantity,Unit Of Measure,BULK/ INDIVIDUAL PACK,Vendor Name, Total Price ,PRICE/ UOM,PROCESSED ,Local (L),Invoice Date,Line #,Invoice #,\n";
     else EXPDumpCSVList = @"";
@@ -329,10 +329,10 @@
 
 
 //=============(EXPTable)=====================================================
--(NSString *) getCSVFromObject : (PFObject *)pfo
+-(NSString *) getCSVFromObject : (PFObject *)pfo : (BOOL) addErrStatus
 {
     NSArray *sitems1 = [NSArray arrayWithObjects:
-                        PInv_Category_key,PInv_Month_key,PInv_Quantity_key,PInv_Item_key,
+                        PInv_Category_key,PInv_Month_key,PInv_ProductName_key,PInv_Quantity_key,
                         PInv_UOM_key,PInv_Bulk_or_Individual_key,PInv_Vendor_key,PInv_TotalPrice_key,
                         PInv_PricePerUOM_key,PInv_Processed_key,PInv_Local_key,PInv_LineNumber_key,
                         PInv_InvoiceNumber_key,
@@ -349,13 +349,21 @@
                         nil];
     s = [s stringByAppendingString:
          [NSString stringWithFormat:@",%@",[self stringFromKeyedItems : pfo :sitems2]]];
+    NSArray *sitems3 = [NSArray arrayWithObjects:
+                        PInv_ErrStatus_key,
+                        nil];
+    if (addErrStatus) //Add extra error info...
+    {
+        s = [s stringByAppendingString:
+             [NSString stringWithFormat:@",%@",[self stringFromKeyedItems : pfo :sitems3]]];
+    }
     return s;
-}
+} //end getCSVFromObject
 
 //=============OCR VC=====================================================
 -(void) readFromParseByObjIDs : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)soids
 {
-    [self handleCSVInit:dumptoCSV];
+    [self handleCSVInit:dumptoCSV:FALSE];
     NSMutableArray *a = [[NSMutableArray alloc] init];
     NSArray *sitems =  [soids componentsSeparatedByString:@","];
     PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
@@ -368,7 +376,7 @@
             [a addObject:oid];
             NSLog(@" .. fetch objid [%@]",oid);
             PFObject *pfo = [query getObjectWithId:oid];  //Fetch by object ID,
-            [self handleCSVAdd : dumptoCSV : [self getCSVFromObject:pfo]];
+            [self handleCSVAdd : dumptoCSV : [self getCSVFromObject:pfo : FALSE]];
         }
     }
     [self.delegate didReadEXPTableAsStrings : self->EXPDumpCSVList];
@@ -458,7 +466,7 @@
 //=============OCR VC=====================================================
 -(void) readFromParseAsStrings : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)batch
 {
-    [self handleCSVInit:TRUE];
+    [self handleCSVInit:TRUE:FALSE];
     PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
     
     //Wildcards means get everything...
@@ -490,7 +498,7 @@
             [self->_expos        removeAllObjects];
             for( PFObject *pfo in objects)
             {
-                [self handleCSVAdd : dumptoCSV : [self getCSVFromObject:pfo]];
+                [self handleCSVAdd : dumptoCSV : [self getCSVFromObject : pfo : FALSE]];
                 EXPObject *e = [self getEXPObjectFromPFObject:pfo];
                 [self->_expos addObject: e];
             }
@@ -498,6 +506,47 @@
         }
     }];
 } //end readFromParseAsStrings
+
+
+#define LIMIT_SIZE 100
+//=============(EXPTable)=====================================================
+// Loads in data 1000 recs at a time, uses "skip" for re=entrant call asdf
+-(void) readFullTableToCSV : (int) skip : (BOOL) addErrStatus
+{
+    if (skip == 0) //Start? Clear CSVList and add header
+    {
+        [csvList removeAllObjects];
+        NSString *header = @"CATEGORY,Month,Item,Quantity,Unit Of Measure,BULK/ INDIVIDUAL PACK,Vendor Name, Total Price ,PRICE/ UOM,PROCESSED ,Local (L),Invoice Date,Line #,Invoice #";
+        if (addErrStatus) header = [header stringByAppendingString:@",ErrStatus"];
+        [csvList addObject:header];
+    }
+    
+        
+    PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
+    NSLog(@" read %d to %d",skip,skip+LIMIT_SIZE);
+    query.skip = skip;
+    query.limit = LIMIT_SIZE;
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            for( PFObject *pfo in objects)
+            {
+                [self->csvList addObject : [self getCSVFromObject : pfo : addErrStatus]];
+            }
+            if (objects.count == LIMIT_SIZE) //Maybe more?
+            {
+                [self readFullTableToCSV : skip+LIMIT_SIZE : addErrStatus];
+            }
+            else
+            {
+                self->EXPDumpCSVList = [self->csvList componentsJoinedByString:@","];
+                NSLog(@" got %lu recs ",(unsigned long)self->csvList.count);
+                [self.delegate didReadFullTableToCSV : self->EXPDumpCSVList];
+            }
+        }
+    }];
+
+
+}
 
 //=============(EXPTable)=====================================================
 // 1/14 assumes CSV table loaded during last parse read...

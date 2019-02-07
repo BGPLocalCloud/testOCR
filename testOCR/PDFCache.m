@@ -221,8 +221,8 @@ static PDFCache *sharedInstance = nil;
 {
     if (cacheNames == nil) return FALSE; //DHS 1/22
     NSString *oid = [self cleanupID : oidIn : page];
-    NSLog(@" oid %@",oid);
-    NSLog(@" index %d",(int)[cacheNames indexOfObject:oid]);
+    //NSLog(@" oid %@",oid);
+    //NSLog(@" index %d",(int)[cacheNames indexOfObject:oid]);
     return ([cacheNames indexOfObject:oid] != NSNotFound); //DHS 1/10
 }
 
@@ -235,7 +235,7 @@ static PDFCache *sharedInstance = nil;
     if (ccount <= 0) return;
     NSString *pdfFile;
     [self clear]; //Clear cache arrays just in case...
-    NSLog(@" loadPDFCache... %d items",ccount);
+    //NSLog(@" loadPDFCache... %d items",ccount);
     for (int i=0;i<ccount;i++) // it looks like ccount is one too big, not causing trouble yet...
     {
         pdfFile   = [cacheNames objectAtIndex:i];

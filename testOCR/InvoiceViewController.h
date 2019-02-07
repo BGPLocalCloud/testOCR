@@ -20,6 +20,8 @@
 #import "invoiceObject.h"
 #import "invoiceTable.h"
 #import "spinnerView.h"
+#import "PDFCache.h"
+#import "PDFVC.h"
 #import "Vendors.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -30,10 +32,15 @@ NS_ASSUME_NONNULL_BEGIN
     invoiceTable *it;
     invoiceObject *iobj;
     NSMutableArray *iobjs;
+    PDFCache *pc;
     Vendors *vv;
     int vptr;
     int selectedRow;
     spinnerView *spv;
+    
+    NSString *selFname;
+    NSString *selNumber;
+
 }
 
 - (IBAction)backSelect:(id)sender;

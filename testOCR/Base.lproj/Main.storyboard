@@ -615,6 +615,106 @@
             </objects>
             <point key="canvasLocation" x="897" y="270"/>
         </scene>
+        <!--PDFVC-->
+        <scene sceneID="jrt-zl-fEZ">
+            <objects>
+                <viewController id="Ebk-GK-f5p" customClass="PDFVC" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="03Z-v5-B6Z">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PDF Viewer" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hvf-Ga-FHv">
+                                <rect key="frame" x="0.0" y="20" width="375" height="27"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="27" id="4Xq-Ds-cfa"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gmk-UG-F4N">
+                                <rect key="frame" x="0.0" y="60" width="375" height="500"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="emptyDoc.png" translatesAutoresizingMaskIntoConstraints="NO" id="FEB-cW-f8b">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="270"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </imageView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="500" id="oLl-Lq-5VY"/>
+                                </constraints>
+                            </scrollView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Vv5-X8-FVY">
+                                <rect key="frame" x="20" y="617" width="36" height="30"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="36" id="30U-hp-1id"/>
+                                    <constraint firstAttribute="height" constant="30" id="be8-r3-1sd"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="27"/>
+                                <state key="normal" title="&lt;">
+                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="backSelect:" destination="Ebk-GK-f5p" eventType="touchUpInside" id="NMd-En-adf"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1CU-Oh-D4C">
+                                <rect key="frame" x="175" y="617" width="74" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="phh-CL-FFt"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="65" id="t1G-H8-lfF"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <state key="normal" title="&lt;PAGE">
+                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="prevPageSelect:" destination="Ebk-GK-f5p" eventType="touchUpInside" id="u3X-tJ-FF7"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dx0-B6-MJf">
+                                <rect key="frame" x="271" y="617" width="74" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="4eO-Ma-Rkn"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="65" id="Zv6-sG-aSI"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <state key="normal" title="PAGE&gt;">
+                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="nextPageSelect:" destination="Ebk-GK-f5p" eventType="touchUpInside" id="Dy6-YC-JgB"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="Hvf-Ga-FHv" firstAttribute="width" secondItem="03Z-v5-B6Z" secondAttribute="width" id="1EH-tz-5TR"/>
+                            <constraint firstItem="s4d-TQ-RfH" firstAttribute="bottom" secondItem="Vv5-X8-FVY" secondAttribute="bottom" constant="20" id="2zF-wU-HmO"/>
+                            <constraint firstItem="s4d-TQ-RfH" firstAttribute="trailing" secondItem="dx0-B6-MJf" secondAttribute="trailing" constant="30" id="36j-Hp-jGk"/>
+                            <constraint firstItem="Hvf-Ga-FHv" firstAttribute="centerX" secondItem="s4d-TQ-RfH" secondAttribute="centerX" id="3lo-el-TOn"/>
+                            <constraint firstItem="gmk-UG-F4N" firstAttribute="top" secondItem="s4d-TQ-RfH" secondAttribute="top" constant="40" id="DqT-cf-xVi"/>
+                            <constraint firstItem="s4d-TQ-RfH" firstAttribute="bottom" secondItem="dx0-B6-MJf" secondAttribute="bottom" constant="10" id="PdE-LR-91o"/>
+                            <constraint firstItem="dx0-B6-MJf" firstAttribute="leading" secondItem="1CU-Oh-D4C" secondAttribute="trailing" constant="22" id="UEF-sK-8Rb"/>
+                            <constraint firstItem="Hvf-Ga-FHv" firstAttribute="top" secondItem="s4d-TQ-RfH" secondAttribute="top" id="WJG-t7-2cl"/>
+                            <constraint firstItem="gmk-UG-F4N" firstAttribute="centerX" secondItem="s4d-TQ-RfH" secondAttribute="centerX" id="m6X-N8-g8C"/>
+                            <constraint firstItem="s4d-TQ-RfH" firstAttribute="bottom" secondItem="1CU-Oh-D4C" secondAttribute="bottom" constant="10" id="qiG-bw-wMs"/>
+                            <constraint firstItem="Vv5-X8-FVY" firstAttribute="leading" secondItem="s4d-TQ-RfH" secondAttribute="leading" constant="20" id="tsg-ei-hE8"/>
+                            <constraint firstItem="gmk-UG-F4N" firstAttribute="width" secondItem="03Z-v5-B6Z" secondAttribute="width" id="zgc-Ih-jJX"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="s4d-TQ-RfH"/>
+                    </view>
+                    <connections>
+                        <outlet property="pdfImage" destination="FEB-cW-f8b" id="h8O-fv-o5I"/>
+                        <outlet property="scrollView" destination="gmk-UG-F4N" id="Ne8-uB-4ez"/>
+                        <outlet property="titleLabel" destination="Hvf-Ga-FHv" id="tPd-FZ-cJp"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="WOq-AS-nho" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-540" y="2203"/>
+        </scene>
         <!--Batch View Controller-->
         <scene sceneID="3KK-5B-YwK">
             <objects>
@@ -2130,6 +2230,7 @@
                         <outlet property="table" destination="6fh-Q4-9PD" id="gZd-36-9YR"/>
                         <outlet property="titleLabel" destination="l1k-NF-v3l" id="jM5-pZ-3Uh"/>
                         <segue destination="Rxp-RM-FcQ" kind="show" identifier="invoiceDetailSegue" id="NCZ-Nq-xZ8"/>
+                        <segue destination="Ebk-GK-f5p" kind="show" identifier="pdfSegue" id="ahS-Vl-1Qy"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fSF-gf-oqb" userLabel="First Responder" sceneMemberID="firstResponder"/>

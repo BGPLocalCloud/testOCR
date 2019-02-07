@@ -13,6 +13,7 @@
 //
 // New columns? PDF source URL?  OCR'ed TextDump? is this useful?
 // 1/25 add invoice update, adds new objectIDs to existing record...
+// 2/5  cleanup, use invoiceObject instead of property list
 //
 #import "invoiceTable.h"
 
@@ -95,6 +96,25 @@
 } //end packInvoiceOids
 
 //=============(invoiceTable)=====================================================
+-(invoiceObject*) packFromPFObject : (PFObject *)pfo
+{
+    invoiceObject *iobj = [[invoiceObject alloc] init];
+    iobj.objectID       = pfo.objectId;
+    iobj.date           = [pfo objectForKey:PInv_Date_key];
+    iobj.expObjectID    = [pfo objectForKey:PInv_EXPObjectID_key];
+    iobj.invoiceNumber  = [pfo objectForKey:PInv_InvoiceNumber_key];
+    iobj.itotal         = [pfo objectForKey:PInv_ITotal_Key];
+    iobj.customer       = [pfo objectForKey:PInv_CustomerKey];
+    iobj.batchID        = [pfo objectForKey:PInv_BatchID_key];
+    iobj.packedOIDs     = [pfo objectForKey:PInv_EXPObjectID_key];
+    iobj.PDFFile        = [pfo objectForKey:PInv_PDFFile_key];
+    iobj.pageCount      = [pfo objectForKey:PInv_PageCount_key];
+    iobj.vendor         = _ivendor;
+    return iobj;
+} //end packFromPFObject
+
+
+//=============(invoiceTable)=====================================================
 //Reads one invoice, using vendor and number
 -(void) readFromParse : (NSString *)vendor : (NSString *)invoiceNumberstring
 {
@@ -106,14 +126,7 @@
         if (!error) { //Query came back...
             for( PFObject *pfo in objects) //Should only be one?
             {
-                self->_idate         = pfo[PInv_Date_key];
-                self->_inumber       = pfo[PInv_InvoiceNumber_key];
-                self->_icustomer     = pfo[PInv_CustomerKey];
-                self->_ivendor       = pfo[PInv_Vendor_key];
-                self->_versionNumber = pfo[PInv_VersionNumber];
-                self->packedOIDs     = pfo[PInv_EXPObjectID_key];
-                self->_PDFFile       = pfo[PInv_PDFFile_key];
-                self->_pageCount     = pfo[PInv_PageCount_key];
+                self.iobj = [self packFromPFObject:pfo];
                 [self unpackInvoiceOids];
             }
             [self->_delegate didReadInvoiceTable];
@@ -137,16 +150,8 @@
             [self->iobjs removeAllObjects];
             for( PFObject *pfo in objects) //Should only be one?
             {
-                invoiceObject *iobj = [[invoiceObject alloc] init];
-                iobj.objectID       = iobj.objectID;
-                iobj.date           = [pfo objectForKey:PInv_Date_key];
-                iobj.expObjectID    = [pfo objectForKey:PInv_EXPObjectID_key];
-                iobj.invoiceNumber  = [pfo objectForKey:PInv_InvoiceNumber_key];
-                iobj.customer       = [pfo objectForKey:PInv_CustomerKey];
-                iobj.batchID        = [pfo objectForKey:PInv_BatchID_key];
-                iobj.vendor         = vendor;
+                invoiceObject *iobj = [self packFromPFObject:pfo];
                 [self->iobjs addObject:iobj];
-
                 NSDate *date = pfo[PInv_Date_key];
                 NSString *ds = [self getDateAsString:date];
                 NSString*s = [NSString stringWithFormat:@"[%@](%@):%@",ds,pfo[PInv_InvoiceNumber_key],pfo[PInv_CustomerKey]];
@@ -165,24 +170,24 @@
 {
     if (tableName.length < 1) return; //No table name!
     [self packInvoiceOids]; //Set up packedOIDs string
-    AppDelegate *iappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     PFObject *iRecord = [PFObject objectWithClassName:tableName];
-    iRecord[PInv_Date_key]          = _idate;
-    iRecord[PInv_InvoiceNumber_key] = _inumber;
-    iRecord[PInv_CustomerKey]       = _icustomer;
+    iRecord[PInv_Date_key]          = _iobj.date;
+    iRecord[PInv_InvoiceNumber_key] = _iobj.invoiceNumber;
+    iRecord[PInv_CustomerKey]       = _iobj.customer;
+    iRecord[PInv_ITotal_Key]        = _iobj.itotal;
     iRecord[PInv_Vendor_key]        = _ivendor;
-    iRecord[PInv_EXPObjectID_key]   = packedOIDs;
-    iRecord[PInv_BatchID_key]       = iappDelegate.batchID;
+    iRecord[PInv_EXPObjectID_key]   = _iobj.packedOIDs;
+    iRecord[PInv_BatchID_key]       = _iobj.batchID;
     iRecord[PInv_VersionNumber]     = _versionNumber;
-    iRecord[PInv_PDFFile_key]       = _PDFFile;
-    iRecord[PInv_PageCount_key]     = _pageCount;
+    iRecord[PInv_PDFFile_key]       = _iobj.PDFFile;
+    iRecord[PInv_PageCount_key]     = _iobj.pageCount;
 
     //NSLog(@" itable savetoParse...");
     [iRecord saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
         if (succeeded) {
             NSLog(@" ...invoice [vendor:%@]->parse",self->_ivendor);
             //NSString *objID = iRecord.objectId;
-            [self.delegate didSaveInvoiceTable:self->_inumber : lastPage];
+            [self.delegate didSaveInvoiceTable:self->_iobj.invoiceNumber : lastPage];
         } else {
             NSLog(@" ERROR: saving invoice: %@",error.localizedDescription);
             [self.delegate errorSavingInvoiceTable:error.localizedDescription : lastPage];
@@ -235,13 +240,16 @@
 -(void) setBasicFields : (NSDate *) ddd : (NSString*)num : (NSString*)total :
                     (NSString*)vendor : (NSString*)customer : (NSString*)PDFFile : (NSString*)pageCount
 {
-    _idate  = ddd;
-    _inumber    = num;
-    _itotal     = total;
-    _ivendor    = vendor;
-    _icustomer  = customer;
-    _PDFFile    = PDFFile;
-    _pageCount  = pageCount;
+    _iobj.date          = ddd;
+    _iobj.itotal        = total;
+    _iobj.invoiceNumber = num;
+    _iobj.vendor        = _ivendor;
+    _iobj.customer      = customer;
+    _iobj.PDFFile       = PDFFile;
+    _iobj.pageCount     = pageCount;
+    //Main delegate knows what batch is running
+    AppDelegate *iappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    _iobj.batchID       = iappDelegate.batchID;
 } //end setBasicFields
 
 //=============(invoiceTable)=====================================================

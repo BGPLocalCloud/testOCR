@@ -229,24 +229,26 @@
 
     [alert setValue:tatString forKey:@"attributedTitle"];
 
-    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"EXP Table",nil)
+    [alert addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"EXP Table",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
-                                                          }];
-    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Invoice Table",nil)
-                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                               [self performSegueWithIdentifier:@"invoiceSegue" sender:@"mainVC"];
-                                                           }];
+                                                          }]];
+    int vindex = 0;
+    for (NSString *s in vv.vNames)
+    {
+        NSString *nextChoice = [NSString stringWithFormat:@"%@ Invoices",s];
+            [alert addAction: [UIAlertAction actionWithTitle:nextChoice
+                                                       style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                           self->selVendor = s;
+                                                           [self performSegueWithIdentifier:@"invoiceSegue" sender:@"mainVC"];
+                                                       }]];
+        vindex++;
+    }
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                            }];
-    [alert addAction:firstAction];
-    [alert addAction:secondAction];
-//    [alert addAction:thirdAction];
-//    [alert addAction:fourthAction];
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
-    
 } //end dbmenu
 
 //=============OCR MainVC=====================================================
@@ -446,6 +448,11 @@
         vc.actData    = sdata; //Pass selected objectID's from activity, if any...
         vc.searchType = stype;
         vc.detailMode = FALSE;
+    }
+    else if([[segue identifier] isEqualToString:@"invoiceSegue"])
+    {
+        InvoiceViewController *vc = (InvoiceViewController*)[segue destinationViewController];
+        vc.vendor    = selVendor;
     }
     else if([[segue identifier] isEqualToString:@"errorSegue"])
     {
@@ -707,8 +714,11 @@ int currentYear = 2019;
 //=============OCR MainVC=====================================================
 -(void) testit
 {
-    [self performSegueWithIdentifier:@"comparisonSegue" sender:@"mainVC"];
+ //   [self performSegueWithIdentifier:@"comparisonSegue" sender:@"mainVC"];
 
+    //et = [[EXPTable alloc] init];
+    //[et readFullTableToCSV:0];
+    
 //    GenParse *gp = [[GenParse alloc] init];
 //    [gp deleteAllByTableAndKey:@"activity" :@"*" :@"*"];
 //    NSLog(@" deletit?");

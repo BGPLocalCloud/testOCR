@@ -108,6 +108,7 @@
 		72CA1A6A21CADE7200F908A0 /* SessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 72CA1A6921CADE7200F908A0 /* SessionManager.m */; };
 		72D6516D2204DA97009E2057 /* ComparisonVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D6516C2204DA97009E2057 /* ComparisonVC.m */; };
 		72DB332021CDC35F00AA44C0 /* DropboxTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DB331F21CDC35F00AA44C0 /* DropboxTools.m */; };
+		72E3FA89220BC1000073C84A /* PDFVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E3FA88220BC1000073C84A /* PDFVC.m */; };
 		72E5D31121B6DE4C005AF869 /* txt in Resources */ = {isa = PBXBuildFile; fileRef = 72E5D31021B6DE4C005AF869 /* txt */; };
 		72E785AC21CCBFC600EEEF1F /* AddTemplateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E785AB21CCBFC600EEEF1F /* AddTemplateViewController.m */; };
 		72ECD04621C88A1000DBD08E /* invoiceObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 72ECD04521C88A1000DBD08E /* invoiceObject.m */; };
@@ -266,6 +267,8 @@
 		72D6516C2204DA97009E2057 /* ComparisonVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ComparisonVC.m; sourceTree = "<group>"; };
 		72DB331E21CDC35F00AA44C0 /* DropboxTools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DropboxTools.h; sourceTree = "<group>"; };
 		72DB331F21CDC35F00AA44C0 /* DropboxTools.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DropboxTools.m; sourceTree = "<group>"; };
+		72E3FA87220BC1000073C84A /* PDFVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PDFVC.h; sourceTree = "<group>"; };
+		72E3FA88220BC1000073C84A /* PDFVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PDFVC.m; sourceTree = "<group>"; };
 		72E5D31021B6DE4C005AF869 /* txt */ = {isa = PBXFileReference; lastKnownFileType = folder; path = txt; sourceTree = "<group>"; };
 		72E785AB21CCBFC600EEEF1F /* AddTemplateViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AddTemplateViewController.m; sourceTree = "<group>"; };
 		72ECD04421C88A1000DBD08E /* invoiceObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = invoiceObject.h; sourceTree = "<group>"; };
@@ -345,6 +348,8 @@
 				725DA97C21CB53BC0024ECF7 /* EXPViewController.m */,
 				728EECC321ED1B5B00F83129 /* InvoiceViewController.h */,
 				728EECC421ED1B5B00F83129 /* InvoiceViewController.m */,
+				72E3FA87220BC1000073C84A /* PDFVC.h */,
+				72E3FA88220BC1000073C84A /* PDFVC.m */,
 				729E9A6221E02E0400F3FB5B /* EXPDetailVC.h */,
 				729E9A6321E02E0400F3FB5B /* EXPDetailVC.m */,
 				7206008E21B64052000B26DC /* Main.storyboard */,
@@ -716,6 +721,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				72DB332021CDC35F00AA44C0 /* DropboxTools.m in Sources */,
+				72E3FA89220BC1000073C84A /* PDFVC.m in Sources */,
 				7209609E21B81FDC00D49C63 /* OCRBox.m in Sources */,
 				7279498E21D041670067B636 /* UIImageExtras.m in Sources */,
 				72B8DEBD21C4642F004ADD79 /* MagnifierView.m in Sources */,

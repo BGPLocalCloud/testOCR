@@ -1224,7 +1224,7 @@
     its = [od cleanupPrice:its]; //Make sure total is formatted!
     [it setBasicFields:invoiceDate :invoiceNumberString : its : supplierName : invoiceCustomer : @"EmptyPDF" : @"1"];
     for (NSString *objID in a) [it addInvoiceItemByObjectID : objID];
-    [it saveToParse];
+    [it saveToParse:FALSE]; //BOOL is lastPage arg...T/F???
 } //end didSaveEXPTable
 
 

@@ -56,6 +56,7 @@
 #define PInv_EXPObjectID_key @"EXPObjectID"
 #define PInv_CustomerKey @"Customer"
 #define PInv_PageCount_key @"PageCount"
+#define PInv_ITotal_Key @"ITotal"
 
 //Batch table...
 #define PInv_BatchSOIDs_key     @"BatchSOIDs"

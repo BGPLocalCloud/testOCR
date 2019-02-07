@@ -147,9 +147,11 @@
                                                                    [self promptForEXPVendor];
                                                                }];
     }
-    UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Export CSV...",nil)
+    UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Export ALL to CSV...",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              [self setupEmailAndSendit];
+                                                              [self->spv start : @"Get CSV List..."];
+                                                              // This loads CSV list, delegate callback does email
+                                                              [self->et readFullTableToCSV : 0 : TRUE];
                                                           }];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -400,15 +402,18 @@
 //=============EXP VC=====================================================
 -(void) setLoadedTitle : (NSString *)tableName
 {
-    NSString *xtra = @"";
-    if ([_searchType isEqualToString:@"E"]) xtra = [NSString stringWithFormat:@" Batch:%@",batchIDLookup];
-    if ([_searchType isEqualToString:@"I"]) xtra = [NSString stringWithFormat:@" Batch:%@",batchIDLookup];
+    //DHS 2/5
     NSString *s;
-    if ([sortBy isEqualToString:@""]) //No particular sort...
-        s = [NSString stringWithFormat:@"[%@%@] (latest 100)",tableName,xtra];
-    else{
-        if (!_detailMode) s = [NSString stringWithFormat:@"Sort by %@",sortBy];
-        else  s = [NSString stringWithFormat:@"Invoice %@",_actData];
+    if (_detailMode) s = [NSString stringWithFormat:@"Invoice:%@",_invoiceNumber];
+    else
+    {
+        NSString *xtra = @"";
+        if ([sortBy isEqualToString:@""]) //No particular sort...
+            s = [NSString stringWithFormat:@"[%@%@]",tableName,xtra];
+        else{
+            if (!_detailMode) s = [NSString stringWithFormat:@"Sort by %@",sortBy];
+            else  s = [NSString stringWithFormat:@"Invoice %@",_actData];
+        }
     }
     if (et.expos.count == 0) s = @"No Records Found...";
     _titleLabel.text = s;
@@ -528,6 +533,14 @@
     });
 }
 
+
+//============<EXPTableDelegate>====================================================
+- (void)didReadFullTableToCSV : (NSString *)s
+{
+    [self setupEmailAndSendit : s];
+}
+
+
 #pragma mark - invoiceTableDelegate
 
 //=============EXP VC=====================================================
@@ -549,10 +562,9 @@
 }
 
 //=============OCR VC=====================================================
--(void) setupEmailAndSendit
+-(void) setupEmailAndSendit : (NSString *)csvString
 {
-    NSString* csvlist = [et dumpToCSV];
-    [self mailit:csvlist];
+    [self mailit:csvString];
 }
 
 //=============OCR VC=====================================================
