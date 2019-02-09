@@ -38,6 +38,8 @@
     NSMutableArray* csvList;
 
     int batchCounter;
+
+    BOOL debugMode;   //2/7 For verbose logging...
 }
 
 @property (nonatomic, unsafe_unretained) id <EXPTableDelegate> delegate; // receiver of completion messages
@@ -63,7 +65,7 @@
 -(void) saveToParse : (int) page : (BOOL) lastPage;
 -(void) readFromParse : (NSString *) invoiceNumberstring;
 -(void) readFromParseByObjIDs : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)soids;
--(void) readFromParseAsStrings : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)batch;
+-(void) readFromParseAsStrings : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)batch : invoiceNumberstring;
 -(void) readFullTableToCSV : (int) skip : (BOOL) addErrStatus;
 -(void) setTableName : (NSString *)newName;
 -(void) writeRecordFromArrays : (NSDate*) fdate : (NSMutableArray *) fields : (NSMutableArray*) values;

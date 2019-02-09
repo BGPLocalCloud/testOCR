@@ -19,6 +19,8 @@
 //  1/25 add reports folder for batch reports on dropbox
 //  1/29 add table deletes for batch run
 //  2/4  add batch month
+//  2/7 add debugMode for logging
+
 #import "BatchObject.h"
 
 @implementation BatchObject
@@ -83,6 +85,7 @@ static BatchObject *sharedInstance = nil;
         
         _versionNumber    = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
 
+        debugMode = FALSE; //DHS 2/7
     }
     return self;
 }
@@ -92,7 +95,7 @@ static BatchObject *sharedInstance = nil;
 -(void) addError : (NSString *) errDesc : (NSString *) objectID : (NSString*) productName
 {
     //Format error and add it to array
-    //NSLog(@" ..batch addError %@:%@",errDesc,productName);
+    if (debugMode) NSLog(@" ..batch addError %@:%@",errDesc,productName);
     NSString *errStr = [NSString stringWithFormat:@"%@:%@",errDesc,objectID];
     [errorList addObject:errStr];
     NSString *errStr2 = [NSString stringWithFormat:@"%@:%@",errDesc,productName];
@@ -103,7 +106,7 @@ static BatchObject *sharedInstance = nil;
 -(void) addWarning : (NSString *) errDesc : (NSString *) objectID : (NSString*) productName
 {
     //Format error and add it to array
-    //NSLog(@" ..batch addWarning %@:%@",errDesc,productName);
+    if (debugMode) NSLog(@" ..batch addWarning %@:%@",errDesc,productName);
     NSString *errStr = [NSString stringWithFormat:@"%@:%@",errDesc,objectID];
     [warningList addObject:errStr];
     NSString *errStr2 = [NSString stringWithFormat:@"%@:%@",errDesc,productName];
@@ -218,8 +221,8 @@ static BatchObject *sharedInstance = nil;
 //=============(BatchObject)=====================================================
 -(BOOL) isErrorFixed :(NSString *)errStr
 {
-    return ([batchFixed containsString:errStr]);
-//    return ([fixedList containsObject:errStr]);
+//2/8    return ([batchFixed containsString:errStr]);
+    return ([fixedList containsObject:errStr]);
 }
 
 //=============(BatchObject)=====================================================
@@ -247,6 +250,8 @@ static BatchObject *sharedInstance = nil;
     
     AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     bappDelegate.batchID = _batchID; //This way everyone can see the batch
+    debugMode = bappDelegate.debugMode; //2/7 For dwbug logging, check every batch
+    
     _batchStatus   = BATCH_STATUS_RUNNING;
     batchErrors   = @"";
     batchFiles    = @"";
@@ -290,14 +295,14 @@ static BatchObject *sharedInstance = nil;
     if (preIncrement) vendorIndex++;
     int vfcsize = (int)vv.vFileCounts.count;
     int vfnsize = (int)vv.vNames.count;
-    NSLog(@" vfcsize %d vs vfnsize %d",vfcsize,vfnsize);
+    if (debugMode) NSLog(@" vfcsize %d vs vfnsize %d",vfcsize,vfnsize);
     //NOTE filecounts can be larger than vendor counts!
     if (vendorIndex >= vfnsize) [self completeBatch : 1 : FALSE];
     //Find next vendor with staged files...
     BOOL found = FALSE;
     while (vendorIndex < vfnsize && !found)
     {
-        NSLog(@" vendorIndex %d vs vfnsize %d",vendorIndex,vfnsize);
+        if (debugMode) NSLog(@" vendorIndex %d vs vfnsize %d",vendorIndex,vfnsize);
         if ([self getVendorFileCount : vv.vNames[vendorIndex]] > 0) found = TRUE;
         else vendorIndex++;
     } //End while...
@@ -357,7 +362,7 @@ static BatchObject *sharedInstance = nil;
 -(void) startProcessingFiles
 {
     batchTotal = (int)pdfEntries.count;
-    NSLog(@" start processing for vendor %@ count %d",vendorName,batchTotal);
+    if (debugMode) NSLog(@" start processing for vendor %@ count %d",vendorName,batchTotal);
     [self updateBatchProgress : [NSString stringWithFormat:@"Process Files:%@",vendorName] : FALSE];
     batchCount = 0;
     [self processNextFile : 4];
@@ -397,11 +402,11 @@ static BatchObject *sharedInstance = nil;
     if (i < 0 || i >= pdfEntries.count) return; //Out of bounds!
     DBFILESMetadata *entry = pdfEntries[i];
     lastFileProcessed = [NSString stringWithFormat:@"%@/%@",dbt.prefix,entry.name];
-    NSLog(@" processing %@ ... (%d)",lastFileProcessed,whereFrom);
+    if (debugMode) NSLog(@" processing %@ ... (%d)",lastFileProcessed,whereFrom);
     //Check for "skip" string, ignore file if so...
     if ([lastFileProcessed.lowercaseString containsString:@"skip"]) //Skip this file?
     {
-        NSLog(@" ...skip %@",lastFileProcessed);
+        if (debugMode) NSLog(@" ...skip %@",lastFileProcessed);
         [self updateBatchProgress : [NSString stringWithFormat:@"   skip:%@",lastFileProcessed] : FALSE];
         [self processNextFile : 0];  //Re-entrant call...
         //DHS 1/31                      may result in batch being completed!
@@ -427,7 +432,7 @@ static BatchObject *sharedInstance = nil;
         //  in that case the OCR never goes through, it gets a nil file reference and fails
         if ([oc txtExistsByID : lastFileProcessed ])  // Use OCR Cache!
         {
-            NSLog(@" OCR Cache HIT! %@",lastFileProcessed);
+            if (debugMode) NSLog(@" OCR Cache HIT! %@",lastFileProcessed);
             if (!gotTemplate) //Handle obvious errors
             {
                 NSLog(@" ERROR: tried to process images w/o template");
@@ -523,7 +528,7 @@ static BatchObject *sharedInstance = nil;
             batchProgress = [NSString stringWithFormat:@"File %d/%d Page %d/%d",batchCount,batchTotal,page+1,numPages];
             [self.delegate batchUpdate : batchProgress];
 
-            NSLog(@" OCR Image(not pdf) page %d of %d",page,numPages);
+            if (debugMode) NSLog(@" OCR Image(not pdf) page %d of %d",page,numPages);
             UIImage *ii =  dbt.batchImages[page];
             if ([vendorRotation isEqualToString:@"-90"]) //Stupid, make this better!
                 ii = [it rotate90CCW:ii];
@@ -541,7 +546,7 @@ static BatchObject *sharedInstance = nil;
         //NSString *ipath = dbt.batchFileList[0]; //[paths objectAtIndex:batchPage];
         NSValue *rectObj = dbt.batchImageRects[0]; //PDF size (hopefully!)
         CGRect imageFrame = [rectObj CGRectValue];
-        NSLog(@"  ...PDF imageXYWH %d %d, %d %d",
+        if (debugMode) NSLog(@"  ...PDF imageXYWH %d %d, %d %d",
               (int)imageFrame.origin.x,(int)imageFrame.origin.y,
               (int)imageFrame.size.width,(int)imageFrame.size.height);
         oto.vendor = vendorName;
@@ -557,7 +562,7 @@ static BatchObject *sharedInstance = nil;
 //  asynchronously when dropboxTools calls delegate method didDownloadImages below
 -(void) processPDFPagesOLD
 {
-    NSLog(@" batch:processPDFPages");
+    if (debugMode) NSLog(@" batch:processPDFPages");
     if (!gotTemplate)
     {
         NSLog(@" ERROR: tried to process images w/o template");
@@ -572,7 +577,7 @@ static BatchObject *sharedInstance = nil;
     NSString *ipath = dbt.batchFileList[0]; //[paths objectAtIndex:batchPage];
     NSValue *rectObj = dbt.batchImageRects[0]; //PDF size (hopefully!)
     CGRect imageFrame = [rectObj CGRectValue];
-    NSLog(@"  ...PDF imageXYWH %d %d, %d %d",
+    if (debugMode) NSLog(@"  ...PDF imageXYWH %d %d, %d %d",
           (int)imageFrame.origin.x,(int)imageFrame.origin.y,
           (int)imageFrame.size.width,(int)imageFrame.size.height);
     oto.vendor = vendorName;
@@ -690,7 +695,7 @@ static BatchObject *sharedInstance = nil;
             [pfo saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
                 if (succeeded)
                 {
-                    NSLog(@" ...batch updated[%@]->parse",self->_batchID);
+                    if (debugMode) NSLog(@" ...batch updated[%@]->parse",self->_batchID);
                     [self.delegate didUpdateBatchToParse];
                 }
                 else
@@ -731,8 +736,8 @@ static BatchObject *sharedInstance = nil;
     //Save locally...
     NSData *data =[s dataUsingEncoding:NSUTF8StringEncoding];
     [data writeToFile:path atomically:YES];
-    NSLog(@" ...writeBatchReport local %@",path);
-    NSLog(@" ...   string %@",s);
+    if (debugMode) NSLog(@" ...writeBatchReport local %@",path);
+    if (debugMode) NSLog(@" ...   string %@",s);
 
     //Save to Dropbox...
     //break up lastFileProcessed, looks like: /inputfolder/vendor/filename.pdf
@@ -752,7 +757,7 @@ static BatchObject *sharedInstance = nil;
 -(void) finishSavingReportToDropbox : (NSString *)filePath
 {
     NSString *outputPath = [NSString stringWithFormat : @"%@/%@_report.txt",filePath,_batchID];
-    NSLog(@" ...save report %@",outputPath);
+    if (debugMode) NSLog(@" ...save report %@",outputPath);
     [dbt saveTextFile : outputPath : batchReportString];
 } //end finishSavingReportToDropbox
 
@@ -795,7 +800,7 @@ static BatchObject *sharedInstance = nil;
 //===========<DropboxToolDelegate>================================================
 - (void)didDownloadCSVFile : (NSString *)vendor : (NSString *)result
 {
-    NSLog(@" didDownloadCSVFile: %@ %@",vendor,result);
+    if (debugMode) NSLog(@" didDownloadCSVFile: %@ %@",vendor,result);
     [oto loadCSVValuesFromString : vendor : result]; //This does EXP writes...
 }
 
@@ -809,7 +814,7 @@ static BatchObject *sharedInstance = nil;
 //===========<DropboxToolDelegate>================================================
 - (void)didDownloadImages
 {
-    NSLog(@" ...downloaded all images? got %d",(int)dbt.batchImages.count);
+    if (debugMode) NSLog(@" ...downloaded all images? got %d",(int)dbt.batchImages.count);
     [self processPDFPages];
 }  //end didDownloadImages
 
@@ -838,7 +843,7 @@ static BatchObject *sharedInstance = nil;
 //===========<GenParseDelegate>================================================
 - (void)didDeleteAllByTableAndKey : (NSString *)s1 : (NSString *)s2 : (NSString *)s3
 {
-    NSLog(@" delete OK %@/%@/%@",s1,s2,s3);
+    if (debugMode) NSLog(@" delete OK %@/%@/%@",s1,s2,s3);
     if ([s1 isEqualToString:@"EXPFullTable"]) //Usually the longest table..
     {
         //OK continue running batch...
@@ -861,7 +866,7 @@ static BatchObject *sharedInstance = nil;
 //===========<OCRTemplateDelegate>================================================
 - (void)didReadTemplate
 {
-    NSLog(@" got template...");
+    if (debugMode) NSLog(@" got template...");
     gotTemplate = TRUE;
     // This performs handoff to the actual running ...
     [self updateBatchProgress : [NSString stringWithFormat:@"Get Files:%@",vendorName] : FALSE];
@@ -893,7 +898,7 @@ static BatchObject *sharedInstance = nil;
 //===========<OCRTopObjectDelegate>================================================
 - (void)didPerformOCR : (NSString *) result
 {
-    NSLog(@" OCR OK page %d tp %d  count %d total %d",batchPage,batchTotalPages,batchCount,batchTotal);
+    if (debugMode) NSLog(@" OCR OK page %d tp %d  count %d total %d",batchPage,batchTotalPages,batchCount,batchTotal);
     batchPage++;
 }
 
@@ -917,7 +922,7 @@ static BatchObject *sharedInstance = nil;
 //===========<OCRTopObjectDelegate>================================================
 - (void)didSaveOCRDataToParse : (NSString *) s
 {
-    NSLog(@" OK: vendor OCR -> DB done, invoice %@",s);
+    if (debugMode) NSLog(@" OK: vendor OCR -> DB done, invoice %@",s);
     dispatch_async(dispatch_get_main_queue(), ^{
         [self processNextFile : 3];
     });

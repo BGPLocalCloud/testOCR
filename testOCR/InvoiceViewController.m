@@ -45,6 +45,11 @@
     spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, csz.width, csz.height)];
     [self.view addSubview:spv];
 
+    if (_vendor == nil) //SHOULD NEVER HAPPEN
+    {
+        NSLog(@" ERROR:InvoiceVC: Nil Vendor! ");
+        _vendor = @"*";
+    }
     _titleLabel.text  = @"Loading Invoices...";
     [spv start : @"Loading Invoices"];
     if ([_vendor isEqualToString:@"*"]) //Get all vendors
@@ -54,7 +59,7 @@
     }
     else
     {
-        [it readFromParseAsStrings : _vendor  : @"*"];
+        [it readFromParseAsStrings : _vendor  : @"*" : _invoiceNumber];
     }
 
 } //end viewDidLoad
@@ -66,17 +71,27 @@
     {
         [spv stop];
         [_table reloadData];
-        if (!_vendor || [_vendor isEqualToString:@"*"]) //Get all vendors
-            _titleLabel.text  = @"Invoices for all Vendors";
+        NSString *s;
+        //2/8 redid
+        if (![_batchID isEqualToString:@"*"])
+        {
+            s = [NSString stringWithFormat:@"Invoices:Batch %@",_batchID];
+        }
+        else if (![_vendor isEqualToString:@"*"])
+            s = [NSString stringWithFormat:@"Invoices:Vendor %@",_vendor];
+        else if (![_invoiceNumber isEqualToString:@"*"])
+            s = [NSString stringWithFormat:@"Invoice:%@",_invoiceNumber];
         else
         {
-            _titleLabel.text = [NSString stringWithFormat:@"Invoices:%@",_vendor] ;
+            s =  @"All Invoices";
         }
+        _titleLabel.text  = s;
+
         return;
     }
     NSString*vname = vv.vNames[vptr];
     //NSLog(@"  ...load next vendor %@",vname);
-    [it readFromParseAsStrings : vname : @"*"];
+    [it readFromParseAsStrings : vname : @"*" : _invoiceNumber];
     vptr++;
 } //end loadNextVendorInvoice
 

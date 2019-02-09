@@ -32,10 +32,13 @@
     }]];
     
     //Dropbox?
-    NSString *appKey = @"ltqz6bwzqfskfwj";
+//2/8 Old key, points to dave's dropbox    NSString *appKey = @"ltqz6bwzqfskfwj";
+//    NSString *appKey = @"di1y8828rc9ax05"; //New key: points to BGP Cloud dropbox
+    NSString *appKey = @"di1y8828rc9ax05"; //New key: points to BGP Cloud dropbox
+
     NSString *registeredUrlToHandle = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleURLTypes"][0][@"CFBundleURLSchemes"][0];
     if (!appKey || [registeredUrlToHandle containsString:@"<"]) {
-        NSString *message = @"You need to set `appKey` variable in `AppDelegate.m`, as well as add to `Info.plist`, before you can use DBRoulette.";
+        NSString *message = @"You need to set `appKey` variable in `AppDelegate.m`, as well as add to `Info.plist`, before you can use BGPCloud.";
         NSLog(@"%@", message);
         NSLog(@"Terminating...");
         exit(1);
@@ -55,7 +58,7 @@
     //Reachability...
     [self monitorReachability];
     
-    _verbose = VERBOSITY_DELIVERY;
+    _debugMode = FALSE;
     
     _versionNumber    = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
 

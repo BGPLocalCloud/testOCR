@@ -168,49 +168,46 @@
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     
     [alert setValue:tatString forKey:@"attributedTitle"];
-    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Add Template",nil)
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add Template",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self performSegueWithIdentifier:@"addTemplateSegue" sender:@"mainVC"];
-                                                          }];
-    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Edit Template",nil)
+                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Edit Template",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self performSegueWithIdentifier:@"templateSegue" sender:@"mainVC"];
-                                                          }];
-    UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Load Comparison EXP File...",nil)
+                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Load Comparison EXP File...",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self performSegueWithIdentifier:@"comparisonSegue" sender:@"mainVC"];
-                                                          }];
-    UIAlertAction *fourthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Clear OCR Cache",nil)
+                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Clear OCR Cache",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self clearCacheMenu];
-                                                          }];
-    UIAlertAction *fifthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Clear PDF Cache",nil)
+                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Clear PDF Cache",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self clearPDFCacheMenu];
-                                                          }];
-    UIAlertAction *sixthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Clear Activities",nil)
+                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Clear Activities",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self clearActivityMenu];
-                                                          }];
-    NSString* t = @"Minimum Activity Logging";
+                                                          }]];
+    //Debug mode: stored in app delegate, flag can be flipped here
+    NSString* t = @"Normal Debug Output";
     AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    if (mappDelegate.verbose) t = @"Verbose Activity Logging";
-    UIAlertAction *seventhAction = [UIAlertAction actionWithTitle:NSLocalizedString(t,nil)
+    if (mappDelegate.debugMode) t = @"Verbose Debug Output";
+    
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(t,nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              mappDelegate.verbose = !mappDelegate.verbose;
-                                                          }];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
-                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                           }];
-    //DHS 3/13: Add owner's ability to delete puzzle
-    [alert addAction:firstAction];
-    [alert addAction:secondAction];
-    [alert addAction:thirdAction];
-    [alert addAction:fourthAction];
-    [alert addAction:fifthAction];
-    [alert addAction:sixthAction];
-    [alert addAction:seventhAction];
-    [alert addAction:cancelAction];
+                                                              mappDelegate.debugMode = !mappDelegate.debugMode;
+                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Logout From Dropbox",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [DBClientsManager unlinkAndResetClients];
+                                              }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                              }]];
     [self presentViewController:alert animated:YES completion:nil];
 
 
@@ -258,8 +255,12 @@
 //   https://exceptionshub.com/uialertcontroller-change-font-color.html
 //  This looks the best
 //    https://stackoverflow.com/questions/26460706/uialertcontroller-custom-font-size-color
+//  2/8 cleanup / add isbatch test
 -(void) batchListChoiceMenu
 {
+    NSArray  *sItems  = [sdata componentsSeparatedByString:@":"]; //Look at the data for this item...
+    BOOL isBatch = (sItems.count > 1); //Is this a batch started / completed item?
+    
     NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:@"Batch Retreival"];
     [tatString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:25] range:NSMakeRange(0, tatString.length)];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:
@@ -270,41 +271,38 @@
     [alert setValue:tatString forKey:@"attributedTitle"];
     
     
-    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Get EXP records",nil)
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Get EXP records",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              self->stype = @"E";
+                                                              if (isBatch) self->stype = @"E"; //Lookup by batch
+                                                              else         self->stype = @"I"; //Lookup by invoice
                                                               [self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
-                                                          }];
-    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Get Invoices",nil)
+                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Get Invoices",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                               self->stype = @"I";
-                                                               [self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
-                                                           }];
-    UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"View/Fix Errors",nil)
-                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              self->fixingErrors = TRUE;
-                                                              [self performSegueWithIdentifier:@"errorSegue" sender:@"mainVC"];
-                                                          }];
-    UIAlertAction *fourthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"View/Fix Warnings",nil)
-                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              self->fixingErrors = FALSE;
-                                                              [self performSegueWithIdentifier:@"errorSegue" sender:@"mainVC"];
-                                                          }];
-    UIAlertAction *fifthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Get Report",nil)
-                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              [self performSegueWithIdentifier:@"batchReportSegue" sender:@"mainVC"];
-                                                          }];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
+                                                                   self->stype = @"I";
+                                                                   [self performSegueWithIdentifier:@"invoiceSegue" sender:@"mainVC"];
+                                                           }]];
+    if (isBatch) //2/8 batch has extra choices...
+    {
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"View/Fix Errors",nil)
+                                                  style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                      self->fixingErrors = TRUE;
+                                                      [self performSegueWithIdentifier:@"errorSegue" sender:@"mainVC"];
+                                                  }]];
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"View/Fix Warnings",nil)
+                                                  style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                      self->fixingErrors = FALSE;
+                                                      [self performSegueWithIdentifier:@"errorSegue" sender:@"mainVC"];
+                                                  }]];
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Get Report",nil)
+                                                  style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                      [self performSegueWithIdentifier:@"batchReportSegue" sender:@"mainVC"];
+                                                  }]];
+
+    }
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                           }];
-    //DHS 3/13: Add owner's ability to delete puzzle
-    [alert addAction:firstAction];
-    [alert addAction:secondAction];
-    [alert addAction:thirdAction];
-    [alert addAction:fourthAction];
-    [alert addAction:fifthAction];
-    [alert addAction:cancelAction];
-    
+                                                           }]];
     [self presentViewController:alert animated:YES completion:nil];
     
 } //end menu
@@ -452,7 +450,28 @@
     else if([[segue identifier] isEqualToString:@"invoiceSegue"])
     {
         InvoiceViewController *vc = (InvoiceViewController*)[segue destinationViewController];
-        vc.vendor    = selVendor;
+        
+//        vc.vendor    = selVendor;
+        vc.vendor    = @"*";  //DHS 2/8 is this right? what verndor are we lookin at anyway? batch could be anyone?
+        vc.batchID = @"*"; //Look at all batches for this vendor
+        if (sdata != nil) // Called from batch popup -> invoices? get batch#
+        {
+            //Get batch ID for invoice lookup...
+            NSArray  *sdItems = [sdata componentsSeparatedByString:@":"];
+            if (sdItems != nil)
+            {
+                if (sdItems.count == 1) //EXP/Invoice item selected
+                {
+                    vc.batchID = @"*";
+                    vc.invoiceNumber = sdItems[0];
+                }
+                else //Batch item selected
+                {
+                    vc.batchID = sdItems[0];
+                    vc.invoiceNumber = @"*";
+                }
+            } //end sdITems...
+        } //end sdata...
     }
     else if([[segue identifier] isEqualToString:@"errorSegue"])
     {
@@ -714,8 +733,8 @@ int currentYear = 2019;
 //=============OCR MainVC=====================================================
 -(void) testit
 {
- //   [self performSegueWithIdentifier:@"comparisonSegue" sender:@"mainVC"];
-
+    [self performSegueWithIdentifier:@"errorSegue" sender:@"mainVC"];
+    return;
     //et = [[EXPTable alloc] init];
     //[et readFullTableToCSV:0];
     

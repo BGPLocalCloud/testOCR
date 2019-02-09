@@ -99,14 +99,14 @@ NSString *const PS_ComparisonFolderKey      = @"ComparisonFolder";
                 [self keepFieldsLegal];
                 [self saveLocalSettings]; //Save a copy locally...
                 self->loaded = TRUE;
-                NSLog(@"...settings loaded");
+                //NSLog(@"...settings loaded");
                 break; //We only go thru once!
                 
             }
             if (self->loaded)
             {
                 [self.delegate didLoadOCRSettings];
-                [self dump];
+                //[self dump];
             }
             else //Failed to load? Probably called from feedVC before parse came up!
             {

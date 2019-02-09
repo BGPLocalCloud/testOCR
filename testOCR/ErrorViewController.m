@@ -12,6 +12,7 @@
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 //  1/12  Added E: or W: prefix to errors!
+//  2/8   made numericPanelView more compact,
 
 #import "ErrorViewController.h"
 
@@ -70,7 +71,6 @@
     
     //Scrolling zoomed PDF viewer
     _scrollView.delegate=self;
-
     _fieldValue.delegate = self;
     _field2Value.delegate = self;
     _field3Value.delegate = self;
@@ -96,8 +96,9 @@
     }
     [expList removeAllObjects];
     _fixNumberView.hidden = TRUE;
+    _scrollView.hidden    = TRUE;
+    [self zoomPDFView : 1];
 
-    
 } //end viewWillAppear
 
 //=============Error VC=====================================================
@@ -109,23 +110,21 @@
     viewHit = (int)csz.height;
     viewW2  = viewWid/2;
     viewH2  = viewHit/2;
-    
+} //end loadView
+
+//------(Onboarding)--------------------------------------------------------------
+-(void) viewDidLayoutSubviews
+{
+    //DHS 2/8 moved from loadView
+    CGRect rrr = _fixNumberView.frame;
     int xi,yi,xs,ys;
     xs = viewWid;
-    ys = xs;
-    xi = viewW2 - xs/2;
-    yi = 60;
+    xi = 0;
+    yi = 65;
+    ys = rrr.origin.y - yi;
     _scrollView.frame = CGRectMake(xi, yi, xs, ys);
+} //end viewDidLayoutSubviews
 
-    [self zoomPDFView : 1];
-    
-//    yi+= ys+10;
-//    xs = viewWid * 0.95;
-//    ys = 200; //Too Tall?
-//    xi = viewW2 - xs/2;
-//    _outputLabel.frame = CGRectMake(xi, yi, xs, ys);
-//    _outputLabel.text  = @"...";
-} //end loadView
 
 //=============Error VC=====================================================
 -(void) zoomPDFView : (int) zoomBy
@@ -140,8 +139,9 @@
     v.center = CGPointMake(vw*zoomBy/2, vh*zoomBy/2);
     _scrollView.contentSize = CGSizeMake(vw*zoomBy, vh*zoomBy);
     [_scrollView setContentOffset:CGPointMake(0,0) animated:NO];
-
 } //end zoomPDFView
+
+
 
 
 //=============Error VC=====================================================
@@ -192,7 +192,8 @@
 //=============Error VC=====================================================
 - (IBAction)fieldCancelSelect:(id)sender {
     //Hide sub-panel for fixing fields... table should show up
-    _fixNumberView.hidden = TRUE;
+    [self animateTextField: _fieldValue up: NO];
+    [self swapViews:FALSE];
 
 }
 
@@ -226,26 +227,29 @@
         bbb.batchID = batchID;        //BatchID was passed in as part of batchData from parent
         [bbb updateParse];           //annnd save updated batch record
     }
-    _fixNumberView.hidden = TRUE;
+    [self swapViews:FALSE];
     [_table reloadData];
 
 } //end fieldFixSelect
 
+//=============Error VC=====================================================
+// 2/8 shows/hides table/backbutton vs. fixnumberview/pdfview
+-(void) swapViews : (BOOL) fixingErrors
+{
+    _table.hidden           = fixingErrors;
+    _backButton.hidden      = fixingErrors;
+    _fixNumberView.hidden   = !fixingErrors;
+    _scrollView.hidden      = !fixingErrors;
+} //end swapViews
 
 //=============Error VC=====================================================
--(void) UpdateUI
+// 2/8 wups there were 2 of these!@
+-(void) updateUI
 {
     NSString *t = @"View / Fix Errors";
     if (!_fixingErrors) t = @"View / Fix Warnings";
     _titleLabel.text = t;
 }
-
-
-//=============Error VC=====================================================
--(void) updateUI
-{
-}
-
 
 //=============Error VC=====================================================
 -(void) dismiss
@@ -282,7 +286,7 @@
         if (_fixingErrors)
         {
             cell.errIcon.image   = xIcon;
-            cell.backgroundColor = [UIColor colorWithRed:1.0 green:1.0 blue:0.4 alpha:1];
+            cell.backgroundColor = [UIColor colorWithRed:1.0 green:0.8 blue:0.8 alpha:1];
         }
         else
         {
@@ -337,7 +341,7 @@
 //=============Error VC=====================================================
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 40;
+    return 60;
 }
 
 //=============Error VC=====================================================
@@ -376,12 +380,16 @@
     NSArray *sItems    = [allErrs componentsSeparatedByString:@":"];
     if (sItems.count > 1)
     {
-        [spv start : @"Get EXP object"];
-        fixingObjectID = sItems[2]; //DHS 1/12 now 3 items in error
-        if (![fixingObjectID isEqualToString:@"n/a"]) //Make sure objectID exists...
+        NSString *errType = sItems[1];
+        if (![errType.lowercaseString containsString:@"product"]) //2/8 Bad product errors can't be fixed!
         {
-            NSLog(@" get EXP object:%@",fixingObjectID);
-            [et getObjectByID:fixingObjectID]; //Delegate callback updates ui...
+            [spv start : @"Get EXP object"];
+            fixingObjectID = sItems[2]; //DHS 1/12 now 3 items in error
+            if (![fixingObjectID isEqualToString:@"n/a"]) //Make sure objectID exists...
+            {
+                NSLog(@" get EXP object:%@",fixingObjectID);
+                [et getObjectByID:fixingObjectID]; //Delegate callback updates ui...
+            }
         }
     }
 } //end didSelectRowAtIndexPath
@@ -428,8 +436,13 @@
 -(void) setupPanelForError : (NSString*) key
 {
     NSLog(@"show fixit view...");
+    [self swapViews : TRUE];
     //Show error fixing view...
+    _table.hidden = TRUE;
+    _backButton.hidden = TRUE;
     _fixNumberView.hidden = FALSE;
+    _pdfView.hidden = FALSE;
+
     fixingObjectKey = key;
     isNumeric = [errKeysNumeric containsObject:key];
     _numericPanelView.hidden = !isNumeric;
@@ -481,7 +494,7 @@
     NSString *rot = [vv getRotationByVendorName:vendorName];
     if ([rot isEqualToString:@"-90"]) ii = [it rotate90CCW : ii];
     _pdfView.image = ii;
-    [self zoomPDFView : 4];
+    [self zoomPDFView : 3];
 
 } //end finishSettingPDFImage
 
@@ -497,6 +510,12 @@
     [self finishSettingPDFImage:ii];
   //  @property (nonatomic , strong) NSMutableArray* batchImages;
    //asdf
+}
+
+//=============<EXPTableDelegate>=====================================================
+- (void)errorDownloadingImages : (NSString *)s
+{
+    NSLog(@" ERROR! %@",s); //2/8 MAKE THIS AN ERROR POPUP?
 }
 
 

@@ -441,7 +441,7 @@
 {
     spinner.hidden = FALSE;
     [spinner startAnimating];
-    [et readFromParseAsStrings : TRUE : @"HFM" : @"*"];
+    [et readFromParseAsStrings : TRUE : @"HFM" : @"*" : @"*"]; //2/8
     
 }
 

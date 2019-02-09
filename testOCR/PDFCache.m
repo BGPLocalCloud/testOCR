@@ -129,7 +129,7 @@ static PDFCache *sharedInstance = nil;
     //No dupes...
     if ([_PDFids containsObject:oid])
     {
-        NSLog(@"  ...PDFcache dupe [%@]...",oid);
+        //NSLog(@"  ...PDFcache dupe [%@]...",oid);
         return;
     }
     [_PDFids addObject : oid];
@@ -241,7 +241,7 @@ static PDFCache *sharedInstance = nil;
         pdfFile   = [cacheNames objectAtIndex:i];
         [_PDFids addObject : pdfFile];
     } //end for i
-    [self dump];
+    //[self dump];
 } //end loadCache
 
 

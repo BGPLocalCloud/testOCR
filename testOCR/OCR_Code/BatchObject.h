@@ -85,6 +85,8 @@
     PDFCache *pc;
     NSString *batchReportString;
 
+    BOOL debugMode;   //2/7 For verbose logging...
+
 }
 @property (nonatomic , strong) NSString* batchID;
 @property (nonatomic , assign) BOOL authorized;

@@ -48,6 +48,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UITableView *table;
 
 @property (nonatomic , strong) NSString* vendor;
+@property (nonatomic , strong) NSString* batchID;
+@property (nonatomic , strong) NSString* invoiceNumber;
 
 @end
 

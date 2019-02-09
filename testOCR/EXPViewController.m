@@ -30,14 +30,14 @@
     ot = [[OCRTemplate alloc] init];
     ot.delegate = self;
     
-    it = [[invoiceTable alloc] init];
-    it.delegate = self;
     et = [[EXPTable alloc] init];
     et.delegate     = self;
     et.selectBy     = @"*";
     et.selectValue  = @"*";
     tableName       = @"";
     dbMode          = DB_MODE_NONE;
+    batchIDLookup   = @"*";
+    invoiceLookup   = @"*";
     vendorLookup    = @"*";
     _detailMode     = FALSE;
 
@@ -83,8 +83,9 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    batchIDLookup = @"*";
-    vendorLookup  = @"*";
+    batchIDLookup  = @"*";
+    vendorLookup   = @"*";
+    invoiceLookup  = @"*";
     //Only for detail mode...
     if (!_detailMode) //Normal mode?
     {
@@ -92,8 +93,15 @@
         {
             NSArray *sitems =  [_actData componentsSeparatedByString:@":"];
             vendorLookup = @"*";
-            if (sitems[0] != nil) batchIDLookup = sitems[0];
-            if (sitems[1] != nil) vendorLookup  = sitems[1];
+            if (![_searchType isEqualToString:@"I"]) //NOT looking up by invoice?
+            {
+                if (sitems.count > 0 && sitems[0] != nil) batchIDLookup = sitems[0];
+                if (sitems.count > 1 && sitems[1] != nil) vendorLookup  = sitems[1];
+            }
+            else
+            {
+                if (sitems.count > 0 && sitems[0] != nil) invoiceLookup = sitems[0];
+            }
         }
         sortBy        = sortOptions[1]; //Batch Counter, latest created -> earliest created
         sortAscending = TRUE;
@@ -344,24 +352,12 @@
 
     if (!_detailMode) //Normal EXP table examination?
     {
-        [et readFromParseAsStrings : FALSE : vendorLookup : batchIDLookup];
+        [et readFromParseAsStrings : FALSE : vendorLookup : batchIDLookup : invoiceLookup];
     }
     else //Just look at one invoice? (comes w/ list of objectIDs)
     {
-        [et readFromParseAsStrings : FALSE : vendorLookup : batchIDLookup];
+        [et readFromParseAsStrings : FALSE : vendorLookup : batchIDLookup : invoiceLookup];
     }
-    [self updateUI];
-}
-
-//=============EXP VC=====================================================
--(void) loadInvoices
-{
-    [spv start : @"Loading Invoices..."];
-    _titleLabel.text = @"Loading Invoices...";
-    
-    tableName = @"Invoices";
-    dbMode = DB_MODE_INVOICE;
-    [it readFromParseAsStrings : vendorLookup  : batchIDLookup]; //All invoices for vendor
     [self updateUI];
 }
 
@@ -375,31 +371,14 @@
     tableName = @"EXP";
     vendorLookup = v;
     dbMode = DB_MODE_EXP;
-    [et readFromParseAsStrings : FALSE : vendorLookup : batchIDLookup];
+    invoiceLookup = @"*";
+    [et readFromParseAsStrings : FALSE : vendorLookup : batchIDLookup : invoiceLookup];
     [self updateUI];
 }
 
-//=============EXP VC=====================================================
--(void) loadInvoiceByVendor : (NSString *)v
-{
-    [spv start : @"Loading Vendor Invoices"];
-    _titleLabel.text = @"Loading Invoices...";
-    tableName = @"Invoices";
-    dbMode = DB_MODE_INVOICE;
-    [it readFromParseAsStrings : vendorLookup : @"*" ]; //All invoices for vendor
-    [self updateUI];
-}
 
 //=============EXP VC=====================================================
--(void) loadTemplates
-{
-    tableName = @"Templates";
-    dbMode = DB_MODE_TEMPLATE;
-    [ot readFromParseAsStrings];
-    [self updateUI];
-}
-
-//=============EXP VC=====================================================
+// A variety of titles may appear depending on mode and sorting
 -(void) setLoadedTitle : (NSString *)tableName
 {
     //DHS 2/5
@@ -411,7 +390,13 @@
         if ([sortBy isEqualToString:@""]) //No particular sort...
             s = [NSString stringWithFormat:@"[%@%@]",tableName,xtra];
         else{
-            if (!_detailMode) s = [NSString stringWithFormat:@"Sort by %@",sortBy];
+            if (!_detailMode)
+            {
+                if ([invoiceLookup isEqualToString:@"*"])  //  2/8 general lookup
+                    s = [NSString stringWithFormat:@"Sort by %@",sortBy];
+                else                                        // 2/8 invoice lookup
+                    s = [NSString stringWithFormat:@"Invoice %@",invoiceLookup];
+            }
             else  s = [NSString stringWithFormat:@"Invoice %@",_actData];
         }
     }

@@ -22,14 +22,13 @@
 @property (nonatomic , strong) NSDate* date;
 @property (nonatomic , strong) NSString* objectID;
 @property (nonatomic , strong) NSString* itotal;
-@property (nonatomic , strong) NSString* expObjectID;
+@property (nonatomic , strong) NSString* packedEXPIDs;
 @property (nonatomic , strong) NSString* invoiceNumber;
 @property (nonatomic , strong) NSString* customer;
 @property (nonatomic , strong) NSString* batchID;
 @property (nonatomic , strong) NSString* vendor;
 @property (nonatomic , strong) NSString* PDFFile;
 @property (nonatomic , strong) NSString* pageCount;
-@property (nonatomic , strong) NSString* packedOIDs;
 
 
 

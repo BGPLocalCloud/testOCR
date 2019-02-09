@@ -13,6 +13,8 @@
 //
 // 1/10/19 in getColumnStrings, changed glyph fudge value!
 //           may result in rows getting mixed up!
+// 2/7 add debugMode for logging
+//      pull cleanupProductNameString, getPost* methods
 
 #import "OCRDocument.h"
 
@@ -49,6 +51,9 @@
         
         unitScale = TRUE;
         hScale = vScale = 1.0;
+        
+        debugMode = FALSE; //DHS 2/7
+
     }
     return self;
 }
@@ -236,7 +241,7 @@
 // Makes sure price has format DDD.CC
 -(NSString *)cleanupPrice : (NSString *)s
 {
-    //NSLog(@" cleanup Price in [%@]",s);
+    if (debugMode) NSLog(@" cleanup Price in [%@]",s);
     NSString* ptst = [s stringByReplacingOccurrencesOfString:@" " withString:@""];
     BOOL numeric = [self isStringAPrice:ptst];
     NSString *sout = @"";
@@ -257,8 +262,6 @@
         sout = [NSString stringWithFormat:@"%d.%2.2d",d,c];
 
     }
-    //NSLog(@" .....out  [%@]",sout);
-
     return sout;
 }
 
@@ -290,16 +293,6 @@
     return aout;
 } //end cleanUpPriceColumns
 
-
-//=============(OCRDocument)=====================================================
-// Fix OCR errors in name strings...
--(NSString*) cleanUpProductNameString : (NSString *)pstr
-{
-    NSString *outstr;
-    outstr = [pstr stringByReplacingOccurrencesOfString:@"|" withString:@""]; //No vertical bars
-    outstr = [outstr stringByReplacingOccurrencesOfString:@"_" withString:@""]; //No underbars!
-    return outstr;
-}
 
 
 //=============(OCRDocument)=====================================================
@@ -399,11 +392,6 @@
     {
         int x = (int)ow.left.intValue; //Get top left corner?
         int y = (int)ow.top.intValue;
-// STOOPID DEBUG
-//        if ([ow.wordtext isEqualToString:@"1,77"])
-//        {
-//            NSLog(@" bing 177"); //asdf
-//        }
         if (x >= xi && x <= x2 && y >= yi && y <= y2) //Hit!
         {
             NSNumber *n = [NSNumber numberWithInt:index];
@@ -485,7 +473,6 @@
         for (int i=0;i<yptr;i++) if (abs(y-ys[i]) < ytolerance) y = ys[i];
         ys[yptr++] = y;
         int abspos = fonyWidth * y + ow.left.intValue; //Abs pixel position in document
-        //NSLog(@"add2wordpairs wid %d y %d owleft %d w %@ abspos %d",fonyWidth,y,ow.left.intValue,ow.wordtext,abspos);
         //add dict of string / y pairs
         [wordPairs addObject:@{@"Word": ow.wordtext,@"XY":[NSNumber numberWithInt:abspos],@"W":[NSNumber numberWithInt:w],@"T":[NSNumber numberWithInt:y]}];
         if (yptr >= 64) break; //Out of room ? string too big anyway!
@@ -575,7 +562,7 @@
         OCRWord *cw     = allWords[closest];
         //Create rectangle starting at xLeft, bounding closest word too...
         nr.origin.x     = xLeft;
-        NSLog(@" next hdr box: xleft %d",xLeft);
+        //NSLog(@" next hdr box: xleft %d",xLeft);
         nr.origin.y     = hdrRect.origin.y;
         nr.size.width   = (cw.left.intValue + cw.width.intValue) - xLeft;
         nr.size.height  = hdrRect.size.height;
@@ -635,7 +622,6 @@
                 found = TRUE;
                 yTest  = ow.top.intValue;  //Document space!
                 //int xt = ow.left.intValue;
-                //NSLog(@" description found:index %d xy (%d,%d)",index,yTest,xt);
                 break;
             }
           index++;
@@ -654,7 +640,7 @@
     }
    // [self dumpArrayFull:b];
     NSString * hdrSentence =  [self assembleWordFromArray : b : FALSE : 2];
-    //NSLog(@" found header %@",hdrSentence);
+    if (debugMode) NSLog(@" found header %@",hdrSentence);
     //Check for other keywords...
     found = FALSE;
     if ([hdrSentence.lowercaseString containsString:@"price"]) found = TRUE;
@@ -679,7 +665,6 @@
     for (NSDictionary *d in wordPairs)
     {
         NSNumber* nexty  = [d objectForKey:@"T"];
-        //NSLog(@" ny %d ty %d",nexty.intValue,topy.intValue);
         if (i == 0) topy = nexty;
         if (nexty.intValue - topy.intValue > maxLines*_glyphHeight)
         {
@@ -692,7 +677,6 @@
         }
         i++;
     }
-    //NSLog(@" ...assembled result [%@]",s);
     return s;
 } //end assembleWordFromArray
 
@@ -706,7 +690,7 @@
     //NOTE the rowYs array is coming in in DOCUMENT coords!!!
     NSMutableArray *resultStrings = [[NSMutableArray alloc] init];
     int yc = (int)finalYs.count;
-    //NSLog(@" col %d yc %d",column,yc);
+    if (debugMode) NSLog(@" getColumnStrings %d yc %d",column,yc);
     int lastYSize = 0;
     for (int i=0;i<yc;i++)
     {
@@ -725,9 +709,9 @@
         CGRect cr = CGRectMake(rr.origin.x, thisY, rr.size.width, nextY-thisY);
         NSMutableArray *a = [self findAllWordsInRect:cr];
         CGRect docRect = [self  template2DocRect : cr];
-        //NSLog(@" getColumnString:(col %d row %d) rect %@ thisy %d nexty %d",
-        //      column,i,NSStringFromCGRect(docRect),thisY,nextY);
-        //[self dumpArrayFull:a];
+        if (debugMode) NSLog(@" ...(col %d row %d) rect %@ thisy %d nexty %d",
+              column,i,NSStringFromCGRect(docRect),thisY,nextY);
+        if (debugMode) [self dumpArrayFull:a];
         [resultStrings addObject:[self assembleWordFromArray : a : FALSE : 2]];
         lastYSize = nextY - thisY;
     }
@@ -745,8 +729,8 @@
         _priceColumn = column;
     if ([headerForThisColumn containsString:@"amount"] || [ctype.lowercaseString containsString:@"amount"])
         _amountColumn = column;
-    //NSLog(@" column header[%d] %@ ic %d qc %d dc %d pc %d ac %d",column,headerForThisColumn,
-    //      _itemColumn,_quantityColumn,_descriptionColumn,_priceColumn,_amountColumn);
+    if (debugMode) NSLog(@" column header[%d] %@ ic %d qc %d dc %d pc %d ac %d",column,headerForThisColumn,
+          _itemColumn,_quantityColumn,_descriptionColumn,_priceColumn,_amountColumn);
     return resultStrings;
 } //end getColumnStrings
 
@@ -771,7 +755,7 @@
 {
     //Get all content within this rect, assume one item per line!
     NSMutableArray *a = [self findAllWordsInRect:rr];
-    //NSLog(@" getColumnYPositionsInRect %d,%d : %d,%d",(int)rr.origin.x,(int)rr.origin.y,(int)rr.size.width,(int)rr.size.height);
+    if (debugMode) NSLog(@" getColumnYPositionsInRect %d,%d : %d,%d",(int)rr.origin.x,(int)rr.origin.y,(int)rr.size.width,(int)rr.size.height);
     //[self dumpArrayFull:a];
     NSMutableArray *colPairs = [[NSMutableArray alloc] init];
     int oldy = -99999;
@@ -827,12 +811,10 @@
         //DHS 1/23 NOTE: this sometimes makes duplicate items show up! (at least in HFM invoice)
         if (dy > _glyphHeight)
         {
-            //NSLog(@" add finalY %d",nextY.intValue);
             [finalYs addObject:nextY];
         }
         lastY = nextY;
     }
-    //NSLog(@" got %d rows",(int)finalYs.count);
     return 0; //OK
 } //end getRowYpositions'
 
@@ -871,7 +853,6 @@
         if (y2 > maxy) maxy = y2;
     } //end for loop
     _docRect = CGRectMake(minx, miny, maxx-minx, maxy-miny);
-    //NSLog(@" doc lims (%d,%d) to (%d,%d)",minx, miny, maxx , maxy );
     return _docRect;
 } //end getDocRect
 
@@ -1308,7 +1289,7 @@
         rcFrame.origin.y -=_glyphHeight;
         rcFrame.size.height +=2*_glyphHeight;
         //NSLog(@" annnd headerRect for column %d is %@",i,NSStringFromCGRect(rcFrame));
-        NSMutableArray *a = [self findAllWordsInRect:rcFrame];
+        //NSMutableArray *a = [self findAllWordsInRect:rcFrame];
         //[self dumpArrayFull:a];
         i++;
     }
@@ -1375,7 +1356,7 @@
 //=============OCRDocument=====================================================
 -(void) parseJSONfromDict : (NSDictionary *)d
 {
-    NSLog(@" Parsing JSON from dict...");
+    if (debugMode) NSLog(@" Parsing JSON from dict...");
     [self clear];
     rawJSONDict   = d;
     NSArray *pr   = [d valueForKey:@"ParsedResults"];
@@ -1402,7 +1383,7 @@
             }
         } //end for ddd
         [allPages addObject:Woids]; //Add next page ...
-        NSLog(@" page %d : %d words",i,(int)Woids.count);
+        if (debugMode) NSLog(@" page %d : %d words",i,(int)Woids.count);
         i++;
     } //end for dpage..
     _numPages = i;
@@ -1447,7 +1428,7 @@
     _scannedName  = @"nada";
     _width        = r.size.width;
     _height       = r.size.height;
-    NSLog(@" od setupdoc wh %d %d",_width,_height);
+    if (debugMode) NSLog(@" od setupdoc wh %d %d",_width,_height);
     [self parseJSONfromDict:d];
 }
 
@@ -1458,42 +1439,6 @@
     postOCRMinorErrors[row] = merror;
 }
 
-//=============(OCRDocument)=====================================================
--(void) setPostOCRQPA : (int) row : (NSString*) q : (NSString*) p : (NSString*) a
-{
-    if (row < 0 || row >= MAX_QPA_ROWS) return;
-    postOCRQuantities[row]  = q;
-    postOCRPrices[row]      = p;
-    postOCRAmounts[row]     = a;
-} //end setQPA
-
-//=============(OCRDocument)=====================================================
--(int) getPostOCRMinorError : (int) row
-{
-    if (row < 0 || row >= MAX_QPA_ROWS)  return 0;
-    return postOCRMinorErrors[row];
-} //end getPostOCRMinorError
-
-//=============(OCRDocument)=====================================================
--(NSString*) getPostOCRQuantity : (int) row
-{
-    if (row < 0 || row >= MAX_QPA_ROWS)  return @"0.0";
-    return postOCRQuantities[row];
-}
-
-//=============(OCRDocument)=====================================================
--(NSString*) getPostOCRPrice : (int) row
-{
-    if (row < 0 || row >= MAX_QPA_ROWS) return @"0.0";
-    return postOCRPrices[row];
-}
-
-//=============(OCRDocument)=====================================================
--(NSString*) getPostOCRAmount : (int) row
-{
-    if (row < 0 || row >= MAX_QPA_ROWS)  return @"0.0";
-    return postOCRAmounts[row];
-}
 
 
 

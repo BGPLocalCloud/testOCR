@@ -127,6 +127,6 @@
             photo = [itools rotate90CCW:photo];
     }
     _pdfImage.image = photo;
-    _titleLabel.text = [NSString stringWithFormat:@"Invoice%@ : Page %d",_invoiceNumber,page];
+    _titleLabel.text = [NSString stringWithFormat:@"Invoice:%@,Page %d",_invoiceNumber,page];
 }
 @end

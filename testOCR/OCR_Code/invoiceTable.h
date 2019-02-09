@@ -25,12 +25,16 @@
 @interface invoiceTable : NSObject
 {
     NSMutableArray *recordStrings;
-    NSMutableArray *iobjs;
+    NSMutableArray *invoiceObjects;
+    NSMutableArray *EXPIDs;
     int dog;
     NSString *tableName;
     NSString *packedOIDs;
+    
+    BOOL debugMode;   //2/7 For verbose logging...
+
 }
-@property (nonatomic , strong) NSString* ivendor;
+
 @property (nonatomic , strong) invoiceObject* iobj;
 @property (nonatomic , strong) NSString* versionNumber;
 
@@ -43,7 +47,7 @@
 -(void) clearObjectIds;
 -(int)  getItemCount;
 -(void) readFromParse : (NSString *)vendor : (NSString *)invoiceNumberstring;
--(void) readFromParseAsStrings : (NSString *)vendor : batch;
+-(void) readFromParseAsStrings : (NSString *)vendor : batch : invoiceNumberstring;
 -(void) saveToParse : (BOOL)lastPage;
 -(void) setupVendorTableName : (NSString *)vname;
 -(void) updateInvoice : (NSString *)vendor : (NSString *)invoiceNumberstring : (NSString *)batchID : (BOOL)lastPage;

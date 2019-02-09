@@ -12,6 +12,8 @@
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 //  1/24 added batchCounter, removed batch_key
+//  2/7 add debugMode for logging
+//  2/8 add invoiceNumber to readFromParseAsStrings
 
 #import "EXPTable.h"
 
@@ -31,6 +33,11 @@
         _sortBy = @"*";
         _selectBy = @"*";
         tableName = @"EXPFullTable";
+
+        AppDelegate *eappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        debugMode = eappDelegate.debugMode; //2/7 For dwbug logging, check every batch
+
+
         _versionNumber    = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
     }
     return self;
@@ -39,7 +46,7 @@
 //=============(EXPTable)=====================================================
 -(void) clear
 {
-    NSLog(@" EXP Clear");
+    if (debugMode) NSLog(@" EXP Clear");
     [_expos removeAllObjects];
     //Clear EXP send/return counts...
     [objectIDs removeAllObjects]; //2/5 back here again
@@ -66,7 +73,7 @@
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
             [PFObject deleteAllInBackground:objects];
-            NSLog(@" deleted all EXP for %@",vendor);
+            if (debugMode) NSLog(@" deleted all EXP for %@",vendor);
         }
         else {
             NSLog(@"Error: %@ %@", error, [error userInfo]);
@@ -134,11 +141,6 @@
     batch       = [self TrackNilErrors : batch : PInv_BatchID_key];
     errStatus   = [self TrackNilErrors : errStatus : PInv_ErrStatus_key];
     PDFFile     = [self TrackNilErrors : PDFFile : PInv_PDFFile_key];
-//    if (allErrors.length > 1) //Got error(s)?  2/5 no need for printout
-//    {
-//        NSLog(@"%@",allErrors);
-////        return;
-//    }
     
     EXPObject *exo = [[EXPObject alloc] init];
     exo.expdate         = fdate;
@@ -374,7 +376,7 @@
         {
             NSString *oid = s2[1];  //THis should be the object ID
             [a addObject:oid];
-            NSLog(@" .. fetch objid [%@]",oid);
+            if (debugMode) NSLog(@" .. fetch objid [%@]",oid);
             PFObject *pfo = [query getObjectWithId:oid];  //Fetch by object ID,
             [self handleCSVAdd : dumptoCSV : [self getCSVFromObject:pfo : FALSE]];
         }
@@ -389,16 +391,16 @@
     PFObject *pfo = [query getObjectWithId:oid];  //Fetch by object ID,
     if (pfo != nil)
     {
-        NSLog(@" fix field [%@] = %@ ",PInv_Quantity_key,qt);
-        NSLog(@" fix field [%@] = %@ ",PInv_PricePerUOM_key,pt);
-        NSLog(@" fix field [%@] = %@ ",PInv_TotalPrice_key,tt);
+        if (debugMode) NSLog(@" fix field [%@] = %@ ",PInv_Quantity_key,qt);
+        if (debugMode) NSLog(@" fix field [%@] = %@ ",PInv_PricePerUOM_key,pt);
+        if (debugMode) NSLog(@" fix field [%@] = %@ ",PInv_TotalPrice_key,tt);
         [pfo setObject:qt forKey:PInv_Quantity_key];
         [pfo setObject:pt forKey:PInv_PricePerUOM_key];
         [pfo setObject:tt forKey:PInv_TotalPrice_key];
         [pfo saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
             if (succeeded)
             {
-                NSLog(@" update qpt OK objID %@",oid);
+                if (debugMode) NSLog(@" update qpt OK objID %@",oid);
                 [self.delegate didFixPricesInObjectByID : oid];
             }
             else
@@ -416,7 +418,7 @@
     PFObject *pfo = [query getObjectWithId:oid];  //Fetch by object ID,
     if (pfo != nil)
     {
-        NSLog(@" fix field [%@] = %@ ",key,value);
+        if (debugMode) NSLog(@" fix field [%@] = %@ ",key,value);
         [pfo setObject:value forKey:key];
         [pfo saveEventually]; //No Hurry, just assume the DB is fast enough
     }
@@ -427,7 +429,7 @@
 //BROKEN! DOESN'T WORK! can't set IDs for some reason?
 -(void) getObjectsByIDs : (NSArray *)oids
 {
-    NSLog(@" gobi %@",oids);
+    if (debugMode) NSLog(@" getObjectsByIDs %@",oids);
     if (oids == nil || oids.count < 1) return;
     PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
     [query whereKey:@"objectId" containedIn:oids];
@@ -440,7 +442,6 @@
                 EXPObject *e = [self getEXPObjectFromPFObject:pfo];
                 [d setObject:e forKey:pfo.objectId];
                 [self->_expos addObject: e];
-                NSLog(@" getObjectsByIDs=================");
                 [e dump];
             }
             [self.delegate didGetObjectsByIds : d];
@@ -464,15 +465,16 @@
 } //end getObjectByID
 
 //=============OCR VC=====================================================
--(void) readFromParseAsStrings : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)batch
+-(void) readFromParseAsStrings : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)batch : invoiceNumberstring
 {
     [self handleCSVInit:TRUE:FALSE];
     PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
     
     //Wildcards means get everything...
-    if (![vendor isEqualToString:@"*"]) [query whereKey:PInv_Vendor_key  equalTo:vendor];
-    if (![batch  isEqualToString:@"*"]) [query whereKey:PInv_BatchID_key equalTo:batch]; //1/31 bug fix wrong key
-    if (![_sortBy isEqualToString:@""]) NSLog(@"...sort EXP by %@",_sortBy);
+    if (![vendor               isEqualToString:@"*"]) [query whereKey:PInv_Vendor_key  equalTo:vendor];
+    if (![batch                isEqualToString:@"*"]) [query whereKey:PInv_BatchID_key equalTo:batch]; //1/31 bug fix wrong key
+    if (![invoiceNumberstring  isEqualToString:@"*"]) [query whereKey:PInv_InvoiceNumber_key equalTo:invoiceNumberstring]; //1/31 bug fix wrong key
+    if (![_sortBy isEqualToString:@""] && debugMode) NSLog(@"...sort EXP by %@",_sortBy);
     NSString *sortkey = @"createdAt";
     if (_sortBy != nil)
     {
@@ -523,7 +525,7 @@
     
         
     PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
-    NSLog(@" read %d to %d",skip,skip+LIMIT_SIZE);
+    if (debugMode) NSLog(@" read %d to %d",skip,skip+LIMIT_SIZE);
     query.skip = skip;
     query.limit = LIMIT_SIZE;
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
@@ -539,7 +541,7 @@
             else
             {
                 self->EXPDumpCSVList = [self->csvList componentsJoinedByString:@","];
-                NSLog(@" got %lu recs ",(unsigned long)self->csvList.count);
+                if (debugMode) NSLog(@" got %lu recs ",(unsigned long)self->csvList.count);
                 [self.delegate didReadFullTableToCSV : self->EXPDumpCSVList];
             }
         }
@@ -566,7 +568,7 @@
 //  then a delegate callback tells parent when all object ID's are ready for invoice
 -(void) saveToParse : (int) page :  (BOOL) lastPage
 {
-    NSLog(@" ET savetoparse page %d last %d etcount %d",page,lastPage,(int)_expos.count);
+    if (debugMode) NSLog(@" ET savetoparse page %d last %d etcount %d",page,lastPage,(int)_expos.count);
     if (_expos.count < 1)
     {
         [self.delegate didSaveEXPTable : nil]; //Trigger next page..
@@ -574,23 +576,7 @@
     }
     int i=0;
     //Clear any old junk from past EXP save...
-//    if (page == 0)
-//    {
-////        [objectIDs removeAllObjects];
-//        for (int i=0;i<32;i++) //DHS 2/4 clear counts here instead of main clear
-//        {
-//            sentCounts[i]   = 0;
-//            returnCounts[i] = 0;
-//        }
-//        totalSentCount = totalReturnCount = 0;
-//    }
-//    sentCounts[page]   = (int)_expos.count;
-//    if (lastPage) //Last page? Get a total of everything sent...
-//    {
-//        totalSentCount = 0;
-//        for (int i=0;i<32;i++) totalSentCount+=sentCounts[i];
-//    }
-    NSLog(@" SENT count for page %d is %d total is %d lp %d",page,sentCounts[page],totalSentCount,lastPage);
+    if (debugMode) NSLog(@" SENT count for page %d is %d total is %d lp %d",page,sentCounts[page],totalSentCount,lastPage);
     for (EXPObject *exo in _expos)
     {
         PFObject *exoRecord = [PFObject objectWithClassName:tableName];
@@ -617,18 +603,17 @@
         exoRecord[PInv_VersionNumber]           = _versionNumber;
         totalSentCount++; //DHS 2/5
 
-        //NSLog(@"EXP ->parse [%@] %@ x %@ = %@",exo.productName,exo.quantity,exo.pricePerUOM,exo.total);
+        if (debugMode) NSLog(@"EXP ->parse [%@] %@ x %@ = %@",exo.productName,exo.quantity,exo.pricePerUOM,exo.total);
         [exoRecord saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
             if (succeeded) {
                 NSString *objID = exoRecord.objectId;
                 [self->objectIDs addObject:objID];
                 //self->returnCounts[page]++;
                 self->totalReturnCount++;
-                NSLog(@" ...EXP[%d/%d] [%@/%@]->parse",self->totalReturnCount,self->totalSentCount,exo.vendor,exo.productName);
+                if (debugMode) NSLog(@" ...EXP[%d/%d] [%@/%@]->parse",self->totalReturnCount,self->totalSentCount,exo.vendor,exo.productName);
                 //NSLog(@" ...  EXP: ids %@",self->objectIDs);
                 //NSLog(@" for page[%d] sent %d return %d",page,self->sentCounts[page],self->returnCounts[page]);
                 //NSLog(@" for page[%d] totalsent %d totalreturn %d",page,self->totalSentCount,self->totalReturnCount);
-//2/5                if (self->returnCounts[page] == self->sentCounts[page]) //Finish this page?
                 if (self->totalReturnCount == self->totalSentCount)
                 {
                     [self.delegate didSaveEXPTable : self->objectIDs];
@@ -636,12 +621,6 @@
                         [self.delegate didFinishAllEXPRecords : self->totalSentCount : self->objectIDs];
 
                 }
-//2/5 
-//                if (lastPage)
-//                {
-//                    if (self->totalReturnCount == self->totalSentCount) //All done w/ everything?
-//                        [self.delegate didFinishAllEXPRecords : self->totalSentCount : self->objectIDs];
-//                }
                 NSString *fieldErr = [exoRecord objectForKey:PInv_ErrStatus_key];
                 if (fieldErr.length > 4) //may be blank or OK
                     [self.delegate errorInEXPRecord : fieldErr : objID :

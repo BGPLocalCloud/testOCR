@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "AppDelegate.h"
 #import "DBKeys.h"
 #import "ActivityTable.h"
 #import "EXPTable.h"
@@ -69,7 +70,7 @@
     OCRCache *oc;
     
     CGRect headerRect; 
-
+    BOOL debugMode;   //2/7 For verbose logging...
     
 }
 

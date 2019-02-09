@@ -56,6 +56,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableSet *gL50;   //Left half
     CGRect topmostLeftRect;
     CGRect topmostRightRect;
+
+    BOOL debugMode;   //2/7 For verbose logging...
 }
 @property (nonatomic , strong) UIImage* scannedImage;
 @property (nonatomic , strong) NSString* scannedName;
@@ -83,7 +85,6 @@ NS_ASSUME_NONNULL_BEGIN
 -(NSString*) cleanUpNumberString : (NSString *)nstr;
 -(NSString *)cleanupPrice : (NSString *)s;
 -(NSMutableArray *) cleanUpPriceColumns : (int) index : (NSString *)ctype : (NSMutableArray*) a;
--(NSString*) cleanUpProductNameString : (NSString *)pstr;
 -(void) computeScaling: (CGRect )tlr : (CGRect )trr;
 -(void) dumpArrayFull : (NSArray*)a;
 -(void) dumpArray : (NSArray*)a;
@@ -104,10 +105,6 @@ NS_ASSUME_NONNULL_BEGIN
 -(NSMutableArray*)  getColumnStrings: (CGRect)rr : (int) index : (NSString*)ctype;
 -(NSArray*)  getHeaderNames;
 -(void) getWordHistogram : (int) ytop : (int) numLines;
--(NSString*) getPostOCRQuantity : (int) row;
--(NSString*) getPostOCRPrice    : (int) row;
--(NSString*) getPostOCRAmount   : (int) row;
--(int) getPostOCRMinorError     : (int) row;
 
 -(CGRect) getDocRect;
 -(CGRect) getTLRect;
@@ -123,8 +120,6 @@ NS_ASSUME_NONNULL_BEGIN
 -(void) parseJSONfromDict : (NSDictionary *)d;
 -(NSDate *) isItADate : (NSString *)tstr;
 -(void) parseHeaderColumns : (NSMutableArray*)rectz : (CGRect) hr ;
--(void) setPostOCRQPA : (int) row : (NSString*) q : (NSString*) p : (NSString*) a;
--(void) setPostOCRMinorError : (int) row : (int) merror;
 -(void) setupDocumentAndParseJDON : (NSString*) ifname : (NSDictionary *)d : (BOOL) flipped90;
 -(void) setupDocumentWithRect : (CGRect) r : (NSDictionary *)d;
 -(void) setupPage : (int) page;

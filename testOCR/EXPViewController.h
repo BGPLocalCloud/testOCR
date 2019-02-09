@@ -19,25 +19,20 @@
 #import "OCRWord.h"
 #import "OCRDocument.h"
 #import "OCRTemplate.h"
-#import "invoiceTable.h"
 #import "EXPObject.h"
 #import "EXPTable.h"
 #import "EXPCell.h"
 #import "EXPDetailVC.h"
 #import "spinnerView.h"
 
-NS_ASSUME_NONNULL_BEGIN
-
-
 #define DB_MODE_NONE 200
 #define DB_MODE_EXP 201
 #define DB_MODE_INVOICE 202
 #define DB_MODE_TEMPLATE 203
 
-@interface EXPViewController : UIViewController <OCRTemplateDelegate,invoiceTableDelegate,EXPTableDelegate,UITableViewDelegate,UITableViewDataSource,
+@interface EXPViewController : UIViewController <OCRTemplateDelegate,EXPTableDelegate,UITableViewDelegate,UITableViewDataSource,
                     MFMailComposeViewControllerDelegate>
 {
-    invoiceTable *it;
     EXPTable *et;
     OCRTemplate *ot;
     
@@ -45,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
     int dbMode;
     NSString *batchIDLookup;
     NSString *vendorLookup;
+    NSString *invoiceLookup;
     UIImage *barnIcon;
     UIImage *bigbuxIcon;
     UIImage *centIcon;
@@ -85,4 +81,3 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END

@@ -33,8 +33,8 @@
 @property (strong, nonatomic) UIWindow *window;
 @property (nonatomic , strong) NSString* versionNumber;
 @property (strong, nonatomic) OCRSettings* settings;
-@property(nonatomic) int verbose;
 @property (nonatomic , assign) BOOL networkStatus;
+@property(nonatomic) BOOL debugMode;
 
 
 @end

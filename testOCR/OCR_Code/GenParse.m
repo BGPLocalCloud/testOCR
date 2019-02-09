@@ -28,7 +28,7 @@
         if (!error) {
             [PFObject deleteAllInBackground:objects block:^(BOOL succeeded, NSError * _Nullable error) {
                 [self.delegate didDeleteAllByTableAndKey : tableName : key : kval];
-                NSLog(@" deleted recs in %@ for %@=%@",tableName,key,kval);
+                //NSLog(@" deleted recs in %@ for %@=%@",tableName,key,kval);
             }];
         }
         else {

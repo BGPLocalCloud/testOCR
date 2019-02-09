@@ -81,6 +81,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *field3Value;
 @property (weak, nonatomic) IBOutlet UILabel *productName;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (weak, nonatomic) IBOutlet UIButton *backButton;
 
 @property (nonatomic , assign) BOOL fixingErrors;
 
