@@ -15,6 +15,7 @@
 // 2/5  cleanup, use invoiceObject instead of property list
 // 2/7  add debugMode for logging, add EXPIDs
 // 2/8  add invoiceNumber to readFromParseAsStrings
+//  2/9 add parentUp flag to avoid delegate callback crashes on dismissed VC
 #import "invoiceTable.h"
 
 @implementation invoiceTable
@@ -36,6 +37,7 @@
 
         _versionNumber    = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
         _iobj = [[invoiceObject alloc] init];
+        _parentUp = TRUE;
     }
     return self;
 }
@@ -177,10 +179,10 @@
         if (succeeded) {
             if (self->debugMode) NSLog(@" ...invoice [vendor:%@]->parse",self->_iobj.vendor);
             //NSString *objID = iRecord.objectId;
-            [self.delegate didSaveInvoiceTable:self->_iobj.invoiceNumber : lastPage];
+            if (self->_parentUp) [self.delegate didSaveInvoiceTable:self->_iobj.invoiceNumber : lastPage];
         } else {
             NSLog(@" ERROR: saving invoice: %@",error.localizedDescription);
-            [self.delegate errorSavingInvoiceTable:error.localizedDescription : lastPage];
+            if (self->_parentUp) [self.delegate errorSavingInvoiceTable:error.localizedDescription : lastPage];
         }
     }];
 } //end saveToParse
@@ -213,10 +215,10 @@
                 [pfo saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
                     if (succeeded) {
                         if (self->debugMode) NSLog(@" ...update save OKI");
-                        [self.delegate didUpdateInvoiceTable:invoiceNumberstring : lastPage];
+                        if (self->_parentUp) [self.delegate didUpdateInvoiceTable:invoiceNumberstring : lastPage];
                     } else {
                         NSLog(@" ERROR: updating invoice: %@",error.localizedDescription);
-                        [self.delegate errorSavingInvoiceTable:error.localizedDescription : lastPage];
+                        if (self->_parentUp) [self.delegate errorSavingInvoiceTable:error.localizedDescription : lastPage];
                     }
                 }];
                 break; //Done after one

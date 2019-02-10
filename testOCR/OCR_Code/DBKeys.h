@@ -64,8 +64,12 @@
 //Vendor table...
 #define PInv_Rotated_key     @"Rotated"
 
-//Keyword table...
-#define PInv_Name_key     @"Name"
+//Keyword,Typos,Splits, etc table...
+#define PInv_Name_key      @"Name"
+#define PInv_Typo_key      @"Typo"
+#define PInv_Fixed_key     @"Fixed"
+#define PInv_Split_key     @"Split"
+#define PInv_Joined_key    @"Joined"
 
 
 //Generic

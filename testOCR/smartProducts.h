@@ -66,7 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableArray *notwilds;
     
     NSMutableDictionary *keywords;
-
+    BOOL didInitAlready;
     OCRCategories* occ; //Categories / processed / local lookup table
 }
 //These props get set by analyze for public access...
@@ -110,7 +110,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 -(NSString*) getKeyword : (NSString*)category : (int) index;
 -(int) getKeywordCount : (NSString*)category;
--(void) saveBuiltinKeywordsToParse;
+-(void) saveKeywordsAndTyposToParse;
 
 
 @end

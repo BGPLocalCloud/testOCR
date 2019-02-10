@@ -14,6 +14,7 @@
 //  1/24 added batchCounter, removed batch_key
 //  2/7 add debugMode for logging
 //  2/8 add invoiceNumber to readFromParseAsStrings
+//  2/9 add parentUp flag to avoid delegate callback crashes on dismissed VC
 
 #import "EXPTable.h"
 
@@ -33,6 +34,7 @@
         _sortBy = @"*";
         _selectBy = @"*";
         tableName = @"EXPFullTable";
+        _parentUp = TRUE;
 
         AppDelegate *eappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         debugMode = eappDelegate.debugMode; //2/7 For dwbug logging, check every batch
@@ -174,10 +176,10 @@
 {
     [PFObject saveAllInBackground:_expos block:^(BOOL succeeded, NSError * _Nullable error) {
         if (succeeded) {
-            [self.delegate didSaveEXPOs];
+            if (self->_parentUp) [self.delegate didSaveEXPOs];
         }
         else{
-            [self.delegate errorSavingEXPOs :
+            if (self->_parentUp) [self.delegate errorSavingEXPOs :
              [NSString stringWithFormat:@"saveEXPOs error:%@",error.localizedDescription]];
         }
     }];
@@ -381,7 +383,7 @@
             [self handleCSVAdd : dumptoCSV : [self getCSVFromObject:pfo : FALSE]];
         }
     }
-    [self.delegate didReadEXPTableAsStrings : self->EXPDumpCSVList];
+    if (_parentUp) [self.delegate didReadEXPTableAsStrings : self->EXPDumpCSVList];
 } //end readFromParseByObjIDs
 
 //=============OCR VC=====================================================
@@ -401,7 +403,7 @@
             if (succeeded)
             {
                 if (debugMode) NSLog(@" update qpt OK objID %@",oid);
-                [self.delegate didFixPricesInObjectByID : oid];
+                if (self->_parentUp) [self.delegate didFixPricesInObjectByID : oid];
             }
             else
             {
@@ -444,7 +446,7 @@
                 [self->_expos addObject: e];
                 [e dump];
             }
-            [self.delegate didGetObjectsByIds : d];
+            if (self->_parentUp) [self.delegate didGetObjectsByIds : d];
         }
     }];
 
@@ -460,7 +462,7 @@
     if (pfo != nil)
     {
         EXPObject *e = [self getEXPObjectFromPFObject:pfo];
-        [self.delegate didReadEXPObjectByID:e:pfo];
+        if (self->_parentUp) [self.delegate didReadEXPObjectByID:e:pfo];
     }
 } //end getObjectByID
 
@@ -504,7 +506,7 @@
                 EXPObject *e = [self getEXPObjectFromPFObject:pfo];
                 [self->_expos addObject: e];
             }
-            [self.delegate didReadEXPTableAsStrings : self->EXPDumpCSVList];
+            if (self->_parentUp) [self.delegate didReadEXPTableAsStrings : self->EXPDumpCSVList];
         }
     }];
 } //end readFromParseAsStrings
@@ -542,7 +544,7 @@
             {
                 self->EXPDumpCSVList = [self->csvList componentsJoinedByString:@","];
                 if (debugMode) NSLog(@" got %lu recs ",(unsigned long)self->csvList.count);
-                [self.delegate didReadFullTableToCSV : self->EXPDumpCSVList];
+                if (self->_parentUp) [self.delegate didReadFullTableToCSV : self->EXPDumpCSVList];
             }
         }
     }];
@@ -571,7 +573,7 @@
     if (debugMode) NSLog(@" ET savetoparse page %d last %d etcount %d",page,lastPage,(int)_expos.count);
     if (_expos.count < 1)
     {
-        [self.delegate didSaveEXPTable : nil]; //Trigger next page..
+        if (self->_parentUp) [self.delegate didSaveEXPTable : nil]; //Trigger next page..
         return; //Nothing to write!
     }
     int i=0;
@@ -616,14 +618,14 @@
                 //NSLog(@" for page[%d] totalsent %d totalreturn %d",page,self->totalSentCount,self->totalReturnCount);
                 if (self->totalReturnCount == self->totalSentCount)
                 {
-                    [self.delegate didSaveEXPTable : self->objectIDs];
+                    if (self->_parentUp) [self.delegate didSaveEXPTable : self->objectIDs];
                     if (lastPage)
-                        [self.delegate didFinishAllEXPRecords : self->totalSentCount : self->objectIDs];
+                        if (self->_parentUp) [self.delegate didFinishAllEXPRecords : self->totalSentCount : self->objectIDs];
 
                 }
                 NSString *fieldErr = [exoRecord objectForKey:PInv_ErrStatus_key];
                 if (fieldErr.length > 4) //may be blank or OK
-                    [self.delegate errorInEXPRecord : fieldErr : objID :
+                    if (self->_parentUp) [self.delegate errorInEXPRecord : fieldErr : objID :
                      [exoRecord objectForKey: PInv_ProductName_key]];
             } else {
                 NSLog(@" ERROR: saving EXP: %@",error.localizedDescription);

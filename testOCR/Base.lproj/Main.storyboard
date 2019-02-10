@@ -1284,8 +1284,19 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="dbGrey.png" translatesAutoresizingMaskIntoConstraints="NO" id="KOS-f3-pX9">
+                                <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="QTJ-Gd-y54"/>
+                                    <constraint firstAttribute="width" constant="60" id="p2D-7O-Bu4"/>
+                                </constraints>
+                            </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Lagel" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="teR-u9-XUO">
                                 <rect key="frame" x="15" y="30" width="345" height="26.5"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="26.5" id="9fQ-GP-aer"/>
+                                    <constraint firstAttribute="width" constant="345" id="Cvn-OT-KmO"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -1462,7 +1473,9 @@
                             <constraint firstItem="teR-u9-XUO" firstAttribute="leading" secondItem="gi4-ks-u2q" secondAttribute="leading" constant="15" id="cNQ-FW-hKl"/>
                             <constraint firstItem="gi4-ks-u2q" firstAttribute="bottom" secondItem="Tng-kQ-rws" secondAttribute="bottom" constant="12" id="es3-dj-EU5"/>
                             <constraint firstItem="q3h-7Z-8JW" firstAttribute="leading" secondItem="gi4-ks-u2q" secondAttribute="leading" constant="15" id="fRc-wT-QpY"/>
+                            <constraint firstItem="KOS-f3-pX9" firstAttribute="leading" secondItem="gi4-ks-u2q" secondAttribute="leading" id="faK-uv-xQp"/>
                             <constraint firstItem="gi4-ks-u2q" firstAttribute="trailing" secondItem="H94-VH-XbA" secondAttribute="trailing" constant="16" id="iyF-h8-uCO"/>
+                            <constraint firstItem="gi4-ks-u2q" firstAttribute="top" secondItem="KOS-f3-pX9" secondAttribute="top" constant="20" id="jfD-dl-uB0"/>
                             <constraint firstItem="J6o-1f-TY2" firstAttribute="top" secondItem="gi4-ks-u2q" secondAttribute="top" constant="40" id="qyX-8e-Wcv"/>
                             <constraint firstItem="gi4-ks-u2q" firstAttribute="bottom" secondItem="q3h-7Z-8JW" secondAttribute="bottom" constant="12" id="qzC-qI-RqS"/>
                             <constraint firstItem="gi4-ks-u2q" firstAttribute="bottom" secondItem="ZRn-7R-lBc" secondAttribute="bottom" constant="7" id="ulg-te-6Ju"/>
@@ -2138,6 +2151,13 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="dbGrey.png" translatesAutoresizingMaskIntoConstraints="NO" id="XUc-un-NAw">
+                                <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="Uye-ge-cPg"/>
+                                    <constraint firstAttribute="width" constant="60" id="jV2-Jo-75K"/>
+                                </constraints>
+                            </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Invoice Table" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="l1k-NF-v3l">
                                 <rect key="frame" x="15" y="27" width="345" height="27"/>
                                 <constraints>
@@ -2215,6 +2235,8 @@
                         <constraints>
                             <constraint firstItem="6fh-Q4-9PD" firstAttribute="centerX" secondItem="8Y6-1E-4Ef" secondAttribute="centerX" id="9Gw-uj-yTM"/>
                             <constraint firstItem="8Y6-1E-4Ef" firstAttribute="bottom" secondItem="vmE-5r-xdF" secondAttribute="bottom" constant="20" id="Aq7-n9-zdm"/>
+                            <constraint firstItem="8Y6-1E-4Ef" firstAttribute="top" secondItem="XUc-un-NAw" secondAttribute="top" constant="20" id="H3W-3y-bXR"/>
+                            <constraint firstItem="XUc-un-NAw" firstAttribute="leading" secondItem="8Y6-1E-4Ef" secondAttribute="leading" id="J6s-Rh-X7v"/>
                             <constraint firstItem="l1k-NF-v3l" firstAttribute="top" secondItem="8Y6-1E-4Ef" secondAttribute="top" constant="7" id="Yl0-is-wss"/>
                             <constraint firstItem="6fh-Q4-9PD" firstAttribute="width" secondItem="bS6-7w-LvK" secondAttribute="width" id="Yxb-r1-roS"/>
                             <constraint firstItem="6fh-Q4-9PD" firstAttribute="top" secondItem="8Y6-1E-4Ef" secondAttribute="top" constant="40" id="dVL-Nn-Mn5"/>
@@ -2242,6 +2264,7 @@
         <image name="arrRight.png" width="128" height="128"/>
         <image name="arrUp.png" width="128" height="128"/>
         <image name="binonion.png" width="516" height="291"/>
+        <image name="dbGrey.png" width="264" height="264"/>
         <image name="dollarIcon.png" width="128" height="128"/>
         <image name="emptyDoc.png" width="626" height="626"/>
         <image name="factoryIcon.png" width="128" height="128"/>

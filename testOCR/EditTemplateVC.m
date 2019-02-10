@@ -142,6 +142,7 @@
 -(void) dismiss
 {
     //[_sfx makeTicSoundWithPitch : 8 : 52];
+    it.parentUp = FALSE; // 2/9 Tell invoiceTable we are outta here
     [self dismissViewControllerAnimated : YES completion:nil];
     
 }

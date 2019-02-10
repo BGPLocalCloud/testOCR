@@ -12,6 +12,7 @@
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 //  2/6 add segue to PDFVC
+//  2/9 add parentUp to invoiceTable
 
 #import "InvoiceViewController.h"
 
@@ -101,8 +102,8 @@
 -(void) dismiss
 {
     //[_sfx makeTicSoundWithPitch : 8 : 52];
+    it.parentUp = FALSE; // 2/9 Tell invoiceTable we are outta here
     [self dismissViewControllerAnimated : YES completion:nil];
-    
 }
 
 //=============Invoice VC=====================================================

@@ -17,6 +17,8 @@
 //  1/9 Make sure batch gets created AFTER parse DB is up!
 //  1/14 Add invoiceVC hookup, bold menu titles too!
 //  2/5  Add vendors, make sure loaded b4 batch segue
+//  2/8  Changed batchListChoiceMenu
+//  2/9  Merged PDF / OCR cache clears
 #import "MainVC.h"
 
 @interface MainVC ()
@@ -180,13 +182,9 @@
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self performSegueWithIdentifier:@"comparisonSegue" sender:@"mainVC"];
                                                           }]];
-    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Clear OCR Cache",nil)
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Clear Local Caches",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self clearCacheMenu];
-                                                          }]];
-    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Clear PDF Cache",nil)
-                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              [self clearPDFCacheMenu];
                                                           }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Clear Activities",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -309,11 +307,11 @@
 
 
 //=============OCR MainVC=====================================================
-// Yes/No for cache clear...
+// Yes/No for ALL cache clear...
 -(void) clearCacheMenu
 {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:
-                                NSLocalizedString(@"Clear OCR Cache? (Cannot be undone!)",nil)
+                                NSLocalizedString(@"Clear Local Caches?\n(Cannot be undone!)",nil)
                                                                    message:nil
                                                             preferredStyle:UIAlertControllerStyleAlert];
     
@@ -321,6 +319,7 @@
     UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"YES",nil)
                                                         style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                             [self->oc clearHardCore];
+                                                            [self->pc clearHardCore];
                                                         }];
     UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"NO",nil)
                                                        style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -333,33 +332,13 @@
 } //end clearCacheMenu
 
 
-//=============OCR MainVC=====================================================
-// Yes/No for cache clear...
--(void) clearPDFCacheMenu
-{
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:
-                                NSLocalizedString(@"Clear PDF Cache? (Cannot be undone!)",nil)
-                                                                   message:nil
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"YES",nil)
-                                                        style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                            [self->pc clearHardCore];
-                                                        }];
-    UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"NO",nil)
-                                                       style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                       }];
-    //DHS 3/13: Add owner's ability to delete puzzle
-    [alert addAction:yesAction];
-    [alert addAction:noAction];
-    [self presentViewController:alert animated:YES completion:nil];
-} //end menu
 
 //=============OCR MainVC=====================================================
 // Yes/No for activity table clear...
 -(void) clearActivityMenu
 {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:
-                                NSLocalizedString(@"Clear Activities? (Cannot be undone!)",nil)
+                                NSLocalizedString(@"Clear Activities?\n(Cannot be undone!)",nil)
                                                                    message:nil
                                                             preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"YES",nil)
@@ -374,7 +353,7 @@
     [alert addAction:yesAction];
     [alert addAction:noAction];
     [self presentViewController:alert animated:YES completion:nil];
-} //end menu
+} //end clearActivityMenu
 
 
 
@@ -450,10 +429,9 @@
     else if([[segue identifier] isEqualToString:@"invoiceSegue"])
     {
         InvoiceViewController *vc = (InvoiceViewController*)[segue destinationViewController];
-        
-//        vc.vendor    = selVendor;
-        vc.vendor    = @"*";  //DHS 2/8 is this right? what verndor are we lookin at anyway? batch could be anyone?
-        vc.batchID = @"*"; //Look at all batches for this vendor
+        vc.vendor        = @"*"; //2/9 Default to all vendors, batches and invoices
+        vc.batchID       = @"*";
+        vc.invoiceNumber = @"*";
         if (sdata != nil) // Called from batch popup -> invoices? get batch#
         {
             //Get batch ID for invoice lookup...
@@ -462,13 +440,11 @@
             {
                 if (sdItems.count == 1) //EXP/Invoice item selected
                 {
-                    vc.batchID = @"*";
                     vc.invoiceNumber = sdItems[0];
                 }
                 else //Batch item selected
                 {
                     vc.batchID = sdItems[0];
-                    vc.invoiceNumber = @"*";
                 }
             } //end sdITems...
         } //end sdata...
@@ -733,8 +709,14 @@ int currentYear = 2019;
 //=============OCR MainVC=====================================================
 -(void) testit
 {
-    [self performSegueWithIdentifier:@"errorSegue" sender:@"mainVC"];
-    return;
+    
+//    smartProducts *smartp = [[smartProducts alloc] init];
+//    [smartp saveKeywordsAndTyposToParse];
+//    return;
+
+    
+//    [self performSegueWithIdentifier:@"errorSegue" sender:@"mainVC"];
+//    return;
     //et = [[EXPTable alloc] init];
     //[et readFullTableToCSV:0];
     
@@ -742,9 +724,6 @@ int currentYear = 2019;
 //    [gp deleteAllByTableAndKey:@"activity" :@"*" :@"*"];
 //    NSLog(@" deletit?");
    // smartProducts *smartp = [[smartProducts alloc] init];
-   // [smartp saveBuiltinKeywordsToParse]; //ONLY CALL THIS ONCE!
-   // NSLog(@" smart testit");
-    return;
     
 //    AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 //    DropboxTools *dbt = [[DropboxTools alloc] init];
@@ -752,46 +731,14 @@ int currentYear = 2019;
 
     return;
     
-    NSDictionary *d    = [self readTxtToJSON:@"hfmpages"];
-    OCRDocument *od = [[OCRDocument alloc] init];
-    
-    NSString *p = @"I. 64";
-    [od cleanupPrice:p];
-     
-    [od setupDocumentAndParseJDON : @"hfmpages" :d :FALSE];
-    return;
-
-   // NSDictionary *d    = [self readTxtToJSON:@"beef"];  //hfmpages"];
-    NSArray *pr   = [d valueForKey:@"ParsedResults"];
-    for (NSDictionary *dd in pr)
-    {
-        //NSString *parsedText = [dd valueForKey:@"ParsedText"]; //Everything lumped together...
-        NSDictionary *to     = [dd valueForKey:@"TextOverlay"];
-        NSArray *lines       = [to valueForKey:@"Lines"]; //array of "Words"
-        NSLog(@" duh");
-        for (NSDictionary *ddd in lines)
-        {
-            //NSLog(@"duhh: %@",ddd);
-            NSArray *words = [ddd valueForKey:@"Words"];
-            for (NSDictionary *w in words) //loop over each word
-            {
-                OCRWord *ow = [[OCRWord alloc] init];
-                [ow packFromDictionary:w];
-                //NSLog(@" w %@",ow.wordtext);
-                [ow dump];
-               // [allWords addObject:ow];
-            }
-        }
-
-    }
-
-    
-  //  NSString *gd = @"https://drive.google.com/open?id=1UF9Yh7kRNX8EuSzrLSSdCN00QO9TzVb4";
-//    [self downloadPDF:gd];
-    // Get the PDF Data from the url in a NSData Object
-//    NSData *pdfData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:gd]];
-//    NSLog(@" data is %@",pdfData);
-   // UIImage *img = [ UIImage imageWithPDFURL:url atSize:CGSizeMake( 60, 60 ) atPage:1 ];
+//    NSDictionary *d    = [self readTxtToJSON:@"hfmpages"];
+//    OCRDocument *od = [[OCRDocument alloc] init];
+//
+//    NSString *p = @"I. 64";
+//    [od cleanupPrice:p];
+//
+//    [od setupDocumentAndParseJDON : @"hfmpages" :d :FALSE];
+//    return;
 
 }
 

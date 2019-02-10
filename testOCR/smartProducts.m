@@ -35,10 +35,13 @@
         notwilds =  [[NSMutableArray alloc] init];
         keywords =  [[NSMutableDictionary alloc] init];
         
+        
+        didInitAlready = FALSE;
         [self loadRulesTextFile : @"splits" : FALSE : splits : joined];
         [self loadRulesTextFile : @"typos"  : TRUE :  typos  : fixed];
         [self loadRulesTextFile : @"wild"   : TRUE :  wilds  : notwilds];
-        [self loadKeywordsFromParse];
+
+        [self loadKeywordsAndTyposFromParse];
     }
     return self;
 }
@@ -399,11 +402,25 @@
 }
 
 
-//=============(OCRTemplate)=====================================================
-// Only run once, to set up external keywords table on DB
+//=============(smartProducts)=====================================================
+// Writes out new keyword, typos, and splits tables to Parse for invoice
+//  product analysis.  Assumes these tables are EMPTY. Does not delete anything.
+-(void) saveKeywordsAndTyposToParse
+{
+    if (didInitAlready) return;
+    NSLog(@" save Keywords and Typos to Parse");
+    [self saveBuiltinKeywordsToParse];
+    [self saveTyposAndSplitsToParse];
+    didInitAlready = TRUE;
+
+}
+
+//=============(smartProducts)=====================================================
+// NOTE: will add multiple copies if used multiple times!
 -(void) saveBuiltinKeywordsToParse
 {
     //Loop over all types, then over all kw's...
+    int recCount = 0;
     for (NSString *cat in categories)
     {
         for (int i=0;i<[self getKeywordCount:cat];i++) //Get each kw in category
@@ -414,13 +431,38 @@
             kwRecord[PInv_Name_key] = keyword;
             //NSLog(@" ...write [%@]%@",cat,keyword);
             [kwRecord saveEventually]; //Just save right off, don't care about return
+            recCount++;
         }
     }
+    NSLog(@" ...saved %d records",recCount);
 } //end saveBuiltinKeywordsToParse
 
 //=============(smartProducts)=====================================================
--(void) loadKeywordsFromParse
+// NOTE: will add multiple copies if used multiple times! 
+-(void) saveTyposAndSplitsToParse
 {
+    NSLog(@" save %d typos...",(int)typos.count);
+    for (int i=0;i<(int)typos.count;i++) //Get each kw in category
+    {
+        PFObject *typoRecord = [PFObject objectWithClassName:@"Typos"];
+        typoRecord[PInv_Typo_key]  = typos[i];
+        typoRecord[PInv_Fixed_key] = fixed[i];
+        [typoRecord saveEventually];
+    }
+    NSLog(@" save %d splits...",(int)splits.count);
+    for (int i=0;i<(int)splits.count;i++) //Get each kw in category
+    {
+        PFObject *splitRecord = [PFObject objectWithClassName:@"Splits"];
+        splitRecord[PInv_Split_key]  = splits[i];
+        splitRecord[PInv_Joined_key] = joined[i];
+        [splitRecord saveEventually];
+    }
+} //end saveTyposToParse
+
+//=============(smartProducts)=====================================================
+-(void) loadKeywordsAndTyposFromParse
+{
+    NSLog(@"loadKeywordsAndTyposFromParse...");
     PFQuery *query = [PFQuery queryWithClassName:@"Keywords"];
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
@@ -431,10 +473,37 @@
                 NSString *cat     = pfo[PInv_Category_key];
                 [self->keywords setObject:cat forKey:keyword];
             }
-            //NSLog(@" ...loaded keywords");
         }
     }];
-     
+    //Go get typos...
+    PFQuery *query2 = [PFQuery queryWithClassName:@"Typos"];
+    [query2 findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            [self->typos removeAllObjects];
+            [self->fixed removeAllObjects];
+            for (PFObject *pfo in objects)
+            {
+                [self->typos addObject:pfo[PInv_Typo_key]];
+                [self->fixed addObject:pfo[PInv_Fixed_key]];
+            }
+            NSLog(@" ...typos OK: %d objects",(int)self->typos.count);
+        }
+    }];
+    //Go get splits...
+    PFQuery *query3 = [PFQuery queryWithClassName:@"Splits"];
+    [query3 findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            [self->splits removeAllObjects];
+            [self->joined removeAllObjects];
+            for (PFObject *pfo in objects)
+            {
+                [self->splits addObject:pfo[PInv_Split_key]];
+                [self->joined addObject:pfo[PInv_Joined_key]];
+            }
+            NSLog(@" ...splits OK: %d objects",(int)self->splits.count);
+        }
+    }];
+
 }
 
 

@@ -79,6 +79,7 @@
 //=============Comparison VC=====================================================
 -(void) dismiss
 {
+    et.parentUp = FALSE; //2/9 Tell expTable we are outta here
     [self dismissViewControllerAnimated : YES completion:nil];
 }
 

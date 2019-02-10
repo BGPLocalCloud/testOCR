@@ -37,6 +37,7 @@
 
 @property (nonatomic , strong) invoiceObject* iobj;
 @property (nonatomic , strong) NSString* versionNumber;
+@property (nonatomic , assign) BOOL      parentUp;
 
 @property (nonatomic, unsafe_unretained) id <invoiceTableDelegate> delegate; // receiver of completion messages
 

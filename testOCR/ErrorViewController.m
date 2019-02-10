@@ -255,6 +255,7 @@
 -(void) dismiss
 {
     //[_sfx makeTicSoundWithPitch : 8 : 52];
+    et.parentUp = FALSE; // 2/9 Tell expTable we are outta here
     [self dismissViewControllerAnimated : YES completion:nil];
     
 }

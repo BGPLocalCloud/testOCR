@@ -50,6 +50,7 @@
 @property (nonatomic , strong) NSString* selectBy;
 @property (nonatomic , strong) NSString* versionNumber;
 @property (nonatomic , strong) NSMutableArray* expos;
+@property (nonatomic , assign) BOOL      parentUp;
 
 -(void) clear;
 
