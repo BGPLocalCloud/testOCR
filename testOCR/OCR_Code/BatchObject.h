@@ -84,8 +84,8 @@
     OCRCache *oc;
     PDFCache *pc;
     NSString *batchReportString;
-
     BOOL debugMode;   //2/7 For verbose logging...
+    BOOL majorFileError;
 
 }
 @property (nonatomic , strong) NSString* batchID;

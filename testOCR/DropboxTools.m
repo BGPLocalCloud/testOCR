@@ -400,8 +400,14 @@
 {
     
     DBUserClient *client = [DBClientsManager authorizedClient];
-    [[client filesRoutes] moveV2:fromPath toPath:toPath];
-}
+    [[[client filesRoutes] moveV2:fromPath toPath:toPath] //2/10 add error handler
+     setResponseBlock:^(DBFILESFileMetadata *result, DBFILESUploadError *routeError, DBRequestError *error) {
+         if (error != nil)
+         {
+             [self->_delegate errorRenamingFile:[self getErrorMessage:error]];
+         }
+     }];
+} //end renameFile
 
 
 //=============(DropboxTools)=====================================================
@@ -429,7 +435,7 @@
          if (error != nil)
          {
              NSString *message = [self getErrorMessage:error];
-             NSLog(@" dropbox upload error : %@",error);
+             NSLog(@" dropbox upload error : %@",message);
              [self->_delegate errorUploadingImage:message];
          }
          else

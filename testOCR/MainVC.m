@@ -343,8 +343,8 @@
                                                             preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"YES",nil)
                                                         style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                            [spv start:@"Clear Activities..."];
-                                                            [gp deleteAllByTableAndKey:@"activity" :@"*" :@"*"];
+                                                            [self->spv start:@"Clear Activities..."];
+                                                            [self->gp deleteAllByTableAndKey:@"activity" :@"*" :@"*"];
                                                         }];
     UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"NO",nil)
                                                        style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {

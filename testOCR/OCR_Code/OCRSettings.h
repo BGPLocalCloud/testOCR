@@ -27,6 +27,7 @@
     NSString *outputFolderDefault;
     NSString *templateFolderDefault;
     NSString *comparisonFolderDefault;
+    NSString *moveProcessedFilesDefault;
     double PhotoJPEGQualityDefault;
     BOOL loaded;
     
@@ -39,12 +40,14 @@
 @property (nonatomic , strong) NSString *outputFolder;
 @property (nonatomic , strong) NSString *templateFolder;
 @property (nonatomic , strong) NSString *comparisonFolder;
+@property (nonatomic , strong) NSString *moveProcessedFiles;
 @property (nonatomic , assign) double   PhotoJPEGQuality;
 
 @property (nonatomic, unsafe_unretained) id <OCRSettingsDelegate> delegate;
 
 + (id)sharedInstance;
-// ?? -(void) loadFromParse;
+
+-(BOOL) moveFiles;
 -(void) dump;
 
 

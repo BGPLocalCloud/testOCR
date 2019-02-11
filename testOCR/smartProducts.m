@@ -781,8 +781,6 @@
         //NSLog(@" ERROR: price over $1000!!");
         pfloat = pfloat / 100.0;
     }
-    float testAmount = (float)qint * pfloat;
-    
     //NSLog(@" above [%@] priceFix q p a %d %f %f",fullProductName,qint,pfloat,afloat);
     //2/5 Missing 2 / 3 values is a failure...
     if ((pfloat == 0.0 && afloat == 0.0) ||
@@ -814,7 +812,7 @@
         else if (qint == 0)
         {
             //NSLog(@" ...ZERO QUANTITY: FIX");
-            qint = (int)(afloat / pfloat);
+            qint = (int)floor((afloat / pfloat) + 0.5); //DHS 2/10 account for roundup/down
             if (qint == 0) qint = 1; //Handle roundoff errors...
             aerror = ANALYZER_ZERO_QUANTITY;
         }

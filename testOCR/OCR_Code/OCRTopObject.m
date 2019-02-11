@@ -423,7 +423,7 @@ static OCRTopObject *sharedInstance = nil;
         _totalLines += smartCount;
     }
     return;
-} //end loadCSVFileFromDocParser
+} //end loadCSVValuesFromString
 
 
 
@@ -554,7 +554,7 @@ static OCRTopObject *sharedInstance = nil;
             {
                 //1/19 don't save to cache unless there are NO ERRORS
                 [self->oc addOCRTxtWithRect:fname :r:self->rawOCRResult];
-                if (debugMode) NSLog(@"  ...OCR result is %@",self->OCRJSONResult);
+                if (self->debugMode) NSLog(@"  ...OCR result is %@",self->OCRJSONResult);
                 [self performFinalOCROnDocument : r ]; //This calls delegate when done
             }
         }
@@ -751,7 +751,7 @@ static OCRTopObject *sharedInstance = nil;
                 {
                     NSLog(@" ---->ERROR: bad product name %@",productName);
                     NSString *s = [NSString stringWithFormat:@"E:Bad Product Name (%@)",productName];
-                    [self->_delegate errorSavingEXP:s:@"n/a":productName];
+                    [self->_delegate errorInEXPRecord:s:@"n/a":productName];
                 }
             }
         }
@@ -786,7 +786,7 @@ static OCRTopObject *sharedInstance = nil;
 }
 
 #pragma mark - EXPTableDelegate
-//=============(OCRTopObject)=====================================================
+//=============<EXPTableDelegate>=====================================================
 // An EXP table set gets saved EACH PAGE. When we have done all the pages,
 //  then the invoice gets saved!
 - (void)didSaveEXPTable  : (NSArray *)a
@@ -819,7 +819,7 @@ static OCRTopObject *sharedInstance = nil;
 } //end didSaveEXPTable
 
 
-//=============(OCRTopObject)=====================================================
+//=============<EXPTableDelegate>=====================================================
 // called when Allll exps are saved in one invoice from all the pages
 - (void)didFinishAllEXPRecords : (int)count : (NSArray *)a;
 {
@@ -830,7 +830,7 @@ static OCRTopObject *sharedInstance = nil;
     NSLog(@" OK YUP didFinishAllEXPRecords is actually being called!");
 }
 
-//=============(OCRTopObject)=====================================================
+//=============<EXPTableDelegate>=====================================================
 - (void)didReadEXPTableAsStrings : (NSString *)s
 {
     //spinner.hidden = TRUE;
@@ -840,11 +840,17 @@ static OCRTopObject *sharedInstance = nil;
 }
 
 
-//=============OCR VC=====================================================
+//=============<EXPTableDelegate>=====================================================
 // Error in an EXP record; pass on to batch for storage
 - (void)errorInEXPRecord : (NSString *)err : (NSString *)oid : (NSString *)productName
 {
-    [self->_delegate errorSavingEXP : err : oid : productName];  // -> BatchObject (bbb)
+    [self->_delegate errorInEXPRecord : err : oid : productName];  // -> BatchObject (bbb)
+}
+
+//=============<EXPTableDelegate>=====================================================
+- (void)errorSavingEXPToParse : (NSString *)err
+{
+    [self->_delegate errorSavingEXPToParse : err ];  // -> BatchObject (bbb) 2/10
 }
 
 
@@ -857,9 +863,10 @@ static OCRTopObject *sharedInstance = nil;
 
 //=============(invoiceTableDelegate)=====================================================
 // 2/5 added lastPage indicator so delegate knows when to do next document
-- (void)errorSavingInvoiceTable:(NSString *) s  : (BOOL)lastPage
+- (void)errorSavingInvoiceToParse:(NSString *) err  : (BOOL)lastPage
 {
     [self handleNextPage : TRUE];
+    [self->_delegate errorSavingInvoiceToParse : err ];  // -> BatchObject (bbb) 2/10
 }
 
 //=============(invoiceTableDelegate)=====================================================

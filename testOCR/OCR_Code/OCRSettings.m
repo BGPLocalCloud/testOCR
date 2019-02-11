@@ -15,6 +15,7 @@
 //  1/9  Add outputFolder
 //  1/14 Add templateFolder
 //  2/1  Add comparisonFolder
+//  2/10 Add moveProcessedFiles
 
 #import "OCRSettings.h"
 
@@ -30,6 +31,7 @@ NSString *const PS_ErrorFolderKey           = @"ErrorFolder";
 NSString *const PS_RejectFolderKey          = @"RejectFolder";
 NSString *const PS_TemplateFolderKey        = @"TemplateFolder";
 NSString *const PS_ComparisonFolderKey      = @"ComparisonFolder";
+NSString *const PS_MoveProcessedFilesKey    = @"MoveProcessedFiles";
 
 
 //=====<OCRSettings>======================================================================
@@ -61,6 +63,7 @@ NSString *const PS_ComparisonFolderKey      = @"ComparisonFolder";
         _outputFolder          = outputFolderDefault           = @"processedBatch";
         _templateFolder        = templateFolderDefault         = @"templates";
         _comparisonFolder      = comparisonFolderDefault       = @"comparison";
+        _moveProcessedFiles    = moveProcessedFilesDefault     = @"FALSE";
         [self readLocalSettings]; //Read local copy first before going to parse..
         [self loadFromParse];
     }
@@ -95,18 +98,18 @@ NSString *const PS_ComparisonFolderKey      = @"ComparisonFolder";
                 self->_outputFolder            = [objectx objectForKey:PS_OutputFolderKey];
                 self->_templateFolder          = [objectx objectForKey:PS_TemplateFolderKey];
                 self->_comparisonFolder        = [objectx objectForKey:PS_ComparisonFolderKey];
+                self->_moveProcessedFiles      = [objectx objectForKey:PS_MoveProcessedFilesKey];
 
                 [self keepFieldsLegal];
                 [self saveLocalSettings]; //Save a copy locally...
                 self->loaded = TRUE;
                 //NSLog(@"...settings loaded");
                 break; //We only go thru once!
-                
             }
             if (self->loaded)
             {
                 [self.delegate didLoadOCRSettings];
-                //[self dump];
+                [self dump];
             }
             else //Failed to load? Probably called from feedVC before parse came up!
             {
@@ -122,6 +125,14 @@ NSString *const PS_ComparisonFolderKey      = @"ComparisonFolder";
     
 } //end loadFromParse
 
+//=====<OCRSettings>======================================================================
+-(BOOL) moveFiles
+{
+    BOOL moveit = FALSE;
+    if ([_moveProcessedFiles.lowercaseString isEqualToString:@"true"]) moveit = TRUE;
+    if ([_moveProcessedFiles.lowercaseString isEqualToString:@"yes"])  moveit = TRUE;
+    return moveit;
+}
 
 
 //=====<OCRSettings>======================================================================
@@ -221,6 +232,8 @@ NSString *const PS_ComparisonFolderKey      = @"ComparisonFolder";
                                               _templateFolder]];
     dumpit = [dumpit stringByAppendingString:[NSString stringWithFormat:@"   ComparisonFolder  : %@\n" ,
                                               _comparisonFolder]];
+    dumpit = [dumpit stringByAppendingString:[NSString stringWithFormat:@"   MoveProcessedFiles: %@\n" ,
+                                              _moveProcessedFiles]];
 
     return dumpit;
 }

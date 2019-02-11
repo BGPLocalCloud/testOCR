@@ -137,7 +137,6 @@
 -(NSString *) stripCommasFromQuotedStrings : (NSString*) s
 {
     NSString *result = @"";
-    NSMutableArray * array = [NSMutableArray array];
     NSRange theRange;
     BOOL inQuotes = FALSE;
     for ( NSInteger i = 0; i < [s length]; i++) {

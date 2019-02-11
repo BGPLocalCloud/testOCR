@@ -182,7 +182,7 @@
             if (self->_parentUp) [self.delegate didSaveInvoiceTable:self->_iobj.invoiceNumber : lastPage];
         } else {
             NSLog(@" ERROR: saving invoice: %@",error.localizedDescription);
-            if (self->_parentUp) [self.delegate errorSavingInvoiceTable:error.localizedDescription : lastPage];
+            if (self->_parentUp) [self.delegate errorSavingInvoiceToParse:error.localizedDescription : lastPage];
         }
     }];
 } //end saveToParse
@@ -218,7 +218,7 @@
                         if (self->_parentUp) [self.delegate didUpdateInvoiceTable:invoiceNumberstring : lastPage];
                     } else {
                         NSLog(@" ERROR: updating invoice: %@",error.localizedDescription);
-                        if (self->_parentUp) [self.delegate errorSavingInvoiceTable:error.localizedDescription : lastPage];
+                        if (self->_parentUp) [self.delegate errorSavingInvoiceToParse:error.localizedDescription : lastPage];
                     }
                 }];
                 break; //Done after one

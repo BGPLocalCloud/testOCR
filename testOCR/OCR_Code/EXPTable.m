@@ -75,7 +75,7 @@
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
             [PFObject deleteAllInBackground:objects];
-            if (debugMode) NSLog(@" deleted all EXP for %@",vendor);
+            if (self->debugMode) NSLog(@" deleted all EXP for %@",vendor);
         }
         else {
             NSLog(@"Error: %@ %@", error, [error userInfo]);
@@ -402,7 +402,7 @@
         [pfo saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
             if (succeeded)
             {
-                if (debugMode) NSLog(@" update qpt OK objID %@",oid);
+                if (self->debugMode) NSLog(@" update qpt OK objID %@",oid);
                 if (self->_parentUp) [self.delegate didFixPricesInObjectByID : oid];
             }
             else
@@ -543,7 +543,7 @@
             else
             {
                 self->EXPDumpCSVList = [self->csvList componentsJoinedByString:@","];
-                if (debugMode) NSLog(@" got %lu recs ",(unsigned long)self->csvList.count);
+                if (self->debugMode) NSLog(@" got %lu recs ",(unsigned long)self->csvList.count);
                 if (self->_parentUp) [self.delegate didReadFullTableToCSV : self->EXPDumpCSVList];
             }
         }
@@ -612,7 +612,7 @@
                 [self->objectIDs addObject:objID];
                 //self->returnCounts[page]++;
                 self->totalReturnCount++;
-                if (debugMode) NSLog(@" ...EXP[%d/%d] [%@/%@]->parse",self->totalReturnCount,self->totalSentCount,exo.vendor,exo.productName);
+                if (self->debugMode) NSLog(@" ...EXP[%d/%d] [%@/%@]->parse",self->totalReturnCount,self->totalSentCount,exo.vendor,exo.productName);
                 //NSLog(@" ...  EXP: ids %@",self->objectIDs);
                 //NSLog(@" for page[%d] sent %d return %d",page,self->sentCounts[page],self->returnCounts[page]);
                 //NSLog(@" for page[%d] totalsent %d totalreturn %d",page,self->totalSentCount,self->totalReturnCount);
@@ -628,7 +628,7 @@
                     if (self->_parentUp) [self.delegate errorInEXPRecord : fieldErr : objID :
                      [exoRecord objectForKey: PInv_ProductName_key]];
             } else {
-                NSLog(@" ERROR: saving EXP: %@",error.localizedDescription);
+                if (self->_parentUp) [self.delegate errorSavingEXPToParse : error.localizedDescription]; //2/10
             }
         }];
         i++;

@@ -187,7 +187,7 @@
                                                             preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"YES",nil)
                                                         style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                            haltingBatchToExitVC = TRUE;
+                                                            self->haltingBatchToExitVC = TRUE;
                                                             [self->bbb haltBatch];
                                                         }];
     UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"NO",nil)

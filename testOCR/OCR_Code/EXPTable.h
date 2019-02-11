@@ -69,7 +69,6 @@
 -(void) readFromParseAsStrings : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)batch : invoiceNumberstring;
 -(void) readFullTableToCSV : (int) skip : (BOOL) addErrStatus;
 -(void) setTableName : (NSString *)newName;
--(void) writeRecordFromArrays : (NSDate*) fdate : (NSMutableArray *) fields : (NSMutableArray*) values;
 -(NSString *) dumpToCSV;
 
 //Gettors .... assume expos table allll loaded
@@ -98,5 +97,6 @@
 - (void)errorInEXPRecord : (NSString *)err : (NSString *)oid : (NSString *)productName;
 - (void)didSaveEXPOs ;
 - (void)errorSavingEXPOs : (NSString *)err;
+- (void)errorSavingEXPToParse : (NSString *)err;
 @end
 

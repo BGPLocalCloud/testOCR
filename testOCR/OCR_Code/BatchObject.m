@@ -19,7 +19,8 @@
 //  1/25 add reports folder for batch reports on dropbox
 //  1/29 add table deletes for batch run
 //  2/4  add batch month
-//  2/7 add debugMode for logging
+//  2/7  add debugMode for logging
+//  2/10 enabled file rename, add majorFileError check
 
 #import "BatchObject.h"
 
@@ -373,20 +374,33 @@ static BatchObject *sharedInstance = nil;
 // Major step in batch process, gets repeatedly called for each OCR job
 -(void) processNextFile : (int) whereFrom
 {
-    // Rename last processed file...
-#ifdef RENAME_FILES_AFTER_PROCESSING
-    if (batchCount > 0)
+    if (batchCount > 0) //Have we run thru a file yet? 2/10
     {
-        NSMutableArray *chunks = (NSMutableArray*)[lastFileProcessed componentsSeparatedByString:@"/"];
-        if (chunks.count > 2)
+        // Rename last processed file...
+        AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        if ([bappDelegate.settings moveFiles]) //Rename files to output area after processing?
         {
-            AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-            chunks[1] = bappDelegate.settings.outputFolder;
-            NSString *outputPath = [chunks componentsJoinedByString:@"/"];
-            [dbt renameFile:lastFileProcessed : outputPath];
-        }
-    }
-#endif
+            if (!majorFileError) //2/10 OK?
+            {
+                NSMutableArray *chunks = (NSMutableArray*)[lastFileProcessed componentsSeparatedByString:@"/"];
+                int ccount = (int)chunks.count;
+                if (ccount > 3)
+                {
+                    chunks[ccount-3] = bappDelegate.settings.outputFolder;
+                    //2/10 outputfolder + supplier name + filename
+                    NSString *outputPath = [NSString stringWithFormat:@"/%@/%@/%@",
+                                            bappDelegate.settings.outputFolder,chunks[ccount-2],chunks[ccount-1]];
+                    NSLog(@" rename %@ -> %@",lastFileProcessed , outputPath);
+                    [dbt renameFile:lastFileProcessed : outputPath];
+                    [self updateBatchProgress : [NSString stringWithFormat:@"...processed OK, move to output"] : FALSE];
+                }
+            }
+            else{ //2/10 one of: Bad EXP/Invoice write, OCR failure, CSV/PDF download failure...
+                [self updateBatchProgress : [NSString stringWithFormat:@"...major Error! File Not Moved"] : FALSE];
+            }
+        }    //end bappDelegate...
+    } //end batchCount
+    majorFileError = FALSE; //Clear major file error flag 2/10
     batchCount++;
     //Last file? Time for next vendor!
     if (batchCount > batchTotal) //1/28 bail when done, don't go below here
@@ -695,7 +709,7 @@ static BatchObject *sharedInstance = nil;
             [pfo saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
                 if (succeeded)
                 {
-                    if (debugMode) NSLog(@" ...batch updated[%@]->parse",self->_batchID);
+                    if (self->debugMode) NSLog(@" ...batch updated[%@]->parse",self->_batchID);
                     [self.delegate didUpdateBatchToParse];
                 }
                 else
@@ -808,7 +822,7 @@ static BatchObject *sharedInstance = nil;
 - (void)errorDownloadingCSV : (NSString *)s
 {
     NSLog(@" Error Downloading CSV %@",s);
-    NSLog(@" what next????");
+    majorFileError = TRUE; //2/10
 }
 
 //===========<DropboxToolDelegate>================================================
@@ -823,20 +837,29 @@ static BatchObject *sharedInstance = nil;
 - (void)errorDownloadingImages : (NSString *)s
 {
     [self addError : s : @"n/a": @"n/a"];
+    majorFileError = TRUE; //2/10
 }
 
 
-//===========<OCRTemplateDelegate>================================================
+//===========<DropboxToolDelegate>================================================
 - (void)didCreateFolder : (NSString *)folderPath
 {
     [self finishSavingReportToDropbox : folderPath];
 }
 
-//===========<OCRTemplateDelegate>================================================
+//===========<DropboxToolDelegate>================================================
 - (void)errorCreatingFolder : (NSString *)folderPath
 {
     [self finishSavingReportToDropbox : folderPath];
 }
+
+//===========<DropboxToolDelegate>================================================
+// 2/10 files renamed after successful OCR... error handler
+- (void)errorRenamingFile : (NSString *)s
+{
+    [self updateBatchProgress : [NSString stringWithFormat:@"Error Renaming PDF File:%@",s] : FALSE];
+}
+
 
 #pragma mark - GenParseDelegate
 
@@ -912,6 +935,7 @@ static BatchObject *sharedInstance = nil;
 - (void)fatalErrorPerformingOCR : (NSString *) errMsg
 {
     [self addError : errMsg : @"n/a": @"n/a"];
+    majorFileError = TRUE; //2/10
     dispatch_async(dispatch_get_main_queue(), ^{
         [self updateBatchProgress : [NSString stringWithFormat:@"Fatal OCR Error:%@",errMsg] : TRUE];
         [self processNextFile : 2];
@@ -941,7 +965,7 @@ static BatchObject *sharedInstance = nil;
 
 //===========<OCRTopObjectDelegate>================================================
 // Called w/ bad product ID, or from errorInEXPRecord in EXP write
-- (void)errorSavingEXP  : (NSString *) errMsg : (NSString*) objectID : (NSString*) productName
+- (void)errorInEXPRecord  : (NSString *) errMsg : (NSString*) objectID : (NSString*) productName
 {
     //Assume only 2 types for now...
     if ([[errMsg substringToIndex:2] containsString:@"E"]) //Error?
@@ -953,6 +977,20 @@ static BatchObject *sharedInstance = nil;
         [self addWarning : errMsg : objectID : productName];
 } //end errorSavingEXP
 
+//===========<OCRTopObjectDelegate>================================================
+// Parse save error only! Not related to OCR errors 2/10
+- (void)errorSavingEXPToParse : (NSString *)err
+{
+    NSLog(@" majorFileError: saving EXP: %@",err);
+    majorFileError = TRUE;
+}
+
+//===========<OCRTopObjectDelegate>================================================
+- (void)errorSavingInvoiceToParse : (NSString *)err
+{
+    NSLog(@" majorFileError: saving Invoice: %@",err);
+    majorFileError = TRUE;
+}
 
 
 @end

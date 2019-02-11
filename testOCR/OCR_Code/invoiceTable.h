@@ -63,7 +63,7 @@
 - (void)didReadInvoiceTableAsStrings : (NSMutableArray*) a;
 - (void)didSaveInvoiceTable:(NSString *) s : (BOOL)lastPage;
 - (void)didUpdateInvoiceTable:(NSString *) inum : (BOOL)lastPage;
-- (void)errorSavingInvoiceTable:(NSString *) s : (BOOL)lastPage;
+- (void)errorSavingInvoiceToParse:(NSString *) s : (BOOL)lastPage;
 
 @end
 

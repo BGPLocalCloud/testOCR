@@ -74,4 +74,6 @@
 - (void)errorDownloadingImages : (NSString *)s;
 - (void)didUploadImageFile : (NSString *)fname;
 - (void)errorUploadingImage : (NSString *)s;
+- (void)errorRenamingFile : (NSString *)s;
+
 @end

@@ -119,7 +119,9 @@
 - (void)didPerformOCR : (NSString *) result;
 - (void)errorPerformingOCR : (NSString *) errMsg;
 - (void)fatalErrorPerformingOCR : (NSString *) errMsg;
-- (void)errorSavingEXP : (NSString *) errMsg : (NSString*) objectID : (NSString*) productName;
+- (void)errorInEXPRecord : (NSString *) errMsg : (NSString*) objectID : (NSString*) productName;
+- (void)errorSavingEXPToParse : (NSString *)err;
+- (void)errorSavingInvoiceToParse : (NSString *)err;
 - (void)didSaveOCRDataToParse : (NSString *) s;
 - (void)errorSavingOCRDataToParse : (NSString *) s;
 - (void)foundEmptyPage;
