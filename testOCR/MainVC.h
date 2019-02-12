@@ -64,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
     Vendors *vv;
     EXPTable *et;
     NSString *selVendor;
-
+    BOOL fatalErrorSelect; //2/11 Better way to do this? Maybe type select?
 
 }
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;

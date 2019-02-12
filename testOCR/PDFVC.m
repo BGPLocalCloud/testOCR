@@ -11,12 +11,10 @@
 //  Created by Dave Scruton on 2/6/19.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  2/10 add download for PDF's not in cache, note retry of output folder too
 
 #import "PDFVC.h"
 
-@interface PDFVC ()
-
-@end
 
 @implementation PDFVC
 
@@ -25,6 +23,11 @@
     if ( !(self = [super initWithCoder:aDecoder]) ) return nil;
     photo = [ UIImage imageNamed:@"emptyDoc"];
     itools = [[imageTools alloc] init];
+    dbt = [[DropboxTools alloc] init];
+    dbt.delegate = self;
+    [dbt setParent:self];
+    triedOutputFolder = FALSE;
+
 
     pc    = [PDFCache sharedInstance];      //For looking at images of ivoices
     vv    = [Vendors sharedInstance];
@@ -41,6 +44,13 @@
     vindex = [vv getVendorIndex:_vendor];
     page = 1;
     pastEnd =  FALSE;
+    
+    //2/10 load spinner view in case we need to download PDF...
+    CGSize csz   = [UIScreen mainScreen].bounds.size;
+    spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, csz.width, csz.height)];
+    [self.view addSubview:spv];
+
+    
     [self loadPhoto];
 
 }
@@ -114,8 +124,11 @@
 -(void) loadPhoto
 {
     UIImage *testPhoto =  [pc getImageByID:_pdfFile : page];
-    if (testPhoto == nil)
+    if (testPhoto == nil) //Cache miss!
     {
+        [spv start:@"Download PDF..."];
+        triedOutputFolder = FALSE;
+        [dbt downloadImages:_pdfFile];    //Asyncbonous, need to finish before handling results
         photo   = [ UIImage imageNamed:@"emptyDoc"];
         pastEnd = TRUE;
     }
@@ -129,4 +142,65 @@
     _pdfImage.image = photo;
     _titleLabel.text = [NSString stringWithFormat:@"Invoice:%@,Page %d",_invoiceNumber,page];
 }
+
+//=============PDF VC=====================================================
+-(void) retryDownloadWithOutputFolder
+{
+    NSMutableArray *chunks = (NSMutableArray*)[_pdfFile componentsSeparatedByString:@"/"];
+    int ccount = (int)chunks.count;
+    if (ccount > 3)
+    {
+        AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        chunks[ccount-3] = bappDelegate.settings.outputFolder;
+        //Overwrite PDf filename? good idea?
+        _pdfFile = [NSString stringWithFormat:@"/%@/%@/%@",
+                    bappDelegate.settings.outputFolder,chunks[ccount-2],chunks[ccount-1]];
+        triedOutputFolder = TRUE;
+        [dbt downloadImages:_pdfFile];
+    }
+} //end retryDownloadWithOutputFolder
+
+//=============PDF VC=====================================================
+-(void) errMsg : (NSString *)title : (NSString*)message
+{
+    UIAlertController *alertController =
+    [UIAlertController alertControllerWithTitle:title
+                                        message:message
+                                 preferredStyle:(UIAlertControllerStyle)UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"OK"
+                                                        style:(UIAlertActionStyle)UIAlertActionStyleCancel
+                                                      handler:nil]];
+    [self presentViewController:alertController animated:YES completion:nil];
+    
+} //end errMsg
+
+
+
+#pragma mark - DropboxToolsDelegate
+
+
+//===========<DropboxToolDelegate>================================================
+- (void)didDownloadImages
+{
+    [spv stop];
+    NSLog(@" ...downloaded %d PDF images",(int)dbt.batchImages.count);
+    [self loadPhoto];
+}  //end didDownloadImages
+
+
+//===========<DropboxToolDelegate>================================================
+- (void)errorDownloadingImages : (NSString *)s
+{
+    [spv stop];
+    if (triedOutputFolder)
+    {
+        [self errMsg:@"No PDF File Found" : @"This invoice cannot be found on Dropbox"];
+        return;
+    }
+    if ([s containsString:@"not_found"])  //Wups! Maybe we should look in processed area?
+    {
+        [self retryDownloadWithOutputFolder];
+    }
+} //end errorDownloadingImages
+
 @end

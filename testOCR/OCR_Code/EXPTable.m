@@ -258,6 +258,7 @@
     e.quantity          = pfo[PInv_Quantity_key];
     e.total             = pfo[PInv_TotalPrice_key];
     e.pricePerUOM       = pfo[PInv_PricePerUOM_key];
+    e.batch             = pfo[PInv_BatchID_key];   //DHS 2/11 WTF? wasn't here!
     e.errStatus         = pfo[PInv_ErrStatus_key];
     e.PDFFile           = pfo[PInv_PDFFile_key];
     e.page              = pfo[PInv_Page_key];
@@ -458,6 +459,9 @@
 -(void) getObjectByID : (NSString *)oid
 {
     PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
+    //2/11 NOTE: this is done in the foreground, the UI is waiting and it's a remote call!
+    //  produces this warning: Warning: A long-running operation is being executed on the main thread.
+    //  Break on warnBlockingOperationOnMainThread() to debug.
     PFObject *pfo = [query getObjectWithId:oid];  //Fetch by object ID,
     if (pfo != nil)
     {
@@ -514,7 +518,7 @@
 
 #define LIMIT_SIZE 100
 //=============(EXPTable)=====================================================
-// Loads in data 1000 recs at a time, uses "skip" for re=entrant call asdf
+// Loads in data LIMIT_SIZE recs at a time, uses "skip" for re=entrant call asdf
 -(void) readFullTableToCSV : (int) skip : (BOOL) addErrStatus
 {
     if (skip == 0) //Start? Clear CSVList and add header
@@ -524,8 +528,6 @@
         if (addErrStatus) header = [header stringByAppendingString:@",ErrStatus"];
         [csvList addObject:header];
     }
-    
-        
     PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
     if (debugMode) NSLog(@" read %d to %d",skip,skip+LIMIT_SIZE);
     query.skip = skip;
@@ -542,7 +544,7 @@
             }
             else
             {
-                self->EXPDumpCSVList = [self->csvList componentsJoinedByString:@","];
+                self->EXPDumpCSVList = [self->csvList componentsJoinedByString:@"\n"];
                 if (self->debugMode) NSLog(@" got %lu recs ",(unsigned long)self->csvList.count);
                 if (self->_parentUp) [self.delegate didReadFullTableToCSV : self->EXPDumpCSVList];
             }

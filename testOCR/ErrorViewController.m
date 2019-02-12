@@ -13,6 +13,9 @@
 //
 //  1/12  Added E: or W: prefix to errors!
 //  2/8   made numericPanelView more compact,
+//  The numeric (decimal) keyboard here SUCKS.
+//  here is a link about adding a minus and enter key:
+//  https://stackoverflow.com/questions/9613109/uikeyboardtypedecimalpad-with-negative-numbers
 
 #import "ErrorViewController.h"
 
@@ -59,8 +62,9 @@
     [self initErrorKeys];
     kbUp = FALSE;
     _fixingErrors = TRUE;
+
     return self;
-}
+} //end initWithCoder
 
 //=============Error VC=====================================================
 - (void)viewDidLoad {
@@ -191,16 +195,18 @@
 
 //=============Error VC=====================================================
 - (IBAction)fieldCancelSelect:(id)sender {
-    //Hide sub-panel for fixing fields... table should show up
+    BOOL needToSwap = !kbUp; //2/11
+    [self dismissKBIfNeeded];
     [self animateTextField: _fieldValue up: NO];
-    [self swapViews:FALSE];
-
+    //Swap sub-panels at bottom?
+    if (needToSwap) [self swapViews:FALSE];
 }
 
 //=============Error VC=====================================================
 - (IBAction)fieldFixSelect:(id)sender
 {
     NSLog(@" fix: new value %@ SAVE TO PARSE...",qText);
+    [self dismissKBIfNeeded]; //2/11
     [self textFieldDidEndEditing:_fieldValue];
     // save new field to parse...
     BOOL changed = FALSE;
@@ -232,6 +238,18 @@
 
 } //end fieldFixSelect
 
+
+//=============Error VC=====================================================
+// 2/11 for cancel/fix button presses
+-(void) dismissKBIfNeeded
+{
+    if (!kbUp) return;
+    [_fieldValue resignFirstResponder];  //One of these is up, resign all dismisses any keyboard
+    [_field2Value resignFirstResponder];
+    [_field3Value resignFirstResponder];
+    kbUp = FALSE; //Needed?
+} //end dismissKBIfNeeded
+
 //=============Error VC=====================================================
 // 2/8 shows/hides table/backbutton vs. fixnumberview/pdfview
 -(void) swapViews : (BOOL) fixingErrors
@@ -257,7 +275,6 @@
     //[_sfx makeTicSoundWithPitch : 8 : 52];
     et.parentUp = FALSE; // 2/9 Tell expTable we are outta here
     [self dismissViewControllerAnimated : YES completion:nil];
-    
 }
 
 
@@ -388,8 +405,9 @@
             fixingObjectID = sItems[2]; //DHS 1/12 now 3 items in error
             if (![fixingObjectID isEqualToString:@"n/a"]) //Make sure objectID exists...
             {
-                NSLog(@" get EXP object:%@",fixingObjectID);
+                //NSLog(@" get EXP object:%@",fixingObjectID);
                 [et getObjectByID:fixingObjectID]; //Delegate callback updates ui...
+                [spv stop];
             }
         }
     }
@@ -465,6 +483,7 @@
     }
     else //Cache miss? get PDF directly from dropbox...
     {
+        [spv start: @"Download PDF..."];
         NSLog(@" ...cache MISS: downloading %@",pdfName);
         [dbt downloadImages:pdfName];
     }
@@ -506,6 +525,7 @@
 // returning from a PDF fetch...
 - (void)didDownloadImages
 {
+    [spv stop];
     if (errorPage < 0 || errorPage >= dbt.batchImages.count) return;
     UIImage *ii = dbt.batchImages[errorPage];
     [self finishSettingPDFImage:ii];
@@ -516,6 +536,7 @@
 //=============<EXPTableDelegate>=====================================================
 - (void)errorDownloadingImages : (NSString *)s
 {
+    [spv stop];
     NSLog(@" ERROR! %@",s); //2/8 MAKE THIS AN ERROR POPUP?
 }
 
@@ -527,6 +548,7 @@
 - (void)didGetObjectsByIds : (NSMutableDictionary *)d
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@" setop");
         [self->spv stop];
     });
 
@@ -539,7 +561,6 @@
 //=============<EXPTableDelegate>=====================================================
 - (void)didReadEXPObjectByID :(EXPObject *)e  : (PFObject*)pfo
 {
-    NSLog(@" e is %@",e);
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->spv stop];
     });
@@ -612,7 +633,7 @@
         pText = _field2Value.text;
 //    else if (tag == 103)
         tText = _field3Value.text;
-    NSLog(@" qpt %@ x %@ = %@",qText,pText,tText);
+    //NSLog(@" ERRVC: qpt %@ x %@ = %@",qText,pText,tText);
 
 } //end loadFields
 
@@ -653,7 +674,6 @@
 //==========<UITextFieldDelegate>================================================================
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    NSLog(@" begedit");
     [self animateTextField: textField up: YES];
     [textField setText:@""];
 } //end textFieldDidBeginEditing
@@ -662,7 +682,6 @@
 //==========<UITextFieldDelegate>================================================================
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-    NSLog(@" endedit");
     [self animateTextField: textField up: NO];
     [textField resignFirstResponder];
     int tag = (int)textField.tag;

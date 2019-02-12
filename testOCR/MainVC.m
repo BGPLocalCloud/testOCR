@@ -50,6 +50,8 @@
     batchPFObjects = nil;
     
     fixingErrors = TRUE;
+    
+    fatalErrorSelect = FALSE;
 
     //Test only, built-in OCR crap...
     //[self loadBuiltinOCRToCache];
@@ -265,21 +267,19 @@
                                 NSLocalizedString(@"Batch Retreival",nil)
                                                                    message:nil
                                                             preferredStyle:UIAlertControllerStyleAlert];
-
+    
     [alert setValue:tatString forKey:@"attributedTitle"];
-    
-    
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Get EXP records",nil)
-                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              if (isBatch) self->stype = @"E"; //Lookup by batch
-                                                              else         self->stype = @"I"; //Lookup by invoice
-                                                              [self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
-                                                          }]];
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  if (isBatch) self->stype = @"E"; //Lookup by batch
+                                                  else         self->stype = @"I"; //Lookup by invoice
+                                                  [self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
+                                              }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Get Invoices",nil)
-                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                                   self->stype = @"I";
-                                                                   [self performSegueWithIdentifier:@"invoiceSegue" sender:@"mainVC"];
-                                                           }]];
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  self->stype = @"I";
+                                                  [self performSegueWithIdentifier:@"invoiceSegue" sender:@"mainVC"];
+                                              }]];
     if (isBatch) //2/8 batch has extra choices...
     {
         [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"View/Fix Errors",nil)
@@ -296,8 +296,7 @@
                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                       [self performSegueWithIdentifier:@"batchReportSegue" sender:@"mainVC"];
                                                   }]];
-
-    }
+    } //end isbatch
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                            }]];
@@ -597,9 +596,9 @@
 
 //=============OCR MainVC=====================================================
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    int row = (int)indexPath.row;
-    sdata  = [act getData:row];
-    [self batchListChoiceMenu];
+    int row          = (int)indexPath.row;
+    sdata            = [act getData:row];
+    if (![act isFatalError:row]) [self batchListChoiceMenu]; //Don't show list on fatal errors
 }
 
 //=============OCR MainVC=====================================================

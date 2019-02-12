@@ -62,6 +62,8 @@
 }
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UITableView *table;
+@property (weak, nonatomic) IBOutlet UIButton *selectButton;
+@property (weak, nonatomic) IBOutlet UIView *headerView;
 
 @property (weak, nonatomic) IBOutlet NSString *actData;
 @property (weak, nonatomic) IBOutlet NSString *searchType;
@@ -77,7 +79,6 @@
 - (IBAction)sortSelect:(id)sender;
 - (IBAction)sortDirSelect:(id)sender;
 - (IBAction)selectSelect:(id)sender;
-@property (weak, nonatomic) IBOutlet UIButton *selectButton;
 
 @end
 

@@ -34,6 +34,7 @@
 -(NSString *) getData : (int) index;
 -(NSDate *)   getDate : (int) index;
 -(int) getReadCount;
+-(BOOL) isFatalError : (int) index;
 
 -(void) readActivitiesFromParse : (NSString*) actType : (NSString *)vendor;
 

@@ -13,21 +13,29 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AppDelegate.h"
+#import "DropboxTools.h"
 #import "imageTools.h"
 #import "PDFCache.h"
+#import "spinnerView.h"
 #import "Vendors.h"
 
-@interface PDFVC : UIViewController <UIScrollViewDelegate>
+@interface PDFVC : UIViewController <UIScrollViewDelegate,DropboxToolsDelegate>
 {
     UIImage *photo;
     PDFCache *pc;
     Vendors *vv;
     imageTools *itools;
+    DropboxTools *dbt;
+    spinnerView *spv;
+
     int viewWid,viewHit,viewW2,viewH2;
 
     int page;
     int vindex;
     BOOL pastEnd;
+    BOOL triedOutputFolder;
+    
 }
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 

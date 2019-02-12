@@ -68,7 +68,16 @@
     _table.refreshControl = refreshControl;
     [refreshControl addTarget:self action:@selector(refreshIt) forControlEvents:UIControlEventValueChanged];
 
-    // 1/19 add activity spinner 
+    //add dropshadow to header  2/11
+    UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:_headerView.bounds];
+    _headerView.layer.masksToBounds = NO;
+    _headerView.layer.shadowColor = [UIColor blackColor].CGColor;
+    _headerView.layer.shadowOffset = CGSizeMake(0.0f, 10.0f);
+    _headerView.layer.shadowOpacity = 0.3f;
+    _headerView.layer.shadowPath = shadowPath.CGPath;
+    [self.view bringSubviewToFront:_headerView];
+    
+    // 1/19 add activity spinner
     CGSize csz   = [UIScreen mainScreen].bounds.size;
     spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, csz.width, csz.height)];
     [self.view addSubview:spv];
@@ -511,7 +520,7 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->_table reloadData];
-        [self->spv stop];
+        [spv stop];
         [self setLoadedTitle : @"EXP"];
         self->_sortButton.hidden   = FALSE;
         self->_selectButton.hidden = FALSE;
@@ -561,9 +570,15 @@
         MFMailComposeViewController *mail = [[MFMailComposeViewController alloc] init];
         mail.mailComposeDelegate = self;
         [mail setSubject:@"EXP CSV output"];
-        [mail setMessageBody:s isHTML:NO];
+        [mail setMessageBody:@"...see text attachment" isHTML:NO];
+        NSData *sdata = [s dataUsingEncoding:NSUTF8StringEncoding];
+        NSDate *today = [NSDate date];
+        NSDateFormatter * formatter =  [[NSDateFormatter alloc] init];
+        [formatter setDateFormat:@"MM_dd_yyyy"];
+        NSString *sfd = [formatter stringFromDate:today];
+        NSString *fname = [NSString stringWithFormat:@"EXP_%@.csv",sfd];
+        [mail addAttachmentData:sdata mimeType:@"text/plain"  fileName:fname];
         [mail setToRecipients:@[@"fraktalmaui@gmail.com"]];
-        
         [self presentViewController:mail animated:YES completion:NULL];
     }
     else

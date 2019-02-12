@@ -46,6 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)backSelect:(id)sender;
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UITableView *table;
+@property (weak, nonatomic) IBOutlet UIView *headerView;
 
 @property (nonatomic , strong) NSString* vendor;
 @property (nonatomic , strong) NSString* batchID;

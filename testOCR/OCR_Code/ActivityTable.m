@@ -42,6 +42,14 @@
 }
 
 //=============(ActivityTable)=====================================================
+-(BOOL) isFatalError : (int) index
+{
+    if (index < 0 || index >= typeStrings.count) return FALSE;
+    NSString *lct = typeStrings[index];
+    return ([lct.lowercaseString containsString:@"fatal"]);
+}
+
+//=============(ActivityTable)=====================================================
 -(NSDate *) getDate : (int) index
 {
     if (index < 0 || index >= dates.count) return [NSDate date];

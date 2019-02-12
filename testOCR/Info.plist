@@ -26,9 +26,9 @@
 		</dict>
 	</array>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.057</string>
+	<string>1.0.059</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.057</string>
+	<string>1.0.059</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
