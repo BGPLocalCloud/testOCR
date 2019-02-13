@@ -23,6 +23,7 @@
 #import "AddTemplateViewController.h"
 #import "BatchReportController.h"
 #import "ErrorViewController.h"
+#import "ErrorHelperVC.h"
 #import "EXPViewController.h"
 #import "InvoiceViewController.h"
 #import "EXPTable.h"

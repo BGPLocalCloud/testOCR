@@ -59,6 +59,12 @@
         
         int w = frame.size.width;
         int h = frame.size.height;
+        //Always assume portrait!
+        if (w > h)
+        {
+            w = frame.size.height;
+            h = frame.size.width;
+        }
         hvsize = 256;
         lsize  = 128;
         cframe = CGRectMake((w-hvsize)/2,(h-hvsize)/2,hvsize,hvsize);

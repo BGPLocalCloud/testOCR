@@ -109,6 +109,14 @@
 } //end viewDidLoad
 
 //=============OCR MainVC=====================================================
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskPortrait;
+}
+
+
+
+//=============OCR MainVC=====================================================
 -(void)refreshIt
 {
     //NSLog(@" pull to refresh...");
@@ -147,16 +155,6 @@
    // [self performSegueWithIdentifier:@"templateSegue" sender:@"mainVC"];
 
     //[self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
-}
-
-//=============OCR MainVC=====================================================
-#if __IPHONE_OS_VERSION_MAX_ALLOWED < 90000
-- (NSUInteger)supportedInterfaceOrientations
-#else
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations
-#endif
-{
-    return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
 }
 
 
@@ -291,6 +289,10 @@
                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                       self->fixingErrors = FALSE;
                                                       [self performSegueWithIdentifier:@"errorSegue" sender:@"mainVC"];
+                                                  }]];
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Error Helper",nil)
+                                                  style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                      [self performSegueWithIdentifier:@"errorHelperSegue" sender:@"mainVC"];
                                                   }]];
         [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Get Report",nil)
                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -453,6 +455,11 @@
         ErrorViewController *vc = (ErrorViewController*)[segue destinationViewController];
         vc.batchData    = sdata;
         vc.fixingErrors = fixingErrors;
+    }
+    else if([[segue identifier] isEqualToString:@"errorHelperSegue"])
+    {
+        ErrorHelperVC *vc = (ErrorHelperVC*)[segue destinationViewController];
+        vc.batchData      = sdata;
     }
     else if([[segue identifier] isEqualToString:@"batchReportSegue"])
     {

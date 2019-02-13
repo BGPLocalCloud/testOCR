@@ -77,6 +77,7 @@
 		728EECC521ED1B5B00F83129 /* InvoiceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 728EECC421ED1B5B00F83129 /* InvoiceViewController.m */; };
 		728EECC821ED1DDB00F83129 /* invoiceCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 728EECC721ED1DDB00F83129 /* invoiceCell.m */; };
 		7290229C21D58FF900885EF9 /* activityCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7290229B21D58FF900885EF9 /* activityCell.m */; };
+		7299F76B2213B43A00FC0814 /* ErrorHelperVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 7299F76A2213B43A00FC0814 /* ErrorHelperVC.m */; };
 		729B7A3E21C886590075486C /* invoiceTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 729B7A3D21C886590075486C /* invoiceTable.m */; };
 		729C592C21C1D08900F4C695 /* smartProducts.m in Sources */ = {isa = PBXBuildFile; fileRef = 729C592B21C1D08900F4C695 /* smartProducts.m */; };
 		729C592F21C1F62400F4C695 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 729C592E21C1F62400F4C695 /* MessageUI.framework */; };
@@ -221,6 +222,8 @@
 		728EECC721ED1DDB00F83129 /* invoiceCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = invoiceCell.m; sourceTree = "<group>"; };
 		7290229A21D58FF900885EF9 /* activityCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = activityCell.h; sourceTree = "<group>"; };
 		7290229B21D58FF900885EF9 /* activityCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = activityCell.m; sourceTree = "<group>"; };
+		7299F7692213B43A00FC0814 /* ErrorHelperVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ErrorHelperVC.h; sourceTree = "<group>"; };
+		7299F76A2213B43A00FC0814 /* ErrorHelperVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ErrorHelperVC.m; sourceTree = "<group>"; };
 		729B7A3C21C886590075486C /* invoiceTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = invoiceTable.h; sourceTree = "<group>"; };
 		729B7A3D21C886590075486C /* invoiceTable.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = invoiceTable.m; sourceTree = "<group>"; };
 		729C592A21C1D08900F4C695 /* smartProducts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = smartProducts.h; sourceTree = "<group>"; };
@@ -340,6 +343,8 @@
 				7206008C21B64052000B26DC /* EditTemplateVC.m */,
 				7209159121E0908B00F94258 /* ErrorViewController.h */,
 				7209159221E0908C00F94258 /* ErrorViewController.m */,
+				7299F7692213B43A00FC0814 /* ErrorHelperVC.h */,
+				7299F76A2213B43A00FC0814 /* ErrorHelperVC.m */,
 				720C17B821CCC1150059CA2D /* AddTemplateViewController.h */,
 				72E785AB21CCBFC600EEEF1F /* AddTemplateViewController.m */,
 				72AFBE9221D4AEA400B75388 /* CheckTemplateVC.h */,
@@ -765,6 +770,7 @@
 				725DA97D21CB53BC0024ECF7 /* EXPViewController.m in Sources */,
 				72F0D8C121D93216005979D2 /* OCRSettings.m in Sources */,
 				72AFBE9421D4AEA400B75388 /* CheckTemplateVC.m in Sources */,
+				7299F76B2213B43A00FC0814 /* ErrorHelperVC.m in Sources */,
 				728EECC521ED1B5B00F83129 /* InvoiceViewController.m in Sources */,
 				7209608F21B8173200D49C63 /* OCRDocument.m in Sources */,
 			);
