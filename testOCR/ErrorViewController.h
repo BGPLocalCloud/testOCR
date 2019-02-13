@@ -58,6 +58,7 @@
     NSArray *errKeysToCheck;
     NSArray *errKeysNumeric;
     NSArray *errKeysBinary;
+    NSString *iText;  
     NSString *qText;
     NSString *pText;
     NSString *tText;
@@ -76,10 +77,10 @@
 @property (weak, nonatomic) IBOutlet UIView *fixNumberView;
 @property (weak, nonatomic) IBOutlet UILabel *fieldName;
 @property (weak, nonatomic) IBOutlet UIView *numericPanelView;
-@property (weak, nonatomic) IBOutlet UITextField *fieldValue;
+@property (weak, nonatomic) IBOutlet UITextField *field0Value;
+@property (weak, nonatomic) IBOutlet UITextField *field1Value;
 @property (weak, nonatomic) IBOutlet UITextField *field2Value;
 @property (weak, nonatomic) IBOutlet UITextField *field3Value;
-@property (weak, nonatomic) IBOutlet UILabel *productName;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UIButton *backButton;
 

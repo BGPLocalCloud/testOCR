@@ -60,7 +60,7 @@
 -(void) deleteObjectsByVendor : (NSString *)vendor;
 -(void) getObjectsByIDs : (NSArray *)oids;
 -(void) getObjectByID : (NSString *)oid;
--(void) fixPricesInObjectByID : (NSString *)oid : (NSString *)qt : (NSString *)pt : (NSString *)tt;
+-(void) fixPricesInObjectByID: (NSString *)oid  : (NSString *)productName : (NSString *)qt : (NSString *)pt : (NSString *)tt;
 -(void) fixFieldInObjectByID : (NSString *)oid : (NSString *)key : (NSString *)value;
 -(void) saveEXPOs;
 -(void) saveToParse : (int) page : (BOOL) lastPage;
@@ -94,6 +94,7 @@
 - (void)didSaveEXPTable : (NSArray *)a;
 - (void)didFinishAllEXPRecords : (int) count : (NSArray *)a;
 - (void)didFixPricesInObjectByID : (NSString *)oid;
+- (void)errorFixingPricesInObjectByID : (NSString *)err;
 - (void)errorInEXPRecord : (NSString *)err : (NSString *)oid : (NSString *)productName;
 - (void)didSaveEXPOs ;
 - (void)errorSavingEXPOs : (NSString *)err;

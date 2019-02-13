@@ -1,9 +1,16 @@
 //
+//   _____                     _   _      _               __     ______
+//  | ____|_ __ _ __ ___  _ __| | | | ___| |_ __   ___ _ _\ \   / / ___|
+//  |  _| | '__| '__/ _ \| '__| |_| |/ _ \ | '_ \ / _ \ '__\ \ / / |
+//  | |___| |  | | | (_) | |  |  _  |  __/ | |_) |  __/ |   \ V /| |___
+//  |_____|_|  |_|  \___/|_|  |_| |_|\___|_| .__/ \___|_|    \_/  \____|
+//                                         |_|
+//
 //  ErrorHelperVC.h
 //  testOCR
 //
 //  Created by Dave Scruton on 2/12/19.
-//  Copyright © 2019 huedoku. All rights reserved.
+//  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -57,6 +64,7 @@
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UILabel *errorLabel;
 
+- (IBAction)rotSelect:(id)sender;
 
 
 - (IBAction)leftArrowSelect:(id)sender;

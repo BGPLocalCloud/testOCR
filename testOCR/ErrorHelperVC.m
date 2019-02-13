@@ -1,10 +1,19 @@
 //
+//   _____                     _   _      _               __     ______
+//  | ____|_ __ _ __ ___  _ __| | | | ___| |_ __   ___ _ _\ \   / / ___|
+//  |  _| | '__| '__/ _ \| '__| |_| |/ _ \ | '_ \ / _ \ '__\ \ / / |
+//  | |___| |  | | | (_) | |  |  _  |  __/ | |_) |  __/ |   \ V /| |___
+//  |_____|_|  |_|  \___/|_|  |_| |_|\___|_| .__/ \___|_|    \_/  \____|
+//                                         |_|
 //  ErrorHelperVC.m
 //  testOCR
 //
 //  Created by Dave Scruton on 2/12/19.
-//  Copyright © 2019 huedoku. All rights reserved.
+//  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  This looks up errors and displays them as text on top of a
+//   fullscreen-scrollable view of the matching invoice.
+//  Designed for use when correcting EXP data on another platform
 
 #import "ErrorHelperVC.h"
 
@@ -23,6 +32,7 @@
     [dbt setParent:self];
     //For loading PDF images...
     pc = [PDFCache sharedInstance];
+    //For getting document rotation...
     vv = [Vendors sharedInstance];
     
     et = [[EXPTable alloc] init];
@@ -96,6 +106,15 @@
 }
 
 
+
+//=============ErrorHelperVC=====================================================
+// Does a 90 degree CCW rotation on exiting image
+- (IBAction)rotSelect:(id)sender
+{
+    UIImage *ii = _pdfImage.image;
+    ii = [it rotate90CCW : ii];
+    _pdfImage.image = ii;
+}
 
 //=============ErrorHelperVC=====================================================
 - (IBAction)leftArrowSelect:(id)sender {
@@ -305,8 +324,6 @@
     if (errorPage < 0 || errorPage >= dbt.batchImages.count) return;
     UIImage *ii = dbt.batchImages[errorPage];
     [self finishSettingPDFImage:ii];
-    //  @property (nonatomic , strong) NSMutableArray* batchImages;
-    //asdf
 }
 
 //=============<EXPTableDelegate>=====================================================

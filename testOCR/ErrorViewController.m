@@ -16,7 +16,7 @@
 //  The numeric (decimal) keyboard here SUCKS.
 //  here is a link about adding a minus and enter key:
 //  https://stackoverflow.com/questions/9613109/uikeyboardtypedecimalpad-with-negative-numbers
-
+//  2/12 added field0Value for productname, renamed fieldValue
 #import "ErrorViewController.h"
 
 @interface ErrorViewController ()
@@ -75,7 +75,8 @@
     
     //Scrolling zoomed PDF viewer
     _scrollView.delegate=self;
-    _fieldValue.delegate = self;
+    _field0Value.delegate = self;
+    _field1Value.delegate = self;
     _field2Value.delegate = self;
     _field3Value.delegate = self;
 
@@ -102,8 +103,12 @@
     _fixNumberView.hidden = TRUE;
     _scrollView.hidden    = TRUE;
     [self zoomPDFView : 1];
+    
+    // Top field: product Name : DO NOT CLEAR!
+    _field0Value.clearsOnBeginEditing = NO;
 
 } //end viewWillAppear
+
 
 //=============Error VC=====================================================
 -(void) loadView
@@ -197,7 +202,7 @@
 - (IBAction)fieldCancelSelect:(id)sender {
     BOOL needToSwap = !kbUp; //2/11
     [self dismissKBIfNeeded];
-    [self animateTextField: _fieldValue up: NO];
+    [self animateTextField: _field1Value up: NO];
     //Swap sub-panels at bottom?
     if (needToSwap) [self swapViews:FALSE];
 }
@@ -207,9 +212,10 @@
 {
     NSLog(@" fix: new value %@ SAVE TO PARSE...",qText);
     [self dismissKBIfNeeded]; //2/11
-    [self textFieldDidEndEditing:_fieldValue];
+    [self textFieldDidEndEditing:_field1Value];
     // save new field to parse...
     BOOL changed = FALSE;
+    [spv start:@"Fix Error..."];
     
     if (isNumeric) //Fix q/p/t fields?
     {
@@ -220,7 +226,15 @@
         td = qd * pd; //Force amount to be correct...
         tText = [sp getDollarsAndCentsString : (float) td]; //Re-format total...
         pText = [sp getDollarsAndCentsString : pText.floatValue]; //Re-format price...
-        [et fixPricesInObjectByID : fixingObjectID : qText : pText : tText];
+        [et fixPricesInObjectByID : fixingObjectID : iText : qText : pText : tText];
+        
+        //Look up our EXP object locally...
+        EXPObject *exp = [expRecordsByID objectForKey:fixingObjectID];
+        exp.productName = iText;   //Fill in our fields from the fix
+        exp.quantity    = qText;
+        exp.pricePerUOM = pText;
+        exp.total       = tText;
+        [expRecordsByID setObject:exp forKey:fixingObjectID];
         changed = TRUE;
     }
     
@@ -234,6 +248,7 @@
         [bbb updateParse];           //annnd save updated batch record
     }
     [self swapViews:FALSE];
+
     [_table reloadData];
 
 } //end fieldFixSelect
@@ -244,7 +259,8 @@
 -(void) dismissKBIfNeeded
 {
     if (!kbUp) return;
-    [_fieldValue resignFirstResponder];  //One of these is up, resign all dismisses any keyboard
+    [_field0Value resignFirstResponder];  //One of these is up, resign all dismisses any keyboard
+    [_field1Value resignFirstResponder];
     [_field2Value resignFirstResponder];
     [_field3Value resignFirstResponder];
     kbUp = FALSE; //Needed?
@@ -292,7 +308,7 @@
         cell = [[errorCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     NSString *errStr = [errorList objectAtIndex:row];
-    NSLog(@" cell %d str %@ fixed %d",row,errStr,[bbb isErrorFixed:errStr]);
+    //NSLog(@" cell %d str %@ fixed %d",row,errStr,[bbb isErrorFixed:errStr]);
     if ([bbb isErrorFixed:errStr])
     {
         NSLog(@" ...FIXED %d",row);
@@ -341,7 +357,6 @@
             if (e != nil)
             {
                 pname = e.productName;
-                NSLog(@" ...pname %@",pname );
             }
         }
     }
@@ -352,7 +367,6 @@
 
 //=============Error VC=====================================================
 - (NSInteger)tableView:(nonnull UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSLog(@"ecount %d",(int)errorList.count);
     return (int)errorList.count;
 }
 
@@ -465,7 +479,7 @@
     fixingObjectKey = key;
     isNumeric = [errKeysNumeric containsObject:key];
     _numericPanelView.hidden = !isNumeric;
-    _productName.text = pfoWork[PInv_ProductName_key];
+    _field0Value.text = pfoWork[PInv_ProductName_key];
     
     vendorName = [bbb getVendor];
     
@@ -487,12 +501,14 @@
         NSLog(@" ...cache MISS: downloading %@",pdfName);
         [dbt downloadImages:pdfName];
     }
+    [_field0Value setKeyboardType:UIKeyboardTypeDefault];
+
     if (isNumeric) //Is this a numeric field?
     {
         NSString *q = pfoWork[PInv_Quantity_key];
         if (q.length < 1) q = @"$ERR";
-        [_fieldValue setKeyboardType:UIKeyboardTypeDecimalPad];
-        [_fieldValue setText : q];
+        [_field1Value setKeyboardType:UIKeyboardTypeDecimalPad];
+        [_field1Value setText : q];
         [_field2Value setKeyboardType:UIKeyboardTypeDecimalPad];
         NSString *p = pfoWork[PInv_PricePerUOM_key];
         if (p.length < 1) p = @"$ERR";
@@ -503,7 +519,7 @@
         [_field3Value setText : t];
     }
     else{ // Characters and numbers?
-        [_fieldValue setKeyboardType:UIKeyboardTypeDefault];
+        [_field1Value setKeyboardType:UIKeyboardTypeDefault];
     }
 } //end setupPanelForError
 
@@ -529,8 +545,6 @@
     if (errorPage < 0 || errorPage >= dbt.batchImages.count) return;
     UIImage *ii = dbt.batchImages[errorPage];
     [self finishSettingPDFImage:ii];
-  //  @property (nonatomic , strong) NSMutableArray* batchImages;
-   //asdf
 }
 
 //=============<EXPTableDelegate>=====================================================
@@ -593,15 +607,22 @@
 }
 
 
-//=============<EXPTableDelegate>==================================asdf===================
+//=============<EXPTableDelegate>=====================================================
 - (void)didFixPricesInObjectByID : (NSString *)oid
 {
+    [spv stop];
     NSLog(@" OK: saved qpt for object %@ , delete from error list",oid);
     //1/23 WRONG![errorList removeObjectAtIndex:selectedRow];
     [_table reloadData];
 
 
 } //end didFixPricesInObjectByID
+
+//=============<EXPTableDelegate>=====================================================
+- (void)errorFixingPricesInObjectByID : (NSString *)err
+{
+    [spv stop];
+}
 
 
 #pragma mark - UITextFieldDelegate
@@ -627,14 +648,10 @@
 //==========<UITextFieldDelegate>================================================================
 -(void) loadFields : (int) tag : (UITextField*) tfield
 {
-//    if (tag == 101)
-        qText = _fieldValue.text;
-//    else if (tag == 102)
-        pText = _field2Value.text;
-//    else if (tag == 103)
-        tText = _field3Value.text;
-    //NSLog(@" ERRVC: qpt %@ x %@ = %@",qText,pText,tText);
-
+    iText = _field0Value.text;
+    qText = _field1Value.text;
+    pText = _field2Value.text;
+    tText = _field3Value.text;
 } //end loadFields
 
 //==========<UITextFieldDelegate>================================================================
@@ -655,9 +672,11 @@
 
 
 //==========<UITextFieldDelegate>================================================================
+//NEVER GETS CALLED?
 - (BOOL)textFieldShouldClear:(UITextField *)textField
 {
     NSLog(@" shdclear");
+    if (textField == _field0Value) return NO;
     return YES;
 }
 //==========<UITextFieldDelegate>================================================================
@@ -675,7 +694,7 @@
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
     [self animateTextField: textField up: YES];
-    [textField setText:@""];
+    if (textField != _field0Value) [textField setText:@""]; //DHS 2/12
 } //end textFieldDidBeginEditing
 
 

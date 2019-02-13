@@ -15,6 +15,7 @@
 //  2/7 add debugMode for logging
 //  2/8 add invoiceNumber to readFromParseAsStrings
 //  2/9 add parentUp flag to avoid delegate callback crashes on dismissed VC
+//  2/12 add productname to fixPrices...
 
 #import "EXPTable.h"
 
@@ -388,15 +389,15 @@
 } //end readFromParseByObjIDs
 
 //=============OCR VC=====================================================
--(void) fixPricesInObjectByID : (NSString *)oid : (NSString *)qt : (NSString *)pt : (NSString *)tt
+// 2/12 add productname
+-(void) fixPricesInObjectByID: (NSString *)oid  : (NSString *)productName : (NSString *)qt : (NSString *)pt : (NSString *)tt
 {
     PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
     PFObject *pfo = [query getObjectWithId:oid];  //Fetch by object ID,
     if (pfo != nil)
     {
-        if (debugMode) NSLog(@" fix field [%@] = %@ ",PInv_Quantity_key,qt);
-        if (debugMode) NSLog(@" fix field [%@] = %@ ",PInv_PricePerUOM_key,pt);
-        if (debugMode) NSLog(@" fix field [%@] = %@ ",PInv_TotalPrice_key,tt);
+        if (debugMode) NSLog(@" fix field Item/Q/P/T = %@/%@/%@/%@  ",productName,qt,pt,tt);
+        [pfo setObject:productName forKey:PInv_ProductName_key];
         [pfo setObject:qt forKey:PInv_Quantity_key];
         [pfo setObject:pt forKey:PInv_PricePerUOM_key];
         [pfo setObject:tt forKey:PInv_TotalPrice_key];
@@ -408,7 +409,7 @@
             }
             else
             {
-                NSLog(@" error updating quantity/price/total oid %@",oid);
+                if (self->_parentUp) [self.delegate errorFixingPricesInObjectByID : error.localizedDescription];
             }
         }];
     }
