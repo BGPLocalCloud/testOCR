@@ -1,0 +1,477 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+  <title>BGPCloud Help...</title>
+  <style type="text/css">
+<!--
+A{text-decoration:none}
+body {
+padding: 2em 1em 2em 10px;
+margin: 0;
+font-family: sans-serif;
+color: black;
+background: white;
+background-position: top left;
+background-attachment: fixed;
+background-repeat: no-repeat;
+}
+-->
+
+  </style>
+  <style type="text/css" title="Amaya theme">
+/* Modern style for Amaya Editor Lite */
+
+/* default rules for the whole document */
+body {
+    font-size: 18pt;
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    color: black;
+    background-color: white;
+    line-height: 1.4em;
+    margin-left: 2em;
+    margin-right: 2em;
+   }
+
+/* paragraphs */
+p  {
+    padding: 0;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    text-align: left;
+   }
+
+/* headings */
+h1 {
+    font-size: 160%;
+    font-weight: bold;
+    font-style: normal;
+    font-variant: small-caps;
+    text-align: left;
+    padding: 0;
+    margin-top: 1.1em;
+    margin-bottom: 1.1em;
+   }
+h2 {
+    font-size: 150%;
+    font-weight: bold;
+    font-style: normal;
+    padding: 0;
+    margin-top: 1.5em;
+    margin-bottom: 1.1em;
+   }
+h3 {
+    font-size: 130%;
+    font-weight: bold;
+    font-style: normal;
+    padding: 0;
+    margin-top: 1.3em;
+    margin-bottom: 1.1em;
+   }
+h4 {
+    font-size: 110%;
+    font-weight: bold;
+    font-style: normal;
+    padding: 0;
+    margin-top: 1.1em;
+    margin-bottom: 1.1em;
+   }
+h5 {
+    font-size: 100%;
+    font-weight: bold;
+    font-style: italic;
+    padding: 0;
+    margin-top: 1em;
+    margin-bottom: 1em;
+   }
+h6 {
+    font-size: 100%;
+    font-weight: normal;
+    font-style: italic;
+    padding: 0;
+    margin-top: 1em;
+    margin-bottom: 1em;
+   }
+
+/* divisions */
+div {
+    padding: 0;
+    margin-top: 0em;
+    margin-bottom: 0em;
+   }
+
+  .outer {
+      width: 90%;
+      color: white;
+      background-color: sienna;
+      border: 2px solid black;
+      padding: 5px;
+  }
+  
+  
+/* lists */
+ul, ol {
+    padding: 0 0 0 3em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+   }
+ul ul, ol ol, ul ol, ol ul {
+    margin-top: 1em;
+    margin-bottom: 1em;
+   }
+li {
+    padding: 0;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    text-align: left;
+   }
+li p {
+    margin-top: 1em;
+    margin-bottom: 1em;
+   }
+dl {
+    padding: 0;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    margin-left: 1em;
+   }
+dl dl {
+    margin-top: 0em;
+    margin-bottom: 0em;
+   }
+dt {
+    padding: 0;
+    font-weight: bold;
+    margin-top: .3em;
+    margin-bottom: .3em;
+   }
+dd {
+    padding: 0;
+    margin-top: .3em;
+    margin-left: 3em;
+    margin-bottom: .3em;
+   }
+dl p {
+    margin-top: .3em;
+    margin-bottom: .3em;
+   }
+
+/* inline */
+strong {
+    font-weight: bold;
+   }
+em {
+    font-style: italic;
+   }
+code {
+    font-family: Courier New, Courier, monospace;
+   }
+ins {
+    background-color: yellow;
+    text-decoration: underline;
+   }
+del {
+    text-decoration: line-through;
+   }
+
+/* anchors */
+a[href] {
+    color: blue;
+    text-decoration: underline;
+   }
+
+/* end */
+  </style>
+</head>
+
+<body>
+<h1>Basic Theory:</h1>
+The app is designed to process sets of invoices, usually in PDF format, and output line item records to a cloud database (the DB).
+You can also feed in PNG or JPG scans as well as certain CSV text files.
+<p>
+Uses Dropbox:<br>
+The invoices are assumed to be stored by vendor in a preset folder on Dropbox.
+<br>
+For instance, HFM invoices are stored in
+<br>
+<b>/latestBatch/HFM/...</b>
+<br>
+As more customers are added this structure will change a little.
+<br>
+For Quest the folder for Gordon Foodservice will be
+<br>
+<b>/Quest/latestBatch/Gordon/</b>
+<p>
+These files are referred to as <i>staged files</i>.
+<br>
+Staged files can be skipped over if you don`t want to process them. Just add the word <i>skip</i> to the filename right before the dot like this: octoberInvoice<i>skip</i>.pdf
+<p>
+Once a batch is run, files that were processed ok get moved to a different folder. There is one processed folder per vendor. For the Gordon files above the folder is
+<br>
+<b>/Quest/processedBatch/Gordon/</b>
+<p>
+These staging and processed folders can be reconfigured by changing the app settings which are stored in the DB. See <i>settings</i> below.
+<p>
+<h4>OCR Server:</h4>
+An OCR (Optical Character Recognition)  server is used to convert scanned images to readable text that can be organized and sorted.  The server also can be used from a website for free:
+<p>
+<center>
+<a href=https://ocr.space/>OCR.Space</a>
+</center>
+<p>
+
+<h4>Parse Server:</h4>
+The final output is stored on a Parse Database server, hosted by Sashido.io.
+Parse is an open-source database that runs on <i>Node.js</i>.
+<br>
+Here`s a link to parse:
+<br>
+<br>
+<center>
+<a href=https://parseplatform.org/>parseplatform.org</a>
+</center>
+
+<br>
+<center>
+<div class="outer" width:90%>
+    <center>
+        <img src=images/ssMain.jpg>
+            <br>
+            <i>main screen</i>
+    </center>
+</div>
+</center>
+
+
+<h1>Using the app:</h1>
+
+
+The first screen you will see is called the <i>MainVC</i>. This screen shows a table of the latest activities that have taken place, such as batch runs or template changes.
+<br>
+At the bottom of the screen are four buttons which navigate you through the app.
+<ul>
+    <li>Menu : High level operations</li>
+    <li>DB : Database Queries</li>
+    <li>Outputs: Graphs and Exports</li>
+    <li>Batch: Processes Invoices</li>
+</ul>
+
+If you select items from the table, you can examine details for some activities. If the activity was related to a batch you can get DB records such as EXP items produced by the batch. You can also fix errors and warnings in EXP line items produced by the batch, or you can look at the Batch Report. See <b>Batch Popup Menu</b> below for more instructions.
+<br>
+
+<h4>Menu:</h4>
+The Menu navigates to other screens where you can create or edit templates, load Comparison Data from past months, or clear data storage from your phone. Most of the time you won`t need to use this control. More detailed instructions will be published later.  At the bottom of the Menu is the <b>Logout from Dropbox</b> command, which may be needed if you use more than one Dropbox account on your phone.
+<p>
+<h4>DB:</h4>
+This puts up another menu which lets you look at all EXP table line items from the latest batch, or the latest invoices grouped by vendor. For instance the <i>HFM Invoices</i> option will show a table of HFM invoices produced in the last batch run.
+See below for more information on these options.
+<p>
+<h4>Output:</h4>
+This is still under construction. More later.
+<p>
+<h4>Batch:</h4>
+This takes you to the Batch Screen. At startup, the app takes up to 15 seconds to load important vendor settings from the DB and this button won`t work until the settings are present.
+<br>
+<center>
+<div class="outer" width:90%>
+    <center>
+        <img src=images/ssBatch.jpg>
+            <br>
+            <i>the batch screen</i>
+            </center>
+</div>
+</center>
+
+
+<h1>Batch Screen:</h1>
+This is where batches are run. The first thing done is a query of Dropbox, to see if there are any staged files for processing. Then it displays a list of vendors with a filecount by each name.
+<br>Vendors with zero files staged are not available for batch processing. Also note that staged files with <i>skip</i> in their name <b>are</b> included in these filecounts.
+<br>
+Some PDF files can have more than one invoice so the filecounts are not the same as the finished invoice counts.
+<br>
+<b>Note:</b> only one vendor is allowed in each PDF file, OCR errors will result otherwise.
+<h4>Running a Batch:</h4>
+Since there is a lot of downloading and uploading, make sure you have a reliable internet connection before running any batches.
+<br>
+At the bottom center is a <b>Month Chooser</b> which selects the fiscal month to use in the batch. Make sure it is correct before starting.
+<br>
+
+At the bottom right is the <b>Run</b> button which brings up a chooser. From there you can run all vendors or just one at a time. Once you make your choice the batch will start.
+<br>
+<center>
+    <div class="outer" width:90%>
+        <center>
+            <img src=images/ssBatchRunning.jpg>
+                <br>
+                <i>screen during batch run</i>
+                </center>
+    </div>
+</center>
+
+<h4>What happens next?</h4>
+<br>
+During a batch a complex chain of events occurs. First a template is loaded for the vendor. After that the list of staged files is downloaded from Dropbox. Then each file is processed.
+<p>
+<b>File Processing:</b>
+<p>
+The file to be processed is downloaded from the vendor folder on Dropbox, and depending on its type one of two different things is done.
+<br>
+If the file is in CSV format then all line items are immediately read and each is categorized, error-checked and stored in the EXP table. After all items are read an invoice record is produced.
+<br>If the file is a scan (PDF, JPG or PNG), then it must first be sent to the OCR.space server. This takes time to upload image data, process and then download text results. This is also where internet errors are most likely to occur. More on errors later.
+<p>
+Once the scanned OCR results are returned from the server then the <i>template is applied</i> to the text results. This means the software looks at certain areas on the page for things like the Invoice Number, Date, line items, etc.
+<br>
+
+If all of the necessary fields are present then the line items are spell checked, error-checked and arithmetically checked to make sure the numbers are correct. Any errors are flagged on a line-by-line basis.
+<br>
+Line items that can be recognized are then written out to the EXP table. After each page is processed, the corresponding invoice is either created or updated and stored on the vendor`s invoice table.
+<p>
+
+As the batch runs, all important activities are displayed on a scrolling list and some are logged to the Activity Table, which appears on the MainVC later. When the Batch is done OR if there is a major error then a message will appear at the end of the list.
+<br>
+<center>
+    <div class="outer" width:90%>
+        <center>
+            <img src=images/ssBatchDone.jpg>
+                <br>
+                <i>typical batch output</i>
+                </center>
+    </div>
+</center>
+<p>
+You should not exit the Batch screen while a batch is running. If it appears as if the system is stuck then you can halt a batch by pressing the back button, which looks like a little arrow at the bottom left.  No invoices will be lost, but you may have to rerun the earlier parts of the batch.
+<br>
+
+If you want to rerun a batch after halting it or because of an internet error, only the files that weren`t processed will be dealt with.
+<br>
+
+<center>
+    <div class="outer" width:90%>
+        <center>
+            <img src=images/ssBatchPopup.jpg>
+                <br>
+                <i>the batch popup</i>
+                </center>
+    </div>
+</center>
+
+<h1>Batch Popup Menu</h1>
+
+<ul>
+    <li>Get EXP records: All EXP Entries produced by this batch</li>
+    <li>Get Invoices: All Invoices produced by this batch</li>
+    <li>View/Fix Errors: Goes to Error Screen</li>
+    <li>View/Fix Warnings: Goes to Warnings Screen</li>
+    <li>Error Helper: Displays PDFs from the batch</li>
+    <li>Get Report: Displays batch report</li>
+</ul>
+
+
+Depending on how clear the invoice scans are, and also depending on the type of fonts used by each vendor, there may be as many as one error per line item or none at all.
+<p>
+To look at the errors from a batch return to the MainVC and look for either the <b>Batch Started</b> or <b>Batch Completed</b> activities in the onscreen list that correspond to the batch you just ran. Note there may be more than one batch in the list.
+<p>
+<b>Note:</b>
+<br>
+If you re-run a batch, the old EXP and Invoice outputs will be overwritten, so you won't be able to retreive this older data.
+Trying to fix errors from such an older batch won`t work: there is no data to fix.
+<p>
+If you select a batch a popup menu appears which lets you view and sometimes alter details from the batch.
+<p>
+There are two ways to fix errors
+
+<ul>
+    <li>Change the database directly (see Sashido Instructions)</li>
+    <li>Use the BGPCloud <b>Fix Errors</b> option to change the errors in the database</li>
+</ul>
+<br>
+
+To look at the all the batch details choose <b>Get Report</b>. This downloads the Batch Report from Dropbox.
+<p>
+
+<center>
+    <div class="outer" width:90%>
+        <center>
+            <img src=images/ssBatchErrors.jpg>
+                <br>
+                <i>the Error Screen</i>
+                </center>
+    </div>
+</center>
+
+<h4>Fixing Errors or Warnings:</h4>
+This brings up the Error Screen.  It shows a list of all the errors that occurred in the batch. Errors are marked with a red X and a pinkish background color, while warnings are marked with a yellow exclamation point and a yellow background color.
+<br>
+
+Currently <i>bad prices, bad math or typos in Product Descriptions</i> can be fixed. If you see one of these errors, select it to bring up the Error Inspector.
+<p>
+
+<center>
+    <div class="outer" width:90%>
+        <center>
+            <img src=images/ssErrorInspector.jpg>
+                <br>
+                <i>the Error Inspector</i>
+                </center>
+    </div>
+</center>
+<br>
+The Error Inspector looks up the PDF scan that the error was found in and displays it on the top half of the window.  On the bottom are four lines of text, a <b>Cancel</b> button, and a <b>Fix</b> button.  If you are using a different iPhone than was used to run the batch on, there will be some delay while PDF files are downloaded for display.
+<p>
+
+The top line of text shows the <i>product description</i>, which is editable.
+<br>
+The next three lines contain the <i>Quantity, Price per item, and Total Amount</i>.
+<p>
+These three should fit this equation:
+<br>
+
+<i>Quantity X Price = Amount</i>
+<p>
+
+You can move the PDF around by dragging it.  Find the line item listed by product description on the PDF, then scroll to the right to see the price and amount.
+<p>
+Select whatever field needs fixing from the three lines in the bottom panel.  When you select an item the keyboard pops up, shifting the entire screen upwards.  You can change one or more fields while the keyboard is up.
+<p>
+
+If you decide not to change anything, press <b>Cancel</b>, or if you want to fix the error, press <b>Fix</b>.  The keyboard along with the Error Inspector will be dismissed, and when the Error Screen comes back you should see a blue checkmark on the item you just changed.
+<br>
+
+Fixing an error marks up the line item in the EXP table on the database.  You can change an item again if you entered the wrong values.
+<p>
+
+Warnings typically do not need to be fixed, they are there to let you know that the OCR server made a mistake reading one of the three <i>Quantity, Price, or Amount items</i>, but was able to rectify the error using simple math.
+<br>
+
+Once you are done fixing errors you can exit the Error Window by pressing the little arrow at the bottom left.
+
+
+<hr>
+
+<h1>Export to Excel:</h1>
+
+Records from the EXP table in the database can be exported in CSV format to Excel as email attachments.
+<br>
+This assumes you just ran a batch and have corrected your errors, want to correct them later in Excel.
+<br>
+<ul>
+    <li> From the mainVC,  press the <b>DB</b> button near the bottom left. This brings up a chooser menu.</li>
+    <li> From the chooser, select <b>EXP Table at the top</b></li>
+    <li> This brings up the EXP window, and loads it with the most recent 100 records in the EXP table.
+        You can examine these records individually by selecting any one; it brings up a detail view that
+        shows every field in each record.  You can swipe left or right in this detail view to look at additional
+        records.</li>
+    <li>  At the bottom right of the EXP window, look for the <b>Menu</b> button. Select it.</li>
+    <li>  A set of options appears, choose <b>Export ALL to CSV</b></li>
+    <li>  An Email composer appears after the records are ready, and lets you send them as an attacehment.</li>
+</ul>
+<i>This capability will be moved into the MainVC if it becomes common</i>
+<p>
+On the other end, you can save this attachment and load it directly into Excel.  Note that the first line of the CSV file contains header labels for your convenience.
+
+<br>
+
+
+</body>
+</html>

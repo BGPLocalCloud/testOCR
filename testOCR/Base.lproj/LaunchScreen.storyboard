@@ -36,8 +36,8 @@
                                     <constraint firstAttribute="width" constant="295" id="Yz9-UH-1L9"/>
                                 </constraints>
                                 <string key="text">(C) 2019 Beyond Green Partners
-Built on the Big Island by
-fractallonomy</string>
+Built on the Big Island
+by fractallonomy</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>

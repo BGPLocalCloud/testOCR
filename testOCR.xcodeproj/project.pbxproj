@@ -62,6 +62,10 @@
 		725145F02200B9860074EDBF /* GenParse.m in Sources */ = {isa = PBXBuildFile; fileRef = 725145EF2200B9860074EDBF /* GenParse.m */; };
 		7257C0DC22149E8B0034A627 /* rotbut.png in Resources */ = {isa = PBXBuildFile; fileRef = 7257C0DB22149E890034A627 /* rotbut.png */; };
 		725DA97D21CB53BC0024ECF7 /* EXPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 725DA97C21CB53BC0024ECF7 /* EXPViewController.m */; };
+		72693B2B2214DEF800EEB571 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 72693B2A2214DEF700EEB571 /* www */; };
+		72693B2E2214DFDB00EEB571 /* helpVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 72693B2D2214DFDB00EEB571 /* helpVC.m */; };
+		72693B312214E7C800EEB571 /* grafNOT.png in Resources */ = {isa = PBXBuildFile; fileRef = 72693B2F2214E7C800EEB571 /* grafNOT.png */; };
+		72693B322214E7C800EEB571 /* grafHOT.png in Resources */ = {isa = PBXBuildFile; fileRef = 72693B302214E7C800EEB571 /* grafHOT.png */; };
 		726F0A4921DF092F007656FD /* dbGrey.png in Resources */ = {isa = PBXBuildFile; fileRef = 726F0A4821DF092E007656FD /* dbGrey.png */; };
 		7272C5ED21D5EE050094D7D1 /* bgpBkgd.png in Resources */ = {isa = PBXBuildFile; fileRef = 7272C5EC21D5EE050094D7D1 /* bgpBkgd.png */; };
 		7272C5F021D6ABFE0094D7D1 /* OCRCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 7272C5EF21D6ABFE0094D7D1 /* OCRCache.m */; };
@@ -133,7 +137,6 @@
 		7206008F21B64052000B26DC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7206009121B64055000B26DC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7206009421B64055000B26DC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		7206009621B64055000B26DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7206009721B64055000B26DC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		7206009E21B640E2000B26DC /* hawaiiBeefInvoice.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = hawaiiBeefInvoice.jpg; path = "New Group/hawaiiBeefInvoice.jpg"; sourceTree = SOURCE_ROOT; };
 		720600A021B6487D000B26DC /* hfm.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = hfm.jpg; path = "New Group/hfm.jpg"; sourceTree = SOURCE_ROOT; };
@@ -201,6 +204,11 @@
 		7257C0DB22149E890034A627 /* rotbut.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = rotbut.png; path = Resources/rotbut.png; sourceTree = SOURCE_ROOT; };
 		725DA97B21CB53BC0024ECF7 /* EXPViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXPViewController.h; sourceTree = "<group>"; };
 		725DA97C21CB53BC0024ECF7 /* EXPViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EXPViewController.m; sourceTree = "<group>"; };
+		72693B2A2214DEF700EEB571 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; path = www; sourceTree = "<group>"; };
+		72693B2C2214DFDB00EEB571 /* helpVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = helpVC.h; sourceTree = "<group>"; };
+		72693B2D2214DFDB00EEB571 /* helpVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = helpVC.m; sourceTree = "<group>"; };
+		72693B2F2214E7C800EEB571 /* grafNOT.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = grafNOT.png; path = Resources/grafNOT.png; sourceTree = SOURCE_ROOT; };
+		72693B302214E7C800EEB571 /* grafHOT.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = grafHOT.png; path = Resources/grafHOT.png; sourceTree = SOURCE_ROOT; };
 		726F0A4821DF092E007656FD /* dbGrey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dbGrey.png; path = Resources/dbGrey.png; sourceTree = SOURCE_ROOT; };
 		7272C5EC21D5EE050094D7D1 /* bgpBkgd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bgpBkgd.png; path = Resources/bgpBkgd.png; sourceTree = SOURCE_ROOT; };
 		7272C5EE21D6ABFE0094D7D1 /* OCRCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCRCache.h; sourceTree = "<group>"; };
@@ -311,6 +319,7 @@
 		7206007C21B64052000B26DC = {
 			isa = PBXGroup;
 			children = (
+				72693B2A2214DEF700EEB571 /* www */,
 				7209609021B81E4A00D49C63 /* Resources */,
 				72E5D31021B6DE4C005AF869 /* txt */,
 				7206008721B64052000B26DC /* testOCR */,
@@ -355,6 +364,8 @@
 				725DA97C21CB53BC0024ECF7 /* EXPViewController.m */,
 				728EECC321ED1B5B00F83129 /* InvoiceViewController.h */,
 				728EECC421ED1B5B00F83129 /* InvoiceViewController.m */,
+				72693B2C2214DFDB00EEB571 /* helpVC.h */,
+				72693B2D2214DFDB00EEB571 /* helpVC.m */,
 				72E3FA87220BC1000073C84A /* PDFVC.h */,
 				72E3FA88220BC1000073C84A /* PDFVC.m */,
 				729E9A6221E02E0400F3FB5B /* EXPDetailVC.h */,
@@ -362,7 +373,6 @@
 				7206008E21B64052000B26DC /* Main.storyboard */,
 				7206009121B64055000B26DC /* Assets.xcassets */,
 				7206009321B64055000B26DC /* LaunchScreen.storyboard */,
-				7206009621B64055000B26DC /* Info.plist */,
 				7206009721B64055000B26DC /* main.m */,
 				72435AB121E697290048846A /* Reachability */,
 				7283813721C4D83100A2954B /* UI */,
@@ -382,6 +392,8 @@
 		7209609021B81E4A00D49C63 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				72693B302214E7C800EEB571 /* grafHOT.png */,
+				72693B2F2214E7C800EEB571 /* grafNOT.png */,
 				7257C0DB22149E890034A627 /* rotbut.png */,
 				725145EC220037E40074EDBF /* lildbGrey.png */,
 				72A4FDCA21F2633E00203A50 /* grecoShrunk3.png */,
@@ -602,6 +614,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72693B2B2214DEF800EEB571 /* www in Resources */,
 				72435AB721E697290048846A /* LICENCE.txt in Resources */,
 				7283812A21C4A36200A2954B /* dbNOT.png in Resources */,
 				7206009521B64055000B26DC /* LaunchScreen.storyboard in Resources */,
@@ -640,8 +653,10 @@
 				72B8DEC121C46459004ADD79 /* loupe-mask@2x.png in Resources */,
 				729E92C421DC1CCC00048DAF /* factoryIcon.png in Resources */,
 				7257C0DC22149E8B0034A627 /* rotbut.png in Resources */,
+				72693B312214E7C800EEB571 /* grafNOT.png in Resources */,
 				72C90B9F21F450050032875D /* bgpspin.png in Resources */,
 				7206009F21B640E2000B26DC /* hawaiiBeefInvoice.jpg in Resources */,
+				72693B322214E7C800EEB571 /* grafHOT.png in Resources */,
 				72B8DEB221C370FB004ADD79 /* hfm90.jpg in Resources */,
 				72183DED21C5FA86005627AB /* squareMask.png in Resources */,
 				7206009021B64052000B26DC /* Main.storyboard in Resources */,
@@ -739,6 +754,7 @@
 				7209608921B7FBB000D49C63 /* OCRWord.m in Sources */,
 				720FB4A021EC679F00C0F320 /* BatchReportController.m in Sources */,
 				72BA4D2E21CF644B00F432E9 /* OCRTopObject.m in Sources */,
+				72693B2E2214DFDB00EEB571 /* helpVC.m in Sources */,
 				729E92B121DBE25B00048DAF /* EXPCell.m in Sources */,
 				7206008D21B64052000B26DC /* EditTemplateVC.m in Sources */,
 				72A4B0882206023E00B02F9F /* EXPStats.m in Sources */,

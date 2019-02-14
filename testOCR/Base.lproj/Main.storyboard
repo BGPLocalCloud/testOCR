@@ -10,6 +10,73 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--HelpVC-->
+        <scene sceneID="iNa-uD-mFz">
+            <objects>
+                <viewController id="SZq-Jm-Iin" customClass="helpVC" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="acW-YV-dHs">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Help Viewer" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uab-Na-XJx">
+                                <rect key="frame" x="0.0" y="15" width="375" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="21" id="NJQ-0i-a6r"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="300" id="QxL-qS-0Sf"/>
+                                    <constraint firstAttribute="height" constant="21" id="evb-2p-mcX"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ysg-L3-bms">
+                                <rect key="frame" x="0.0" y="60" width="375" height="549"/>
+                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nfo-o0-rsI">
+                                <rect key="frame" x="20" y="617" width="36" height="30"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="1BY-wA-7XL"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="36" id="H7u-VK-oSa"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="27"/>
+                                <state key="normal" title="&lt;">
+                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="backSelect:" destination="bXq-Rg-b6M" eventType="touchUpInside" id="L7B-Gz-BgX"/>
+                                    <action selector="backSelect:" destination="SZq-Jm-Iin" eventType="touchUpInside" id="cXz-0o-JVt"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="Uab-Na-XJx" firstAttribute="width" secondItem="acW-YV-dHs" secondAttribute="width" id="BFw-HQ-I5o"/>
+                            <constraint firstItem="IYI-Q9-Ple" firstAttribute="bottom" secondItem="nfo-o0-rsI" secondAttribute="bottom" constant="20" id="Fnd-Yg-KLW"/>
+                            <constraint firstItem="ysg-L3-bms" firstAttribute="centerX" secondItem="IYI-Q9-Ple" secondAttribute="centerX" id="fEG-qi-Yyl"/>
+                            <constraint firstItem="IYI-Q9-Ple" firstAttribute="top" secondItem="Uab-Na-XJx" secondAttribute="top" constant="5" id="g2J-sk-Po1"/>
+                            <constraint firstItem="IYI-Q9-Ple" firstAttribute="bottom" secondItem="ysg-L3-bms" secondAttribute="bottom" constant="58" id="g8H-Df-uJe"/>
+                            <constraint firstItem="nfo-o0-rsI" firstAttribute="leading" secondItem="IYI-Q9-Ple" secondAttribute="leading" constant="20" id="iEu-aC-URV"/>
+                            <constraint firstItem="Uab-Na-XJx" firstAttribute="centerX" secondItem="IYI-Q9-Ple" secondAttribute="centerX" id="rIq-hL-bqy"/>
+                            <constraint firstItem="ysg-L3-bms" firstAttribute="width" secondItem="acW-YV-dHs" secondAttribute="width" id="s8x-zw-XAb"/>
+                            <constraint firstItem="ysg-L3-bms" firstAttribute="top" secondItem="IYI-Q9-Ple" secondAttribute="top" constant="40" id="w2k-Ku-r28"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="IYI-Q9-Ple"/>
+                    </view>
+                    <connections>
+                        <outlet property="titleLabel" destination="Uab-Na-XJx" id="g4X-KD-QyE"/>
+                        <outlet property="webView" destination="ysg-L3-bms" id="yP7-G3-KM2"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6aL-uZ-Mc2" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2066.4000000000001" y="-928.78560719640188"/>
+        </scene>
         <!--MainVC-->
         <scene sceneID="hVH-Ut-HFs">
             <objects>
@@ -168,6 +235,7 @@
                         <segue destination="2pW-AS-3QH" kind="show" identifier="invoiceSegue" id="O9x-pA-B20"/>
                         <segue destination="P7s-Sg-RCH" kind="show" identifier="comparisonSegue" id="8re-ah-y3Q"/>
                         <segue destination="AYb-aX-a6J" kind="show" identifier="errorHelperSegue" id="Sec-ao-vIs"/>
+                        <segue destination="SZq-Jm-Iin" kind="show" identifier="helpSegue" id="KDu-RZ-SKo"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OZA-ZU-3pK" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -2432,7 +2500,7 @@
         <image name="tgrid50.png" width="400" height="500"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="lcM-JM-DIo"/>
+        <segue reference="1jN-gk-huX"/>
         <segue reference="rxd-eE-W54"/>
     </inferredMetricsTieBreakers>
 </document>

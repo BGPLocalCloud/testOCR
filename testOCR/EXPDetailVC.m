@@ -33,8 +33,13 @@
     UISwipeGestureRecognizer *rightGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeDetectedRight:)];
     rightGesture.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:rightGesture];
-    
 
+    CGSize csz = [UIScreen mainScreen].bounds.size;
+    screenRect = CGRectMake(0, 0, csz.width, csz.height);
+    ssOverlay  = [[UIImageView alloc] initWithFrame:screenRect]; //footer view, wid
+    ssOverlay.image = nil;
+    [self.view addSubview:ssOverlay];
+    ssOverlay.hidden = TRUE;
 }
 
 //=============EXPDetail VC=====================================================
@@ -52,7 +57,6 @@
 {
     [super viewDidAppear:animated];
     [self updateUI];
-    
 }
 
 //=============EXPDetail VC=====================================================
@@ -80,7 +84,32 @@
     [self setTextFieldWithError : _pdfFileLabel      : _eobj.PDFFile : TRUE];
     int aoc = (int)_allObjects.count;
     if (aoc > 0) [_progressView setProgress:(float)_detailIndex/(float)aoc];
+    sss = [self getScreenshot];
+
 } //end updateUI
+
+//=============EXPDetail VC=====================================================
+-(void) animSwipe : (int)dir
+{
+    ssOverlay.image = sss;
+    ssOverlay.hidden = FALSE;
+    ssOverlay.frame = screenRect;
+    CGRect rr = screenRect;
+    if (dir == 0) //Left
+        rr.origin.x -= 500;
+    else
+        rr.origin.x += 500;
+    [UIView animateWithDuration:0.5
+                          delay:0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self->ssOverlay.frame = rr;
+                     }
+                     completion:^(BOOL completed) {
+                         self->ssOverlay.hidden = TRUE;
+                     }
+     ];  // end anim
+} //end animSwipe
 
 //=============EXPDetail VC=====================================================
 - (void)swipeDetectedRight:(UISwipeGestureRecognizer *)sender
@@ -89,6 +118,7 @@
     if (_detailIndex != 0) // This way it will not go negative
         _detailIndex--;
     _eobj = [_allObjects objectAtIndex:_detailIndex];
+    [self animSwipe : 1];
     [self updateUI];
 }
 
@@ -100,6 +130,7 @@
     if (_detailIndex != [_allObjects count]) // make sure that it does not go over the number of objects in the array.
         _detailIndex++;  // you'll need to check bounds
     _eobj = [_allObjects objectAtIndex:_detailIndex];
+    [self animSwipe : 0];
     [self updateUI];
 }
 
@@ -117,5 +148,20 @@
     [self dismissViewControllerAnimated : YES completion:nil];
     
 }
+
+
+//=============EXPDetail VC=====================================================
+-(UIImage *)getScreenshot
+{
+    //NSLog(@" PixUtils: getSS");
+    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
+    CGRect rect = [keyWindow bounds];
+    UIGraphicsBeginImageContextWithOptions(rect.size,YES,0.0f);
+    CGContextRef lcontext = UIGraphicsGetCurrentContext();
+    [keyWindow.layer renderInContext:lcontext];
+    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return img;
+} //end getScreenshot
 
 @end

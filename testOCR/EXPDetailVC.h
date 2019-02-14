@@ -18,6 +18,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface EXPDetailVC : UIViewController
+{
+    UIImage *sss;
+    UIImageView *ssOverlay;
+    CGRect screenRect;
+}
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 @property (weak, nonatomic) IBOutlet UILabel *categoryLabel;

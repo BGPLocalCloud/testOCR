@@ -152,8 +152,7 @@
     _versionLabel.text = [NSString stringWithFormat:@"V %@",versionNumber];
    // [self testit];
 
-   // [self performSegueWithIdentifier:@"templateSegue" sender:@"mainVC"];
-
+ 
     //[self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
 }
 
@@ -388,9 +387,9 @@
     [nav setLabelTextColor : NAV_DB_BUTTON : [UIColor blackColor]];
     [nav setHidden         : NAV_DB_BUTTON : FALSE];
     // other button...
-    [nav setHotNot         : NAV_SETTINGS_BUTTON : [UIImage imageNamed:@"gearHOT"]  :
-     [UIImage imageNamed:@"gearNOT"] ];
-    [nav setLabelText      : NAV_SETTINGS_BUTTON : NSLocalizedString(@"Settings",nil)];
+    [nav setHotNot         : NAV_SETTINGS_BUTTON : [UIImage imageNamed:@"grafHOT"]  :
+     [UIImage imageNamed:@"grafNOT"] ];
+    [nav setLabelText      : NAV_SETTINGS_BUTTON : NSLocalizedString(@"Outputs",nil)];
     [nav setLabelTextColor : NAV_SETTINGS_BUTTON : [UIColor blackColor]];
     [nav setHidden         : NAV_SETTINGS_BUTTON : FALSE]; //10/16 show create even logged out...
 
@@ -659,9 +658,11 @@
     }
     else if (which == 2) //Templates / settings?
     {
+        [self performSegueWithIdentifier:@"helpSegue" sender:@"mainVC"];
+
        // [self testit];
        // return;
-        [self performSegueWithIdentifier:@"templateSegue" sender:@"mainVC"];
+       // [self performSegueWithIdentifier:@"templateSegue" sender:@"mainVC"];
     }
     if (which == 3 && vv.loaded) //batch? (2/5 make sure vendors are there first!)
     {

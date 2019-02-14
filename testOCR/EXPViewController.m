@@ -68,15 +68,6 @@
     _table.refreshControl = refreshControl;
     [refreshControl addTarget:self action:@selector(refreshIt) forControlEvents:UIControlEventValueChanged];
 
-    //add dropshadow to header  2/11
-    UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:_headerView.bounds];
-    _headerView.layer.masksToBounds = NO;
-    _headerView.layer.shadowColor = [UIColor blackColor].CGColor;
-    _headerView.layer.shadowOffset = CGSizeMake(0.0f, 10.0f);
-    _headerView.layer.shadowOpacity = 0.3f;
-    _headerView.layer.shadowPath = shadowPath.CGPath;
-    [self.view bringSubviewToFront:_headerView];
-    
     // 1/19 add activity spinner
     CGSize csz   = [UIScreen mainScreen].bounds.size;
     spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, csz.width, csz.height)];
@@ -123,6 +114,22 @@
     [self loadEXP];
     [self updateUI];
 } //end viewWillAppear
+
+
+//=============EXP VC=====================================================
+-(void) viewDidLayoutSubviews
+{
+    //add dropshadow to header  2/13 moved here
+    UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:_headerView.bounds];
+    _headerView.layer.masksToBounds = NO;
+    _headerView.layer.shadowColor = [UIColor blackColor].CGColor;
+    _headerView.layer.shadowOffset = CGSizeMake(0.0f, 10.0f);
+    _headerView.layer.shadowOpacity = 0.3f;
+    _headerView.layer.shadowPath = shadowPath.CGPath;
+    [self.view bringSubviewToFront:_headerView];
+
+} //end viewDidLayoutSubviews
+
 
 
 //=============EXP VC=====================================================

@@ -40,15 +40,6 @@
     [super viewDidLoad];
     _table.delegate   = self;
     _table.dataSource = self;
-    
-    //add dropshadow to header  2/11
-    UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:_headerView.bounds];
-    _headerView.layer.masksToBounds = NO;
-    _headerView.layer.shadowColor = [UIColor blackColor].CGColor;
-    _headerView.layer.shadowOffset = CGSizeMake(0.0f, 10.0f);
-    _headerView.layer.shadowOpacity = 0.3f;
-    _headerView.layer.shadowPath = shadowPath.CGPath;
-    [self.view bringSubviewToFront:_headerView];
 
     // 1/19 Add spinner busy indicator...
     CGSize csz   = [UIScreen mainScreen].bounds.size;
@@ -73,6 +64,22 @@
     }
 
 } //end viewDidLoad
+
+
+//=============Invoice VC=====================================================
+-(void) viewDidLayoutSubviews
+{
+    //add dropshadow to header  2/13 moved here
+    UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:_headerView.bounds];
+    _headerView.layer.masksToBounds = NO;
+    _headerView.layer.shadowColor = [UIColor blackColor].CGColor;
+    _headerView.layer.shadowOffset = CGSizeMake(0.0f, 10.0f);
+    _headerView.layer.shadowOpacity = 0.3f;
+    _headerView.layer.shadowPath = shadowPath.CGPath;
+    [self.view bringSubviewToFront:_headerView];
+    
+} //end viewDidLayoutSubviews
+
 
 //=============Invoice VC=====================================================
 -(void) loadNextVendorInvoice
