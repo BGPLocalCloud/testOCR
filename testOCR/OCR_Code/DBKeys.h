@@ -45,6 +45,7 @@
 #define PInv_BatchFixed_key @"BatchFixed"
 #define PInv_BatchWarnings_key @"BatchWarnings"
 #define PInv_BatchWFixed_key @"WarningsFixed"
+#define PInv_UserName_key @"UserName"
 
 
 //Activity Table
@@ -54,15 +55,16 @@
 
 //Invoice table items...
 #define PInv_EXPObjectID_key @"EXPObjectID"
-#define PInv_CustomerKey @"Customer"
-#define PInv_PageCount_key @"PageCount"
-#define PInv_ITotal_Key @"ITotal"
+#define PInv_CustomerKey     @"Customer"
+#define PInv_PageCount_key   @"PageCount"
+#define PInv_ITotal_Key      @"ITotal"
 
 //Batch table...
-#define PInv_BatchSOIDs_key     @"BatchSOIDs"
+#define PInv_BatchSOIDs_key  @"BatchSOIDs"
 
 //Vendor table...
 #define PInv_Rotated_key     @"Rotated"
+#define PInv_IntQuantity_key @"IntQuantity"
 
 //Keyword,Typos,Splits, etc table...
 #define PInv_Name_key      @"Name"

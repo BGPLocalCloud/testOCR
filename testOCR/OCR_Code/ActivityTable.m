@@ -6,7 +6,7 @@
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 //  Should this be a singleton?
-
+//  2/14 add username column
 #import "ActivityTable.h"
 
 @implementation ActivityTable
@@ -98,6 +98,9 @@
     aRecord[PInv_ActivityType_key]     = actType;
     aRecord[PInv_ActivityData_key]     = actData;
     aRecord[PInv_VersionNumber    ]    = _versionNumber;
+    NSString *uname = @"empty";  //DHS 2/14 add username column
+    if ([PFUser currentUser] != nil) uname = [PFUser currentUser].username;
+    aRecord[PInv_UserName_key]         = uname;
     //NSLog(@" activity savetoParse...");
     [aRecord saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
         if (succeeded) {

@@ -21,7 +21,7 @@
 //  2/4  add batch month
 //  2/7  add debugMode for logging
 //  2/10 enabled file rename, add majorFileError check
-
+//  2/14 add username column, int/float quantity support
 #import "BatchObject.h"
 
 @implementation BatchObject
@@ -303,6 +303,9 @@ static BatchObject *sharedInstance = nil;
     if (preIncrement) vendorIndex++;
     int vfcsize = (int)vv.vFileCounts.count;
     int vfnsize = (int)vv.vNames.count;
+    //DHS 2/14 int/floating point quantities for this vendor?
+    NSString *intstr = vv.vIntQuantities[vendorIndex];
+    oto.intQuantity  = [intstr.lowercaseString isEqualToString:@"true"];
     if (debugMode) NSLog(@" vfcsize %d vs vfnsize %d",vfcsize,vfnsize);
     //NOTE filecounts can be larger than vendor counts!
     if (vendorIndex >= vfnsize) [self completeBatch : 1 : FALSE];
@@ -713,6 +716,10 @@ static BatchObject *sharedInstance = nil;
             pfo[PInv_BatchFixed_key]    = [self->fixedList componentsJoinedByString:@","];
             pfo[PInv_BatchWFixed_key]   = [self->warningFixedList componentsJoinedByString:@","];
             pfo[PInv_VersionNumber]     = self->_versionNumber;
+            NSString *uname = @"empty";  //DHS 2/14 add username column
+            if ([PFUser currentUser] != nil) uname = [PFUser currentUser].username;
+            pfo[PInv_UserName_key]         = uname;
+
             [pfo saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
                 if (succeeded)
                 {

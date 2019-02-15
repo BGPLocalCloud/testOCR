@@ -108,7 +108,6 @@
 		72B8DEBD21C4642F004ADD79 /* MagnifierView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B8DEBB21C4642E004ADD79 /* MagnifierView.m */; };
 		72B8DEC021C46459004ADD79 /* magtarg.png in Resources */ = {isa = PBXBuildFile; fileRef = 72B8DEBE21C46459004ADD79 /* magtarg.png */; };
 		72B8DEC121C46459004ADD79 /* loupe-mask@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 72B8DEBF21C46459004ADD79 /* loupe-mask@2x.png */; };
-		72B9D270221640FE00D6404E /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 72B9D26F221640FD00D6404E /* Info.plist */; };
 		72BA4D2521CE175000F432E9 /* BatchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72BA4D2421CE175000F432E9 /* BatchViewController.m */; };
 		72BA4D2821CEFC0100F432E9 /* ActivityTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 72BA4D2721CEFC0100F432E9 /* ActivityTable.m */; };
 		72BA4D2B21CF52B600F432E9 /* BatchObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 72BA4D2A21CF52B600F432E9 /* BatchObject.m */; };
@@ -127,6 +126,35 @@
 		72F394FF21E91AD4009E59C4 /* lilGreenCheck.png in Resources */ = {isa = PBXBuildFile; fileRef = 72F394FE21E91AD3009E59C4 /* lilGreenCheck.png */; };
 		72F6DC2A21E5C0D900EDF9A4 /* bluecheck.png in Resources */ = {isa = PBXBuildFile; fileRef = 72F6DC2921E5C0D800EDF9A4 /* bluecheck.png */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		728215F1221652220031516A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 728215EC221652220031516A /* Charts.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 65AD9E95D9ED4DC0BD73A743;
+			remoteInfo = Charts;
+		};
+		728215F3221652220031516A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 728215EC221652220031516A /* Charts.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1CBBC58C6CE1EBEE9852CE41;
+			remoteInfo = ChartsTests;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		728215E7221650AE0031516A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		10023EDCB985E127D3A90CB2 /* Pods_testOCR.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_testOCR.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -219,6 +247,8 @@
 		7272C5EF21D6ABFE0094D7D1 /* OCRCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OCRCache.m; sourceTree = "<group>"; };
 		7279498C21D041660067B636 /* UIImageExtras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIImageExtras.h; sourceTree = "<group>"; };
 		7279498D21D041670067B636 /* UIImageExtras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIImageExtras.m; sourceTree = "<group>"; };
+		728215E92216519A0031516A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		728215EC221652220031516A /* Charts.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Charts.xcodeproj; path = "../Charts-master/Charts.xcodeproj"; sourceTree = "<group>"; };
 		7283811E21C4A17300A2954B /* NavButtons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavButtons.m; sourceTree = "<group>"; };
 		7283811F21C4A17300A2954B /* NavButtons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavButtons.h; sourceTree = "<group>"; };
 		7283812621C4A36100A2954B /* dbNOT.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dbNOT.png; path = Resources/dbNOT.png; sourceTree = SOURCE_ROOT; };
@@ -271,7 +301,6 @@
 		72B8DEBC21C4642E004ADD79 /* MagnifierView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MagnifierView.h; path = testOCR/UI/MagnifierView.h; sourceTree = SOURCE_ROOT; };
 		72B8DEBE21C46459004ADD79 /* magtarg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = magtarg.png; path = Resources/magtarg.png; sourceTree = SOURCE_ROOT; };
 		72B8DEBF21C46459004ADD79 /* loupe-mask@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "loupe-mask@2x.png"; path = "Resources/loupe-mask@2x.png"; sourceTree = SOURCE_ROOT; };
-		72B9D26F221640FD00D6404E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../../Info.plist; sourceTree = "<group>"; };
 		72BA4D2321CE175000F432E9 /* BatchViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BatchViewController.h; sourceTree = "<group>"; };
 		72BA4D2421CE175000F432E9 /* BatchViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BatchViewController.m; sourceTree = "<group>"; };
 		72BA4D2621CEFC0100F432E9 /* ActivityTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ActivityTable.h; sourceTree = "<group>"; };
@@ -328,6 +357,7 @@
 		7206007C21B64052000B26DC = {
 			isa = PBXGroup;
 			children = (
+				728215EC221652220031516A /* Charts.xcodeproj */,
 				72693B2A2214DEF700EEB571 /* www */,
 				7209609021B81E4A00D49C63 /* Resources */,
 				72E5D31021B6DE4C005AF869 /* txt */,
@@ -381,7 +411,7 @@
 				72E3FA88220BC1000073C84A /* PDFVC.m */,
 				729E9A6221E02E0400F3FB5B /* EXPDetailVC.h */,
 				729E9A6321E02E0400F3FB5B /* EXPDetailVC.m */,
-				72B9D26F221640FD00D6404E /* Info.plist */,
+				728215E92216519A0031516A /* Info.plist */,
 				7206008E21B64052000B26DC /* Main.storyboard */,
 				7206009121B64055000B26DC /* Assets.xcassets */,
 				7206009321B64055000B26DC /* LaunchScreen.storyboard */,
@@ -534,6 +564,15 @@
 			path = OCR_Code;
 			sourceTree = "<group>";
 		};
+		728215ED221652220031516A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				728215F2221652220031516A /* Charts.framework */,
+				728215F4221652220031516A /* ChartsTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		7283813721C4D83100A2954B /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -581,6 +620,7 @@
 				7206008321B64052000B26DC /* Resources */,
 				3C9DE857D4069CB4AFDA745F /* [CP] Embed Pods Frameworks */,
 				72E44DE321F274C900809DA7 /* ShellScript */,
+				728215E7221650AE0031516A /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -616,12 +656,35 @@
 			mainGroup = 7206007C21B64052000B26DC;
 			productRefGroup = 7206008621B64052000B26DC /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 728215ED221652220031516A /* Products */;
+					ProjectRef = 728215EC221652220031516A /* Charts.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				7206008421B64052000B26DC /* testOCR */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		728215F2221652220031516A /* Charts.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Charts.framework;
+			remoteRef = 728215F1221652220031516A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		728215F4221652220031516A /* ChartsTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = ChartsTests.xctest;
+			remoteRef = 728215F3221652220031516A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		7206008321B64052000B26DC /* Resources */ = {
@@ -644,7 +707,6 @@
 				7209609521B81E6B00D49C63 /* arrRight.png in Resources */,
 				722F9A7321C23E0D001D8EE6 /* ssd_hare.png in Resources */,
 				7283813321C4A54600A2954B /* binonion.png in Resources */,
-				72B9D270221640FE00D6404E /* Info.plist in Resources */,
 				7234DF5121EFEE1500049128 /* gordon.png in Resources */,
 				72435B3921C8E01200620F4B /* cal_kona.jpg in Resources */,
 				729E92BE21DBE3A000048DAF /* bigbuxIcon.png in Resources */,

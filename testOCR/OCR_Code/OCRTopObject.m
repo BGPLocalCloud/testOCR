@@ -23,7 +23,7 @@
 //        handle multiple invoices per PDF file
 //        add handleNextPage, now page only gets OCR'ed after previous page is saved
 //  2/7 add debugMode for logging
-
+//  2/14 add int/float quantity support
 #import "OCRTopObject.h"
 
 @implementation OCRTopObject

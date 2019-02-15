@@ -91,6 +91,7 @@
 @property (nonatomic , strong) NSArray* columnHeaders;
 @property (nonatomic , assign) int totalLines;
 @property (nonatomic , strong) OCRTemplate* ot;
+@property (nonatomic , assign) BOOL intQuantity;
 
 @property (nonatomic, unsafe_unretained) id <OCRTopObjectDelegate> delegate; // receiver of completion messages
 

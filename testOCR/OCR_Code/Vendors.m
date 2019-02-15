@@ -33,12 +33,13 @@ static Vendors *sharedInstance = nil;
 {
     if (self = [super init])
     {
-        _vNames       = [[NSMutableArray alloc] init]; // Vendor names
-        _vFolderNames = [[NSMutableArray alloc] init]; //  and matching folder names
-        _vRotations   = [[NSMutableArray alloc] init]; //  invoices rotated?
-        _vFileCounts  = [[NSMutableArray alloc] init]; //  runtime filecounts of PDF/CSV's to process
-        vNamesLC      = [[NSMutableArray alloc] init]; // Vendor names
-        _loaded       = FALSE;
+        _vNames         = [[NSMutableArray alloc] init]; // Vendor names
+        _vFolderNames   = [[NSMutableArray alloc] init]; //  and matching folder names
+        _vRotations     = [[NSMutableArray alloc] init]; //  invoices rotated?
+        _vFileCounts    = [[NSMutableArray alloc] init]; //  runtime filecounts of PDF/CSV's to process
+        _vIntQuantities = [[NSMutableArray alloc] init]; //  integer/float quantity flags
+        vNamesLC        = [[NSMutableArray alloc] init]; // Vendor names
+        _loaded         = FALSE;
         [self readFromParse];
     }
     return self;
@@ -88,9 +89,10 @@ static Vendors *sharedInstance = nil;
                 [self.delegate errorReadingVendorsFromParse];
                 return;
             }
-            [self->_vNames       removeAllObjects];
-            [self->_vFolderNames removeAllObjects];
-            [self->_vRotations   removeAllObjects];
+            [self->_vNames         removeAllObjects];
+            [self->_vFolderNames   removeAllObjects];
+            [self->_vRotations     removeAllObjects];
+            [self->_vIntQuantities removeAllObjects];
             for( PFObject *pfo in objects)  //Save all our vendor names...
             {
                 NSString *s = [pfo objectForKey:PInv_Vendor_key];
@@ -101,8 +103,9 @@ static Vendors *sharedInstance = nil;
                 sf = [sf stringByReplacingOccurrencesOfString:@"." withString:@"_"];
                 sf = [sf stringByReplacingOccurrencesOfString:@"," withString:@"_"];
                 sf = [sf stringByReplacingOccurrencesOfString:@"\'" withString:@"_"];
-                [self->_vFolderNames addObject:sf];
-                [self->_vRotations addObject:[pfo objectForKey:PInv_Rotated_key]];
+                [self->_vFolderNames   addObject:sf];
+                [self->_vRotations     addObject:[pfo objectForKey:PInv_Rotated_key]];
+                [self->_vIntQuantities addObject:[pfo objectForKey:PInv_IntQuantity_key]];
             }
             NSLog(@" ...loaded all vendors");
             self->_loaded = TRUE;

@@ -89,6 +89,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic , assign) int  minorError;
 @property (nonatomic , assign) int  majorError;
 @property (nonatomic , assign) BOOL nonProduct;
+@property (nonatomic , assign) BOOL intQuantity;
 
 
 

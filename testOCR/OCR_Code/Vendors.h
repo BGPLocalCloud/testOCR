@@ -28,6 +28,7 @@
 @property (nonatomic , strong) NSMutableArray* vFolderNames;
 @property (nonatomic , strong) NSMutableArray* vRotations;
 @property (nonatomic , strong) NSMutableArray* vFileCounts;
+@property (nonatomic , strong) NSMutableArray* vIntQuantities;
 @property (nonatomic , assign) BOOL loaded;
 
 @property (nonatomic, unsafe_unretained) id <VendorsDelegate> delegate; // receiver of completion messages

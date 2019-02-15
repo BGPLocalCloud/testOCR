@@ -15,6 +15,7 @@
 //  1/10  add analyze, get rid of old analyze stuff...
 //  2/4   remove _analyzedShortDateString
 //  2/5   redid q / p / a match check again
+//  2/14  add int/float quantity support
 #import "smartProducts.h"
 
 @implementation smartProducts
@@ -758,7 +759,8 @@
         local = TRUE;
     
     //Sanity Check: quantity * price = amount?
-    int qint     = [quantity intValue];
+    int qint         = [quantity intValue];
+    float qfloat     = [quantity floatValue];
     float pfloat     = [price floatValue];
     float afloat     = [amount floatValue];
     if (afloat > 10000.0) //Huge Amount? Assume decimal error
@@ -781,64 +783,90 @@
         //NSLog(@" ERROR: price over $1000!!");
         pfloat = pfloat / 100.0;
     }
+    //2/14 support float/int quantity
+    BOOL zeroQuantity = ((_intQuantity && qint == 0) || (!_intQuantity && qfloat == 0.0));
+    BOOL zeroPrice    = (pfloat == 0.0);
+    BOOL zeroAmount   = (afloat == 0.0);
     //NSLog(@" above [%@] priceFix q p a %d %f %f",fullProductName,qint,pfloat,afloat);
     //2/5 Missing 2 / 3 values is a failure...
-    if ((pfloat == 0.0 && afloat == 0.0) ||
-        (qint   == 0   && afloat == 0.0) ||
-        (qint   == 0   && pfloat == 0.0) )
+    if (( zeroPrice    && zeroAmount)   || //2/14 2/3 zero fields?
+        ( zeroQuantity && zeroAmount) ||
+        ( zeroQuantity && zeroPrice ))
     {
         //NSLog(@" ... 2 out of 3 price columns are zero!");
         _majorError = ANALYZER_BAD_PRICE_COLUMNS;
-        if (pfloat != 0.0)  //Got a price, assume quantity is 1...
+        if (!zeroPrice)  //Got a price, assume quantity is 1...
         {
             qint   = 1;
+            qfloat = 1.0;
             afloat = pfloat;
         }
-        else if (afloat != 0.0)  //Got an amount, assume quantity is 1...
+        else if (!zeroAmount)  //Got an amount, assume quantity is 1...
         {
             qint   = 1;
+            qfloat = 1.0;
             pfloat = afloat;
         }
     }
     else //2/5 check for one zero field, fixable!
     {
         //NSLog(@" ...price err: q * p not equal to a!");
-        if (afloat == 0.0)
+        if (zeroAmount)
         {
             //NSLog(@" ...ZERO Amount: FIX");
-            afloat = (float)qint * pfloat;
+            if (_intQuantity) //2/14
+                afloat = (float)qint * pfloat;
+            else
+                afloat = qfloat * pfloat;
             aerror = ANALYZER_ZERO_AMOUNT;
         }
-        else if (qint == 0)
+        else if (zeroQuantity)
         {
             //NSLog(@" ...ZERO QUANTITY: FIX");
-            qint = (int)floor((afloat / pfloat) + 0.5); //DHS 2/10 account for roundup/down
-            if (qint == 0) qint = 1; //Handle roundoff errors...
+            if (_intQuantity) //2/14
+            {
+                qint = (int)floor((afloat / pfloat) + 0.5); //DHS 2/10 account for roundup/down
+                if (qint == 0) qint = 1; //Handle roundoff errors...
+            }
+            else{
+                qfloat = afloat / pfloat;      // 2/14
+                if (qfloat == 0) qfloat = 1.0;
+            }
             aerror = ANALYZER_ZERO_QUANTITY;
         }
-        else if (pfloat == 0.0)
+        else if (zeroPrice)
         {
             //NSLog(@" ...ZERO PRICE: FIX");
-            pfloat = afloat / (float)qint;
+            if (_intQuantity) //2/14
+                pfloat = afloat / (float)qint;
+            else
+                pfloat = afloat / qfloat;
             aerror = ANALYZER_ZERO_PRICE;
         }
-        else if (afloat != (float)qint * pfloat) //All fields present but still bad math? Assume quantity is wrong?
+        else if ((_intQuantity  && (afloat != (float)qint * pfloat)) ||  //All fields present but still bad math?
+                 (!_intQuantity && (afloat != (qfloat * pfloat))))        // Assume quantity is wrong?
         {
             if (afloat < 0.0) afloat = -1.0 * afloat; //Just negate any negatives!
             if (pfloat < 0.0) pfloat = -1.0 * pfloat;
-            //NSLog(@" ...bad math?");
-            if (qint == 1) //Check mismatch price/amount, defer to amount
+            if (!_intQuantity) NSLog(@" ...bad math  q %4.2f p %4.2f a %4.2f q*p %4.2f",qfloat,pfloat,afloat,qfloat*pfloat);
+            if ((_intQuantity && (qint == 1)) || (!_intQuantity && (qfloat == 1.0)) ) //Mismatch price/amount, defer to amount
             {
                 pfloat = afloat;
             }
             else //Bogus quantity maybe?
             {
-                qint = (int)(afloat / pfloat);
+                if (_intQuantity)
+                    qint = (int)(afloat / pfloat);
+                else
+                    qfloat = afloat/pfloat;
             }
             _majorError = ANALYZER_BAD_MATH;
         }
     }
-    quantity = [NSString stringWithFormat:@"%d", qint];
+    if (_intQuantity)
+        quantity = [NSString stringWithFormat:@"%d", qint];
+    else
+        quantity = [NSString stringWithFormat:@"%4.2f", qfloat];
     price    = [self getDollarsAndCentsString  : pfloat];
     amount   = [self getDollarsAndCentsString  : afloat];
     //pass to outputs...
@@ -873,6 +901,7 @@
     _minorError = aerror;
     return 0;
 } //end analyze
+
 
 
 //=============(smartProducts)=====================================================
