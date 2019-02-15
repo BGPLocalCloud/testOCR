@@ -43,6 +43,7 @@
     // 1/4 add genparse to clear activities
     gp = [[GenParse alloc] init];
     gp.delegate = self;
+    ecount = 0;
     
     vv = [Vendors sharedInstance];
     
@@ -149,6 +150,17 @@
 - (void)viewDidAppear:(BOOL)animated {
     //NSLog(@"mainvc viewDidAppear...");
     [super viewDidAppear:animated];
+    
+//    if ([PFUser currentUser] != nil && (PFUser.currentUser.objectId != nil)) //Logged in?
+    if ([PFUser currentUser] == nil) //NOT Logged in?
+    {
+        loginMode = @"login";
+        [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
+    }
+    else NSLog(@" ...logged into Parse");
+
+
+    
     _versionLabel.text = [NSString stringWithFormat:@"V %@",versionNumber];
    // [self testit];
 
@@ -157,6 +169,19 @@
 }
 
 
+//=============OCR MainVC=====================================================
+- (IBAction)eSelect:(id)sender  //estie eeg
+{
+    ecount++;
+    if (ecount % 1 == 0) [self admin];
+}
+
+//=============OCR MainVC=====================================================
+-(void) admin
+{
+    NSLog(@" admin");
+    [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
+}
 
 //=============OCR MainVC=====================================================
 -(void) menu
@@ -413,11 +438,16 @@
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     //NSLog(@" prepareForSegue: %@ sender %@",[segue identifier], sender);
-    if([[segue identifier] isEqualToString:@"addTemplateSegue"])
+    if([[segue identifier] isEqualToString:@"loginSegue"])
+    {
+        LoginVC *vc = (LoginVC*)[segue destinationViewController];
+        vc.mode  = loginMode;
+    }
+    else if([[segue identifier] isEqualToString:@"addTemplateSegue"])
     {
         AddTemplateViewController *vc = (AddTemplateViewController*)[segue destinationViewController];
         vc.step = 0;
-        vc.needPicker = TRUE;	
+        vc.needPicker = TRUE;
     }
     else if([[segue identifier] isEqualToString:@"expSegue"])
     {

@@ -82,6 +82,9 @@
 		728EECC521ED1B5B00F83129 /* InvoiceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 728EECC421ED1B5B00F83129 /* InvoiceViewController.m */; };
 		728EECC821ED1DDB00F83129 /* invoiceCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 728EECC721ED1DDB00F83129 /* invoiceCell.m */; };
 		7290229C21D58FF900885EF9 /* activityCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7290229B21D58FF900885EF9 /* activityCell.m */; };
+		72990754221523D40021804F /* empty64x64.png in Resources */ = {isa = PBXBuildFile; fileRef = 72990753221523D30021804F /* empty64x64.png */; };
+		72990756221524990021804F /* dbug.png in Resources */ = {isa = PBXBuildFile; fileRef = 72990755221524980021804F /* dbug.png */; };
+		72990759221632430021804F /* LoginVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 72990758221632430021804F /* LoginVC.m */; };
 		7299F76B2213B43A00FC0814 /* ErrorHelperVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 7299F76A2213B43A00FC0814 /* ErrorHelperVC.m */; };
 		729B7A3E21C886590075486C /* invoiceTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 729B7A3D21C886590075486C /* invoiceTable.m */; };
 		729C592C21C1D08900F4C695 /* smartProducts.m in Sources */ = {isa = PBXBuildFile; fileRef = 729C592B21C1D08900F4C695 /* smartProducts.m */; };
@@ -105,6 +108,7 @@
 		72B8DEBD21C4642F004ADD79 /* MagnifierView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B8DEBB21C4642E004ADD79 /* MagnifierView.m */; };
 		72B8DEC021C46459004ADD79 /* magtarg.png in Resources */ = {isa = PBXBuildFile; fileRef = 72B8DEBE21C46459004ADD79 /* magtarg.png */; };
 		72B8DEC121C46459004ADD79 /* loupe-mask@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 72B8DEBF21C46459004ADD79 /* loupe-mask@2x.png */; };
+		72B9D270221640FE00D6404E /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 72B9D26F221640FD00D6404E /* Info.plist */; };
 		72BA4D2521CE175000F432E9 /* BatchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72BA4D2421CE175000F432E9 /* BatchViewController.m */; };
 		72BA4D2821CEFC0100F432E9 /* ActivityTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 72BA4D2721CEFC0100F432E9 /* ActivityTable.m */; };
 		72BA4D2B21CF52B600F432E9 /* BatchObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 72BA4D2A21CF52B600F432E9 /* BatchObject.m */; };
@@ -232,6 +236,10 @@
 		728EECC721ED1DDB00F83129 /* invoiceCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = invoiceCell.m; sourceTree = "<group>"; };
 		7290229A21D58FF900885EF9 /* activityCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = activityCell.h; sourceTree = "<group>"; };
 		7290229B21D58FF900885EF9 /* activityCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = activityCell.m; sourceTree = "<group>"; };
+		72990753221523D30021804F /* empty64x64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = empty64x64.png; path = Resources/empty64x64.png; sourceTree = SOURCE_ROOT; };
+		72990755221524980021804F /* dbug.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dbug.png; path = Resources/dbug.png; sourceTree = SOURCE_ROOT; };
+		72990757221632430021804F /* LoginVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginVC.h; sourceTree = "<group>"; };
+		72990758221632430021804F /* LoginVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginVC.m; sourceTree = "<group>"; };
 		7299F7692213B43A00FC0814 /* ErrorHelperVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ErrorHelperVC.h; sourceTree = "<group>"; };
 		7299F76A2213B43A00FC0814 /* ErrorHelperVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ErrorHelperVC.m; sourceTree = "<group>"; };
 		729B7A3C21C886590075486C /* invoiceTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = invoiceTable.h; sourceTree = "<group>"; };
@@ -263,6 +271,7 @@
 		72B8DEBC21C4642E004ADD79 /* MagnifierView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MagnifierView.h; path = testOCR/UI/MagnifierView.h; sourceTree = SOURCE_ROOT; };
 		72B8DEBE21C46459004ADD79 /* magtarg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = magtarg.png; path = Resources/magtarg.png; sourceTree = SOURCE_ROOT; };
 		72B8DEBF21C46459004ADD79 /* loupe-mask@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "loupe-mask@2x.png"; path = "Resources/loupe-mask@2x.png"; sourceTree = SOURCE_ROOT; };
+		72B9D26F221640FD00D6404E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../../Info.plist; sourceTree = "<group>"; };
 		72BA4D2321CE175000F432E9 /* BatchViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BatchViewController.h; sourceTree = "<group>"; };
 		72BA4D2421CE175000F432E9 /* BatchViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BatchViewController.m; sourceTree = "<group>"; };
 		72BA4D2621CEFC0100F432E9 /* ActivityTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ActivityTable.h; sourceTree = "<group>"; };
@@ -344,6 +353,8 @@
 				7206008921B64052000B26DC /* AppDelegate.m */,
 				7283813421C4A60000A2954B /* MainVC.h */,
 				7283813521C4A60000A2954B /* MainVC.m */,
+				72990757221632430021804F /* LoginVC.h */,
+				72990758221632430021804F /* LoginVC.m */,
 				72D6516B2204DA97009E2057 /* ComparisonVC.h */,
 				72D6516C2204DA97009E2057 /* ComparisonVC.m */,
 				72BA4D2321CE175000F432E9 /* BatchViewController.h */,
@@ -370,6 +381,7 @@
 				72E3FA88220BC1000073C84A /* PDFVC.m */,
 				729E9A6221E02E0400F3FB5B /* EXPDetailVC.h */,
 				729E9A6321E02E0400F3FB5B /* EXPDetailVC.m */,
+				72B9D26F221640FD00D6404E /* Info.plist */,
 				7206008E21B64052000B26DC /* Main.storyboard */,
 				7206009121B64055000B26DC /* Assets.xcassets */,
 				7206009321B64055000B26DC /* LaunchScreen.storyboard */,
@@ -392,6 +404,8 @@
 		7209609021B81E4A00D49C63 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				72990755221524980021804F /* dbug.png */,
+				72990753221523D30021804F /* empty64x64.png */,
 				72693B302214E7C800EEB571 /* grafHOT.png */,
 				72693B2F2214E7C800EEB571 /* grafNOT.png */,
 				7257C0DB22149E890034A627 /* rotbut.png */,
@@ -630,6 +644,7 @@
 				7209609521B81E6B00D49C63 /* arrRight.png in Resources */,
 				722F9A7321C23E0D001D8EE6 /* ssd_hare.png in Resources */,
 				7283813321C4A54600A2954B /* binonion.png in Resources */,
+				72B9D270221640FE00D6404E /* Info.plist in Resources */,
 				7234DF5121EFEE1500049128 /* gordon.png in Resources */,
 				72435B3921C8E01200620F4B /* cal_kona.jpg in Resources */,
 				729E92BE21DBE3A000048DAF /* bigbuxIcon.png in Resources */,
@@ -664,8 +679,10 @@
 				72A4FDCB21F2633E00203A50 /* grecoShrunk3.png in Resources */,
 				729E92BB21DBE3A000048DAF /* centIcon.png in Resources */,
 				724B4BB321E74BDE0086B933 /* multiHOT.png in Resources */,
+				72990756221524990021804F /* dbug.png in Resources */,
 				725145ED220037E40074EDBF /* lildbGrey.png in Resources */,
 				729E92C121DC1CC100048DAF /* barnIcon.png in Resources */,
+				72990754221523D40021804F /* empty64x64.png in Resources */,
 				72B787B521ED30DA00459AD4 /* redX.png in Resources */,
 				72435B3B21C96E8E00620F4B /* loves.jpg in Resources */,
 				720FB49D21EC4F5800C0F320 /* yellowWarningIcon.png in Resources */,
@@ -766,6 +783,7 @@
 				7206008A21B64052000B26DC /* AppDelegate.m in Sources */,
 				72BA4D2B21CF52B600F432E9 /* BatchObject.m in Sources */,
 				72BA4D2521CE175000F432E9 /* BatchViewController.m in Sources */,
+				72990759221632430021804F /* LoginVC.m in Sources */,
 				729E9A6421E02E0400F3FB5B /* EXPDetailVC.m in Sources */,
 				721D9C2021CB122F00D1E78A /* OCRCategories.m in Sources */,
 				729B7A3E21C886590075486C /* invoiceTable.m in Sources */,

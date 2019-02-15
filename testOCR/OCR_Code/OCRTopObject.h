@@ -95,16 +95,17 @@
 @property (nonatomic, unsafe_unretained) id <OCRTopObjectDelegate> delegate; // receiver of completion messages
 
 + (id)sharedInstance;
--(NSString *) getRawResult;
--(NSString *) getParsedText;
--(void) clearEXPBatchCounter;
+- (NSString *) getRawResult;
+- (NSString *) getParsedText;
+- (void) clearEXPBatchCounter;
 - (void) loadCSVFileFromDocParser : (NSString *)fname : (NSString *)vendor;
 - (void) loadCSVValuesFromString : (NSString *)avendor : (NSString *)s;
-- (void)performOCROnImage : (NSString *)fname : (UIImage *)imageToOCR ;
-- (void)performOCROnData : (NSString *)fname : (NSData *)imageDataToOCR : (CGRect) r  ;
--(void) stubbedOCR: (NSString*)imageName : (UIImage *)imageToOCR : (OCRTemplate *)ot;
--(void) setupTestDocumentJSON : (NSDictionary *) json;  //FOR TESTING ONLY
--(void) setupDocumentFrameAndParseJSON : (CGRect) r;
+- (void) performOCROnImage : (NSString *)fname : (UIImage *)imageToOCR ;
+- (void) performOCROnData : (NSString *)fname : (NSData *)imageDataToOCR : (CGRect) r  ;
+- (void) stubbedOCR: (NSString*)imageName : (UIImage *)imageToOCR : (OCRTemplate *)ot;
+- (void) setVisualDebug  : (UIViewController*) p : (NSString*)dbs;
+- (void) setupTestDocumentJSON : (NSDictionary *) json;  //FOR TESTING ONLY
+- (void) setupDocumentFrameAndParseJSON : (CGRect) r;
 - (void)applyTemplate : (OCRTemplate *)ot : (int) page;             //FOR TESTING ONLY
 -(void) writeEXPToParse : (int) page;
 -(NSString *) dumpResults;

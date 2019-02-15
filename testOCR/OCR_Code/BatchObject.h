@@ -14,6 +14,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
 #import <Parse/Parse.h>
 #import "AppDelegate.h"
@@ -115,6 +116,8 @@
 -(void) readFromParseByIDs : (NSArray *) bIDs;
 -(void) runOneOrMoreBatches  : (int) vindex;
 -(void) setParent : (UIViewController*) p;
+-(void) setVisualDebug : (UIViewController*) p : (NSString*)dbs;
+
 -(void) updateParse;
 -(void) writeBatchReport;
 

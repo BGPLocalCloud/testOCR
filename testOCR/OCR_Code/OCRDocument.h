@@ -58,6 +58,8 @@ NS_ASSUME_NONNULL_BEGIN
     CGRect topmostRightRect;
 
     BOOL debugMode;   //2/7 For verbose logging...
+    NSString* debugString; //2/13 for arbitrary debugging
+    UIViewController *debugParent; //Top level VC for debug output
 }
 @property (nonatomic , strong) UIImage* scannedImage;
 @property (nonatomic , strong) NSString* scannedName;
@@ -111,6 +113,8 @@ NS_ASSUME_NONNULL_BEGIN
 -(CGRect) getTRRect;
 -(CGRect) getBLRect;
 -(CGRect) getBRRect;
+-(void) setVisualDebug  : (UIViewController*) p : (NSString*)dbs;
+
 -(CGRect) template2DocRect  : (CGRect) r;
 
 -(void) getAverageGlyphHeight;

@@ -28,6 +28,7 @@
 #import "InvoiceViewController.h"
 #import "EXPTable.h"
 #import "GenParse.h"
+#import "LoginVC.h"
 #import "NavButtons.h"
 #import "SessionManager.h"
 #import "OCRCache.h"
@@ -66,7 +67,9 @@ NS_ASSUME_NONNULL_BEGIN
     EXPTable *et;
     NSString *selVendor;
     BOOL fatalErrorSelect; //2/11 Better way to do this? Maybe type select?
-
+    int ecount;
+    NSString *loginMode;
+    
 }
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UILabel *logoLabel;
@@ -75,6 +78,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) IBOutlet UILabel *versionLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *logoView;
+
+
+- (IBAction)eSelect:(id)sender;
+
 
 @end
 

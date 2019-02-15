@@ -33,11 +33,12 @@
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UIButton *runButton;
 @property (weak, nonatomic) IBOutlet UITextView *outputText;
-- (IBAction)monthSelect:(id)sender;
 @property (weak, nonatomic) IBOutlet UIButton *monthButton;
 
 - (IBAction)cancelSelect:(id)sender;
 - (IBAction)runSelect:(id)sender;
+- (IBAction)monthSelect:(id)sender;
+- (IBAction)debugSelect:(id)sender;
 
 @end
 

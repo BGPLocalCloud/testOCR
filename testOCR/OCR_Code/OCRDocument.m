@@ -53,6 +53,7 @@
         hScale = vScale = 1.0;
         
         debugMode = FALSE; //DHS 2/7
+        debugString = @"";
 
     }
     return self;
@@ -731,6 +732,18 @@
         _amountColumn = column;
     if (debugMode) NSLog(@" column header[%d] %@ ic %d qc %d dc %d pc %d ac %d",column,headerForThisColumn,
           _itemColumn,_quantityColumn,_descriptionColumn,_priceColumn,_amountColumn);
+
+    //Special debug: outputs prompt to UI w/ debug data
+    if ( ([debugString isEqualToString:@"quantity"]    && (column == _quantityColumn)) ||
+         ([debugString isEqualToString:@"price"]       && (column == _priceColumn))    ||
+         ([debugString isEqualToString:@"amount"]      && (column == _amountColumn))   ||
+         ([debugString isEqualToString:@"description"] && (column == _descriptionColumn)) )
+    {   //Set up title and message strings
+        NSString* tstr = [NSString stringWithFormat:@"%@ Column (raw)",debugString];
+        NSString* mstr = [NSString stringWithFormat:@"%@",[resultStrings componentsJoinedByString:@"\n"]];
+        [self debugOutputPrompt : debugParent : tstr : mstr];
+    }
+
     return resultStrings;
 } //end getColumnStrings
 
@@ -1392,7 +1405,33 @@
     //NSLog(@" overall image wh %d,%d",_width,_height);
 } //end parseJSONfromDict
 
-//=============OCR VC=====================================================
+//=============OCRDocument=====================================================
+// 2/13 send debug display info down to children..
+-(void) setVisualDebug  : (UIViewController*) p : (NSString*)dbs
+{
+    debugString = dbs.lowercaseString;
+    debugParent = p;
+}
+
+
+
+//=============OCRDocument=====================================================
+// Used to dump debug info to window
+-(void) debugOutputPrompt : (UIViewController*) p : (NSString *) dtitle : (NSString*) msg
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:dtitle
+                                                                   message:msg
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK",nil)
+                                                        style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                        }];
+    //DHS 3/13: Add owner's ability to delete puzzle
+    [alert addAction:yesAction];
+    [p presentViewController:alert animated:YES completion:nil];
+
+} //end debugOutputPrompt
+
+//=============OCRDocument=====================================================
 // page is zero=based
 -(void) setupPage : (int) page
 {

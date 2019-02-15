@@ -611,6 +611,14 @@ static OCRTopObject *sharedInstance = nil;
 } //end handleNextPage
 
 //=============(OCRTopObject)=====================================================
+// 2/13 send debug display info down to children..
+-(void) setVisualDebug  : (UIViewController*) p : (NSString*)dbs
+{
+    [od setVisualDebug : p : dbs];
+}
+
+
+//=============(OCRTopObject)=====================================================
 -(void) stubbedOCR: (NSString*)imageName : (UIImage *)imageToOCR : (OCRTemplate *)ot
 {
     NSString * stubbedDocName = @"lilbeef";

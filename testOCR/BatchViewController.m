@@ -11,6 +11,7 @@
 //  Created by Dave Scruton on 12/21/18.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  2/13 add debugMenu
 
 #import "BatchViewController.h"
 
@@ -116,12 +117,7 @@
     
 } //end updateUI
 
-//=============Batch VC=====================================================
-// 2/4 new button: fiscal month
-- (IBAction)monthSelect:(id)sender
-{
-    [self monthMenu];
-}
+
 
 //=============Batch VC=====================================================
 - (IBAction)cancelSelect:(id)sender
@@ -133,6 +129,20 @@
     else
         [self dismiss];
 }
+//=============Batch VC=====================================================
+- (IBAction)debugSelect:(id)sender
+{
+    [self debugMenu];
+}
+
+
+//=============Batch VC=====================================================
+// 2/4 new button: fiscal month
+- (IBAction)monthSelect:(id)sender
+{
+    [self monthMenu];
+}
+
 
 //=============Batch VC=====================================================
 - (IBAction)runSelect:(id)sender {
@@ -176,6 +186,47 @@
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
 } //end runSelect
+
+//=============Batch VC=====================================================
+-(void) setVisualDebug : (NSString*)dbs
+{
+    [bbb setVisualDebug : self : dbs]; //Pass the buck...
+}
+
+//=============Batch VC=====================================================
+-(void) debugMenu
+{
+    NSArray *debugShite = @[  //CANNED stuff that never is a product
+                    @"quantity",
+                    @"description",
+                    @"price",
+                    @"amount",
+                    @"nothing"
+                    ];
+
+    NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:@"Debug Functions"];
+    [tatString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:30] range:NSMakeRange(0, tatString.length)];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:
+                                NSLocalizedString(@"Main Functions",nil)
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    [alert setValue:tatString forKey:@"attributedTitle"];
+
+    for (NSString *dbs in debugShite)
+    {
+        [alert addAction:[UIAlertAction actionWithTitle:[NSString stringWithFormat:@"Dump %@",dbs]
+                                                  style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                      [self setVisualDebug : dbs];
+                                                  }]];
+    }
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                              }]];
+    [self presentViewController:alert animated:YES completion:nil];
+    
+    
+} //end menu
+
 
 //=============Batch VC=====================================================
 // Yes/No to exit UI on batch running...

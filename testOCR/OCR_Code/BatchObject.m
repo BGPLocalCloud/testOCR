@@ -285,6 +285,13 @@ static BatchObject *sharedInstance = nil;
 } //end runOneOrMoreBatches
 
 //=============(BatchObject)=====================================================
+// 2/13 send debug display info down to children..
+-(void) setVisualDebug : (UIViewController*) p : (NSString*)dbs
+{
+    [oto setVisualDebug : p : dbs];
+}
+
+//=============(BatchObject)=====================================================
 // Get next vendor with staged files and start batch
 -(void) startNextVendorBatch : (BOOL) preIncrement
 {
