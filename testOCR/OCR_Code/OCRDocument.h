@@ -14,6 +14,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "AppDelegate.h"
 #import "OCRWord.h"
 #import "documentBox.h"
 
@@ -86,7 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(int)  autoFindHeader;
 -(NSString*) cleanUpNumberString : (NSString *)nstr;
 -(NSString *)cleanupPrice : (NSString *)s;
--(NSMutableArray *) cleanUpPriceColumns : (int) index : (NSString *)ctype : (NSMutableArray*) a;
+-(NSMutableArray *) cleanUpRawColumns : (int) index : (NSString *)ctype : (NSMutableArray*) a;
 -(void) computeScaling: (CGRect )tlr : (CGRect )trr;
 -(void) dumpArrayFull : (NSArray*)a;
 -(void) dumpArray : (NSArray*)a;
@@ -114,7 +115,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(CGRect) getBLRect;
 -(CGRect) getBRRect;
 -(void) setVisualDebug  : (UIViewController*) p : (NSString*)dbs;
-
+-(void) setDebugMode : (BOOL) mode;
 -(CGRect) template2DocRect  : (CGRect) r;
 
 -(void) getAverageGlyphHeight;

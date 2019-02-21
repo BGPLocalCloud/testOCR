@@ -144,7 +144,10 @@
     if (frame.origin.x < 0) frame.origin.x = 0; //Don't allow off-document frmaes!
     if (frame.origin.y < 0) frame.origin.y = 0;
     
-    if ([fname isEqualToString : INVOICE_COLUMN_FIELD]) //Column? which one?
+    //2/15 compare against multiple column types
+    if ([@[INVOICE_COLUMN_FIELD,INVOICE_COLUMN_ITEM_FIELD,INVOICE_COLUMN_DESCRIPTION_FIELD,
+           INVOICE_COLUMN_QUANTITY_FIELD,INVOICE_COLUMN_PRICE_FIELD ,INVOICE_COLUMN_AMOUNT_FIELD]
+         containsObject: fname]) //Column? get which one?
     {
         int fcindex = [self firstColumn];
         if (fcindex >= 0) //2nd...column? just line up w/ first

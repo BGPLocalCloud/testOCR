@@ -311,6 +311,7 @@
                      @"celery",
                      @"corn IFQ",  //???WTF?
                      @"cranberry",
+                     @"cucumber",
                      @"cucumbers",
                      @"garlic",
                      @"green beans",
@@ -747,7 +748,7 @@
 
     if (!found)
     {
-        //NSLog(@" analyze ... no product found %@",fullProductName);
+        NSLog(@" analyze ... no product found %@",fullProductName);
         _majorError = ANALYZER_NO_PRODUCT_FOUND;
         return ANALYZER_NO_PRODUCT_FOUND; //Indicate failure
     }

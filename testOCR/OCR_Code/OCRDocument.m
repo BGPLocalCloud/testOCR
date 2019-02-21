@@ -15,7 +15,8 @@
 //           may result in rows getting mixed up!
 // 2/7 add debugMode for logging
 //      pull cleanupProductNameString, getPost* methods
-
+//  2/15 add setDebugMode
+//  2/17 add cleanupNonEnglishCharacters
 #import "OCRDocument.h"
 
 @implementation OCRDocument
@@ -51,8 +52,7 @@
         
         unitScale = TRUE;
         hScale = vScale = 1.0;
-        
-        debugMode = FALSE; //DHS 2/7
+        debugMode = FALSE;
         debugString = @"";
 
     }
@@ -237,6 +237,25 @@
     return outstr;
 }
 
+//=============(OCRDocument)=====================================================
+//https://stackoverflow.com/questions/27697591/remove-apostrophe-in-cfstringtransform-results/27698313#27698313
+-(NSString *) cleanupNonEnglishCharacters : (NSString*)s
+{
+//   NSString *duh = CFStringTransform(bufferRef, NULL, CFSTR("[^[:Latin:][:space:][:number:]] Remove"), false);
+    NSString *source = s;
+    NSMutableString *dest = [source mutableCopy];
+    
+    NSCharacterSet *validCharacters = [NSCharacterSet characterSetWithCharactersInString:
+                                       @" abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ."];
+    NSCharacterSet *invalidCharacters = [validCharacters invertedSet];
+    
+    NSRange invalidRange;
+    while ( (invalidRange = [dest rangeOfCharacterFromSet:invalidCharacters]).length != 0)
+    {
+        [dest replaceCharactersInRange:invalidRange withString:@" "];
+    }
+    return (NSString*)dest;
+} //end cleanupNonEnglishCharacters
 
 //=============(OCRDocument)=====================================================
 // Makes sure price has format DDD.CC
@@ -267,32 +286,48 @@
 }
 
 //=============(OCRDocument)=====================================================
-// Fix typos etc in price / amount columns..
-// 1/23 added support for column types
--(NSMutableArray *) cleanUpPriceColumns : (int) index : (NSString *)ctype : (NSMutableArray*) a
+// 2/17 handles price/quantity/description now, they all need initial cleanup
+-(NSMutableArray *) cleanUpRawColumns : (int) index : (NSString *)ctype : (NSMutableArray*) a
 {
-    if ([ctype isEqualToString:@"INVOICE_COLUMN"]) //Columns assumed I/Q/D/P/A??
-    {
-        if (index != _priceColumn &&
-            index != _amountColumn &&
-            index != _quantityColumn) return a; //Using our 5 canned columns
-    }
+//    if ([ctype isEqualToString:@"INVOICE_COLUMN"]) //Columns assumed I/Q/D/P/A??
+//    {
+//        if (index != _priceColumn &&
+//            index != _amountColumn &&
+//            index != _descriptionColumn &&
+//            index != _quantityColumn) return a; //Using our 5 canned columns
+//    }
     //Need a cleanup?
     NSMutableArray *aout = [[NSMutableArray alloc] init];
-    //Cleanup dollar amounts... 1/23 added new column types...
-    //DHS 2/5 wups forgot about built-in column numbers!
-    if ([ctype isEqualToString:@"INVOICE_COLUMN_PRICE"] || [ctype isEqualToString:@"INVOICE_COLUMN_TOTAL"] ||
-        index == _priceColumn || index == _amountColumn)
+    //2/17 3 types of column designations: INVOICE_COLUMN uses built-in numeric assumptions,
+    //  while INVOICE_COLUMN_PRICE... avoid these assumptions!
+    BOOL gotPrice       = FALSE;
+    BOOL gotQuantity    = FALSE;
+    BOOL gotDescription = FALSE;
+    if ([ctype isEqualToString:@"INVOICE_COLUMN"]) //Generic (old type) column
     {
+        //Check price / amount columns (dollar amounts)
+        if ((index == _priceColumn) || (index == _amountColumn)) gotPrice = TRUE;
+        //Check price / amount columns (dollar amounts)
+        if (index == _quantityColumn) gotQuantity = TRUE;
+        if (index == _descriptionColumn) gotDescription = TRUE;
+    }
+    else if ([ctype isEqualToString:@"INVOICE_COLUMN_PRICE"] || [ctype isEqualToString:@"INVOICE_COLUMN_TOTAL"])
+        gotPrice = TRUE;
+    else if ([ctype isEqualToString:@"INVOICE_COLUMN_QUANTITY"])
+        gotQuantity = TRUE;
+    else if ([ctype isEqualToString:@"INVOICE_COLUMN_DESCRIPTION"]) //Description? look for garbage
+        gotDescription = TRUE;
+
+    if (gotPrice)
         for (NSString * s in a) [aout addObject:[self cleanupPrice:s]];
-    }
-    else if ([ctype isEqualToString:@"INVOICE_COLUMN_QUANTITY"] || index == _quantityColumn) //quantity
-    {
+    else if (gotQuantity)
         for (NSString * s in a) [aout addObject:[self cleanUpNumberString : s]];
-    }
-    else aout = [NSMutableArray arrayWithArray:a];
+    else if (gotDescription)
+        for (NSString * s in a) [aout addObject:[self cleanupNonEnglishCharacters : s]]; // 2/17
+    else
+        aout = [NSMutableArray arrayWithArray:a];
     return aout;
-} //end cleanUpPriceColumns
+} //end cleanUpRawColumns
 
 
 
@@ -462,7 +497,7 @@
     int ys[64];  //we can handle up to 256 words...
     for (int i=0;i<64;i++) ys[i] = -999;
     int yptr = 0;
-    int ytolerance = 1.5 * _glyphHeight;
+    int ytolerance = 0.9 * _glyphHeight; //DHS 2/17 was too big for gordon invoices?
     int fonyWidth = topmostRightRect.origin.x + topmostRightRect.size.width;
     for (NSNumber *n in a)
     {
@@ -551,7 +586,7 @@
     NSArray *a = [self findAllWordsInRect:hdrRect];
     //[self dumpArrayFull:a];
     BOOL done = FALSE;
-    int col = 0; //asdf
+    int col = 0;
     int xLeft = 0;
     while (!done) //Go get header strings
     {
@@ -659,6 +694,15 @@
 {
     if (a.count == 0) return @""; //handle edge cases
     NSMutableArray *wordPairs = [self getSortedWordPairsFromArray:a];
+    NSString *output = @""; //Assemble string now, assume sorted
+    for (NSDictionary *d in wordPairs)  //Is there an easier way to assemble a string?
+    {
+        NSString* ns  = [d objectForKey:@"Word"];
+        output = [output stringByAppendingString:ns];
+        if (!numeric) output = [output stringByAppendingString:@" "];
+    }
+    return output;
+#ifdef DELETETHISOLDCRAP
     //All sorted! Now pluck'em out!
     NSString *s = @"";
     int i    = 0;
@@ -679,6 +723,7 @@
         i++;
     }
     return s;
+#endif
 } //end assembleWordFromArray
 
 
@@ -693,6 +738,11 @@
     int yc = (int)finalYs.count;
     if (debugMode) NSLog(@" getColumnStrings %d yc %d",column,yc);
     int lastYSize = 0;
+    
+    int bing = 0; //2/17 test
+    if ( [ctype.lowercaseString containsString:@"description"])
+        bing = 1;
+    
     for (int i=0;i<yc;i++)
     {
         NSNumber *ny = finalYs[i];
@@ -712,7 +762,8 @@
         CGRect docRect = [self  template2DocRect : cr];
         if (debugMode) NSLog(@" ...(col %d row %d) rect %@ thisy %d nexty %d",
               column,i,NSStringFromCGRect(docRect),thisY,nextY);
-        if (debugMode) [self dumpArrayFull:a];
+        if (debugMode)
+            [self dumpArrayFull:a];
         [resultStrings addObject:[self assembleWordFromArray : a : FALSE : 2]];
         lastYSize = nextY - thisY;
     }
@@ -1405,6 +1456,14 @@
     //NSLog(@" overall image wh %d,%d",_width,_height);
 } //end parseJSONfromDict
 
+
+//=============OCRDocument=====================================================
+-(void) setDebugMode : (BOOL) mode
+{
+    debugMode = mode;
+}
+
+
 //=============OCRDocument=====================================================
 // 2/13 send debug display info down to children..
 -(void) setVisualDebug  : (UIViewController*) p : (NSString*)dbs
@@ -1419,16 +1478,18 @@
 // Used to dump debug info to window
 -(void) debugOutputPrompt : (UIViewController*) p : (NSString *) dtitle : (NSString*) msg
 {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:dtitle
-                                                                   message:msg
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK",nil)
-                                                        style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                        }];
-    //DHS 3/13: Add owner's ability to delete puzzle
-    [alert addAction:yesAction];
-    [p presentViewController:alert animated:YES completion:nil];
-
+    //2/25 This may be called on a bkgd thread!
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:dtitle
+                                                                       message:msg
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK",nil)
+                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                            }];
+        //DHS 3/13: Add owner's ability to delete puzzle
+        [alert addAction:yesAction];
+        [p presentViewController:alert animated:YES completion:nil];
+    });
 } //end debugOutputPrompt
 
 //=============OCRDocument=====================================================

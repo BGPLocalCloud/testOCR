@@ -494,12 +494,15 @@
 
 
 //=============OCR VC=====================================================
+// setups field for moving around and positioning:
+//   finishAndAddBox does actual creation of new template box
 -(void) addNewField : (NSString*) ftype
 {
     //Multiple columns are desired, other types of fields are one-only!
-    if (![ftype isEqualToString:INVOICE_COLUMN_FIELD] &&
-        ![ftype isEqualToString:INVOICE_IGNORE_FIELD] &&
-        [ot gotFieldAlready:ftype])
+    // 2/15 make a special array for here...
+    if ([@[INVOICE_NUMBER_FIELD,INVOICE_DATE_FIELD,INVOICE_SUPPLIER_FIELD,
+           INVOICE_CUSTOMER_FIELD,INVOICE_HEADER_FIELD ,INVOICE_TOTAL_FIELD]
+        containsObject: ftype])
     {
         [self alertMessage:@"Field in Use" :@"This field is already used."];
         return;
@@ -589,23 +592,16 @@
                                 NSLocalizedString(@"Clear All Fields: Are you sure?",nil)
                                                                    message:nil
                                                             preferredStyle:UIAlertControllerStyleAlert];
-    
-    
-    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK",nil)
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self clearFields];
                                                               [self stopMagView];
-                                                          }];
-    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
+                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                           }];
-    //DHS 3/13: Add owner's ability to delete puzzle
-    [alert addAction:firstAction];
-    [alert addAction:secondAction];
-    
+                                                           }]];
     [self presentViewController:alert animated:YES completion:nil];
-    
-}
+} //end clearSelect
 
 //=============OCR VC=====================================================
 // Handles add field OR cancel adding field
@@ -625,56 +621,59 @@
                                                                    message:nil
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     [alert setValue:tatString forKey:@"attributedTitle"];
-    
-    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Add Invoice Supplier",nil)
+    // 2/15 cleanup...
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add Invoice Supplier",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self addNewField : INVOICE_SUPPLIER_FIELD];
-                                                          }];
-    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Add Invoice Number",nil)
+                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add Invoice Number",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                                [self addNewField : INVOICE_NUMBER_FIELD];
-                                                           }];
-    UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Add Invoice Date",nil)
+                                                           }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add Invoice Date",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self addNewField : INVOICE_DATE_FIELD];
-                                                          }];
-    UIAlertAction *fourthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Add Invoice Customer",nil)
+                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add Invoice Customer",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                                [self addNewField : INVOICE_CUSTOMER_FIELD];
-                                                           }];
-    UIAlertAction *fifthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Add Invoice Column Header",nil)
+                                                           }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add Header across columns   ",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self addNewField : INVOICE_HEADER_FIELD];
-                                                          }];
-    UIAlertAction *sixthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Add a Column",nil)
+                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add Item# Column",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              [self addNewField : INVOICE_COLUMN_FIELD];
-                                                          }];
-    UIAlertAction *seventhAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Add Invoice Total",nil)
+                                                              [self addNewField : INVOICE_COLUMN_ITEM_FIELD];
+                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add Description Column",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self addNewField : INVOICE_COLUMN_DESCRIPTION_FIELD];
+                                              }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add Quantity Column",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self addNewField : INVOICE_COLUMN_QUANTITY_FIELD];
+                                              }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add Price/Item Column",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self addNewField : INVOICE_COLUMN_PRICE_FIELD];
+                                              }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add Total Amount Column",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self addNewField : INVOICE_COLUMN_AMOUNT_FIELD];
+                                              }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add Invoice Total",nil)
                                                             style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                                 [self addNewField : INVOICE_TOTAL_FIELD];
-                                                            }];
-    UIAlertAction *eighthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Ignore this Area",nil)
+                                                            }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Ignore this Area",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                                [self addNewField : INVOICE_IGNORE_FIELD];
-                                                           }];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
+                                                           }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                           }];
-    //DHS 3/13: Add owner's ability to delete puzzle
-    [alert addAction:firstAction];
-    [alert addAction:secondAction];
-    [alert addAction:thirdAction];
-    [alert addAction:fourthAction];
-    [alert addAction:fifthAction];
-    [alert addAction:sixthAction];
-    [alert addAction:seventhAction];
-    [alert addAction:eighthAction];
-    
-    [alert addAction:cancelAction];
-    
+                                                           }]];
     [self presentViewController:alert animated:YES completion:nil];
-    
 } //end addFieldSelect
 
 //=============OCR VC=====================================================
@@ -804,6 +803,7 @@
     //  and text offsets!
     CGRect r = [self getDocumentFrameFromSelectBox];
     if (adjusting) [ot deleteBox:adjustSelect]; //Adjust? Replace box
+    // 2/15 NOTE for column boxes, the top/bottoms get auto-aligned
     [ot addBox : r : fieldName : fieldFormat];
     editing = adjusting = FALSE;
     [ot dump];
@@ -814,8 +814,7 @@
     [ot saveToParse:supplierName];
     [self clearScreenAfterEdit];
     [self stopMagView];
-    
-}
+} //end finishAndAddBox
 
 //=============OCR VC=====================================================
 -(void) clearScreenAfterEdit

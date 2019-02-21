@@ -22,6 +22,8 @@
 //  2/7  add debugMode for logging
 //  2/10 enabled file rename, add majorFileError check
 //  2/14 add username column, int/float quantity support
+//  2/15 add setDebugMode
+//  2/17 use dbt.batchFileList (sorted list of files)
 #import "BatchObject.h"
 
 @implementation BatchObject
@@ -252,7 +254,7 @@ static BatchObject *sharedInstance = nil;
     AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     bappDelegate.batchID = _batchID; //This way everyone can see the batch
     debugMode = bappDelegate.debugMode; //2/7 For dwbug logging, check every batch
-    
+    [oto setDebugMode : debugMode];
     _batchStatus   = BATCH_STATUS_RUNNING;
     batchErrors   = @"";
     batchFiles    = @"";
@@ -372,7 +374,7 @@ static BatchObject *sharedInstance = nil;
 //  run OCR on all pages... assumes template loaded and dbt.getBatchList was called....
 -(void) startProcessingFiles
 {
-    batchTotal = (int)pdfEntries.count;
+    batchTotal = (int)dbt.batchFileList.count; //2/17 USE presorted list duh!
     if (debugMode) NSLog(@" start processing for vendor %@ count %d",vendorName,batchTotal);
     [self updateBatchProgress : [NSString stringWithFormat:@"Process Files:%@",vendorName] : FALSE];
     batchCount = 0;
@@ -423,9 +425,9 @@ static BatchObject *sharedInstance = nil;
     [self updateBatchProgress : [NSString stringWithFormat:@"Fetch File %d of %d",batchCount,batchTotal] : FALSE];
 
     int i = batchCount-1; //Batch Count is 1...n
-    if (i < 0 || i >= pdfEntries.count) return; //Out of bounds!
+    if (i < 0 || i >= dbt.batchFileList.count) return; //2/17 use sorted list! Out of bounds!
     DBFILESMetadata *entry = pdfEntries[i];
-    lastFileProcessed = [NSString stringWithFormat:@"%@/%@",dbt.prefix,entry.name];
+    lastFileProcessed = dbt.batchFileList[i]; //2/17 Use sorted results
     if (debugMode) NSLog(@" processing %@ ... (%d)",lastFileProcessed,whereFrom);
     //Check for "skip" string, ignore file if so...
     if ([lastFileProcessed.lowercaseString containsString:@"skip"]) //Skip this file?
@@ -984,7 +986,7 @@ static BatchObject *sharedInstance = nil;
     //Assume only 2 types for now...
     if ([[errMsg substringToIndex:2] containsString:@"E"]) //Error?
     {
-        NSLog(@" exp error %@ : %@",errMsg,objectID);
+        NSLog(@" exp error %@ : %@: %@",errMsg,objectID,productName);
         [self addError : errMsg : objectID : productName];
     }
     else //Warning?

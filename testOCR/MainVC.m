@@ -158,14 +158,8 @@
         [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
     }
     else NSLog(@" ...logged into Parse");
-
-
-    
     _versionLabel.text = [NSString stringWithFormat:@"V %@",versionNumber];
-   // [self testit];
-
- 
-    //[self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
+    //[self testit];
 }
 
 
@@ -215,9 +209,9 @@
                                                               [self clearActivityMenu];
                                                           }]];
     //Debug mode: stored in app delegate, flag can be flipped here
-    NSString* t = @"Normal Debug Output";
+    NSString* t = @"Set Verbose Debug Output";
     AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    if (mappDelegate.debugMode) t = @"Verbose Debug Output";
+    if (mappDelegate.debugMode) t = @"Set Normal Debug Output";
     
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(t,nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -688,7 +682,15 @@
     }
     else if (which == 2) //Templates / settings?
     {
-        [self performSegueWithIdentifier:@"helpSegue" sender:@"mainVC"];
+        
+        NSString *chartitAppURL = @"Chartit://";
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:chartitAppURL]];
+
+//        if ( canOpenUrl ) [[UIApplication sharedApplication]
+//                           openURL:[NSURL URLWithString:url]];
+        
+//        To find all the url, go to this page: http://handleopenurl.com/
+        //        [self performSegueWithIdentifier:@"helpSegue" sender:@"mainVC"];
 
        // [self testit];
        // return;

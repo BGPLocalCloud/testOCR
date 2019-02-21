@@ -61,7 +61,8 @@
     [spv start : @"Get batch counts"];
     _outputText.text = @"...";
     _runButton.hidden = TRUE;
-
+    AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSLog(@"Verbose Debug Output %d",mappDelegate.debugMode);
     [bbb getBatchCounts];
 }
 

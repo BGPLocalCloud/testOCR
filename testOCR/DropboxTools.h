@@ -42,10 +42,9 @@
 
 -(void) countEntries : (NSString *)batchFolder : (NSString *)vendorFolder;
 -(void) createFolderIfNeeded : (NSString *)folderPath;
-
-- (void)downloadImages:(NSString *)imagePath;
-- (void)downloadCSV : (NSString *)path : (NSString *)vendor;
-- (void)downloadTextFile:(NSString *)imagePath;
+-(void) downloadImages:(NSString *)imagePath;
+-(void) downloadCSV : (NSString *)path : (NSString *)vendor;
+-(void) downloadTextFile:(NSString *)imagePath;
 -(void) errMsg : (NSString *)title : (NSString*)message;
 -(void) setParent : (UIViewController*) p;
 -(void) getBatchList : (NSString *) batchFolder : (NSString *) vendorFolder;

@@ -104,6 +104,7 @@
 - (void) performOCROnImage : (NSString *)fname : (UIImage *)imageToOCR ;
 - (void) performOCROnData : (NSString *)fname : (NSData *)imageDataToOCR : (CGRect) r  ;
 - (void) stubbedOCR: (NSString*)imageName : (UIImage *)imageToOCR : (OCRTemplate *)ot;
+-(void) setDebugMode : (BOOL) mode;
 - (void) setVisualDebug  : (UIViewController*) p : (NSString*)dbs;
 - (void) setupTestDocumentJSON : (NSDictionary *) json;  //FOR TESTING ONLY
 - (void) setupDocumentFrameAndParseJSON : (CGRect) r;

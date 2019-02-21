@@ -24,6 +24,7 @@
 //        add handleNextPage, now page only gets OCR'ed after previous page is saved
 //  2/7 add debugMode for logging
 //  2/14 add int/float quantity support
+//  2/15 add setDebugMode
 #import "OCRTopObject.h"
 
 @implementation OCRTopObject
@@ -123,6 +124,7 @@ static OCRTopObject *sharedInstance = nil;
             }
             else if ( [fieldName isEqualToString:INVOICE_DATE_FIELD]) //Looking for a date?
             {
+                //[od dumpArrayFull : a];
                 NSDate* testDate = [od findDateInArrayOfFields:a]; //Find date-like string?
                 if (testDate == nil) //Bogus?  1/27 redid
                 {
@@ -208,7 +210,7 @@ static OCRTopObject *sharedInstance = nil;
         NSMutableArray *stringArray;
         stringArray = [od getColumnStrings : rr : i : [ot getColumnType:i]];
         
-        NSMutableArray *cleanedUpArray = [od cleanUpPriceColumns : i : [ot getColumnType:i] : stringArray ];
+        NSMutableArray *cleanedUpArray = [od cleanUpRawColumns : i : [ot getColumnType:i] : stringArray ];
         [od addColumnStringData:cleanedUpArray];
         if (debugMode) NSLog(@" col[%d] cleanup %@",i,cleanedUpArray);
     }
@@ -609,6 +611,14 @@ static OCRTopObject *sharedInstance = nil;
         }
     }
 } //end handleNextPage
+
+//=============OCRDocument=====================================================
+-(void) setDebugMode : (BOOL) mode
+{
+    debugMode = mode;
+    [od setDebugMode : mode]; //pass it down
+}
+
 
 //=============(OCRTopObject)=====================================================
 // 2/13 send debug display info down to children..

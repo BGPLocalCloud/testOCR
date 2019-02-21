@@ -245,6 +245,8 @@
             [_batchFileList addObject:entry.pathDisplay];
         }
     }
+    //2/17 list comes from dropbox in arbitrary order! Sortit...
+    _batchFileList = (NSMutableArray*)[_batchFileList sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
     //Make this an error message!
     if ([imagePaths count] == 0)
     {
