@@ -151,6 +151,18 @@
 } //end zoomPDFView
 
 
+//=============Error VC=====================================================
+-(void) errorMessage : (NSString *) title :(NSString *) msg
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:
+                                NSLocalizedString(title,nil)  message:msg
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                              }]];
+    [self presentViewController:alert animated:YES completion:nil];
+    
+} //end errorMessage
 
 
 //=============Error VC=====================================================
@@ -410,10 +422,15 @@
     selectedRow        = (int)indexPath.row;
     NSString *allErrs  = [errorList objectAtIndex:selectedRow];
     NSArray *sItems    = [allErrs componentsSeparatedByString:@":"];
-    if (sItems.count > 1)
+    if (sItems.count > 2) //2/28 need 3 fields!
     {
         NSString *errType = sItems[1];
-        if (![errType.lowercaseString containsString:@"product"]) //2/8 Bad product errors can't be fixed!
+        if ([errType.lowercaseString containsString:@"product"] ||
+            [errType.lowercaseString containsString:@"missing"] )
+        {    //2/28 bad product / missing fields can't be fixed here...
+            [self errorMessage:@"Cannot fix this error" : @"You can only fix numeric product errors in this VC"];
+        }
+        else
         {
             [spv start : @"Get EXP object"];
             fixingObjectID = sItems[2]; //DHS 1/12 now 3 items in error

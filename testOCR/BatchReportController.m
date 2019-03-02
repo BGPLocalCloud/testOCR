@@ -11,6 +11,7 @@
 //  Created by Dave Scruton on 1/13/19.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  2/23 Fix array -> mutableArray conversion bug
 
 #import "BatchReportController.h"
 
@@ -66,7 +67,7 @@
     if (bItems != nil && bItems.count > 0)
     {
         //Look at first file in batch, break it up by folders
-        NSMutableArray *chunks = (NSMutableArray*)[bItems[0] componentsSeparatedByString:@"/"];
+        NSMutableArray *chunks = [[bItems[0] componentsSeparatedByString:@"/"] mutableCopy];//DHS 2/23
         if (chunks.count >= 4)
         {
             ///outputFolder/reports/fname

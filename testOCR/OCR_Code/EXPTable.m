@@ -186,7 +186,7 @@
     }];
 } //end saveEXPOs
 
-//asdf
+
 //=============(EXPTable)=====================================================
 // Add record to EXPOS, for saving later...
 -(void) addRecordFromArrays : (NSDate*) fdate : (NSMutableArray *) fields : (NSMutableArray*) values
@@ -340,16 +340,14 @@
     NSArray *sitems1 = [NSArray arrayWithObjects:
                         PInv_Category_key,PInv_Month_key,PInv_ProductName_key,PInv_Quantity_key,
                         PInv_UOM_key,PInv_Bulk_or_Individual_key,PInv_Vendor_key,PInv_TotalPrice_key,
-                        PInv_PricePerUOM_key,PInv_Processed_key,PInv_Local_key,PInv_LineNumber_key,
-                        PInv_InvoiceNumber_key,
+                        PInv_PricePerUOM_key,PInv_Processed_key,PInv_Local_key,
                         nil];
     NSString *s = [self stringFromKeyedItems : pfo :sitems1];
     //Inject date into this mess (it's special!)
     NSDateFormatter * formatter =  [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"MM/dd/yy"];
     NSString *sfd = [formatter stringFromDate:[pfo objectForKey:PInv_Date_key]];
-    s = [s stringByAppendingString:
-         [NSString stringWithFormat:@"%@,",sfd]];
+    s = [s stringByAppendingString: [NSString stringWithFormat:@",%@",sfd]];
     NSArray *sitems2 = [NSArray arrayWithObjects:
                         PInv_LineNumber_key,PInv_InvoiceNumber_key,
                         nil];
@@ -519,8 +517,8 @@
 
 #define LIMIT_SIZE 100
 //=============(EXPTable)=====================================================
-// Loads in data LIMIT_SIZE recs at a time, uses "skip" for re=entrant call asdf
--(void) readFullTableToCSV : (int) skip : (BOOL) addErrStatus
+// Loads in data LIMIT_SIZE recs at a time, uses "skip" for re=entrant call
+-(void) readFullTableToCSV : (int) skip : (BOOL) addErrStatus : (NSString*)batchID
 {
     if (skip == 0) //Start? Clear CSVList and add header
     {
@@ -530,6 +528,7 @@
         [csvList addObject:header];
     }
     PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
+    if (![batchID isEqualToString:@"*"]) [query whereKey:PInv_BatchID_key equalTo:batchID];
     if (debugMode) NSLog(@" read %d to %d",skip,skip+LIMIT_SIZE);
     query.skip = skip;
     query.limit = LIMIT_SIZE;
@@ -541,7 +540,7 @@
             }
             if (objects.count == LIMIT_SIZE) //Maybe more?
             {
-                [self readFullTableToCSV : skip+LIMIT_SIZE : addErrStatus];
+                [self readFullTableToCSV : skip+LIMIT_SIZE : addErrStatus : batchID];
             }
             else
             {
@@ -550,10 +549,12 @@
                 if (self->_parentUp) [self.delegate didReadFullTableToCSV : self->EXPDumpCSVList];
             }
         }
+        else
+        {
+            if (self->_parentUp) [self.delegate errorReadingFullTableToCSV : error.localizedDescription];
+        }
     }];
-
-
-}
+} //end readFullTableToCSV
 
 //=============(EXPTable)=====================================================
 // 1/14 assumes CSV table loaded during last parse read...

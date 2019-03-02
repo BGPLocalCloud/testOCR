@@ -102,15 +102,16 @@
 - (void) loadCSVFileFromDocParser : (NSString *)fname : (NSString *)vendor;
 - (void) loadCSVValuesFromString : (NSString *)avendor : (NSString *)s;
 - (void) performOCROnImage : (NSString *)fname : (UIImage *)imageToOCR ;
-- (void) performOCROnData : (NSString *)fname : (NSData *)imageDataToOCR : (CGRect) r  ;
+- (void) performOCROnData : (NSString *)fname : (NSData *)imageDataToOCR : (CGRect) r : (BOOL) isBatch ;
 - (void) stubbedOCR: (NSString*)imageName : (UIImage *)imageToOCR : (OCRTemplate *)ot;
--(void) setDebugMode : (BOOL) mode;
+- (void) readCSVThenSaveToDropbox;
+- (void) setDebugMode : (BOOL) mode;
 - (void) setVisualDebug  : (UIViewController*) p : (NSString*)dbs;
 - (void) setupTestDocumentJSON : (NSDictionary *) json;  //FOR TESTING ONLY
 - (void) setupDocumentFrameAndParseJSON : (CGRect) r;
-- (void)applyTemplate : (OCRTemplate *)ot : (int) page;             //FOR TESTING ONLY
--(void) writeEXPToParse : (int) page;
--(NSString *) dumpResults;
+- (void) applyTemplate : (OCRTemplate *)ot : (int) page;             //FOR TESTING ONLY
+- (void) writeEXPToParse : (int) page;
+- (NSString *) dumpResults;
 
 
 @end
@@ -126,6 +127,8 @@
 - (void)errorSavingEXPToParse : (NSString *)err;
 - (void)errorSavingInvoiceToParse : (NSString *)err;
 - (void)didSaveOCRDataToParse : (NSString *) s;
+- (void)didReadFullTableToCSV : (NSString *) s;
+- (void)errorReadingFullTableToCSV : (NSString *) s;
 - (void)errorSavingOCRDataToParse : (NSString *) s;
 - (void)foundEmptyPage;
 @end

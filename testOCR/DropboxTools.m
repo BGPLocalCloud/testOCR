@@ -17,6 +17,7 @@
 //
 //  1/10 Add PDF cache hit to bypass downloading...
 //  1/14 Add uploadPNGImage
+//  2/23 Fix array -> mutableArray conversion bug
 #import "DropboxTools.h"
 
 @implementation DropboxTools
@@ -237,6 +238,7 @@
 {
     //NSLog(@" entries %@",folderEntries);
     NSMutableArray<NSString *> *imagePaths = [NSMutableArray new];
+    //DHS 2/22?? had crash here  WHY??? Only happens after an ERROR during OCR
     [_batchFileList removeAllObjects];
     for (DBFILESMetadata *entry in folderEntries) {
         NSString *itemName = entry.name;
@@ -246,7 +248,8 @@
         }
     }
     //2/17 list comes from dropbox in arbitrary order! Sortit...
-    _batchFileList = (NSMutableArray*)[_batchFileList sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+    //2/23 Was type casting, causing a crash later!
+    _batchFileList = [[_batchFileList sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] mutableCopy];
     //Make this an error message!
     if ([imagePaths count] == 0)
     {

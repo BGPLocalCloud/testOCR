@@ -20,6 +20,7 @@
 #import "DropboxTools.h"
 #import "BatchObject.h"
 #import "AppDelegate.h"
+#import "AnalyzeVC.h"
 #import "AddTemplateViewController.h"
 #import "BatchReportController.h"
 #import "ErrorViewController.h"
@@ -41,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MainVC : UIViewController <NavButtonsDelegate,ActivityTableDelegate,
                     UITableViewDelegate,UITableViewDataSource, batchObjectDelegate,DropboxToolsDelegate,
-                    GenParseDelegate>
+                    GenParseDelegate,EXPTableDelegate, MFMailComposeViewControllerDelegate>
 {
     NavButtons *nav;
     int viewWid,viewHit,viewW2,viewH2;

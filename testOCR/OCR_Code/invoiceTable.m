@@ -16,6 +16,7 @@
 // 2/7  add debugMode for logging, add EXPIDs
 // 2/8  add invoiceNumber to readFromParseAsStrings
 //  2/9 add parentUp flag to avoid delegate callback crashes on dismissed VC
+//  2/23 Fix array -> mutableArray conversion bug
 #import "invoiceTable.h"
 
 @implementation invoiceTable
@@ -78,7 +79,7 @@
 //=============(invoiceTable)=====================================================
 -(void) unpackInvoiceOids
 {
-    EXPIDs =  (NSMutableArray*)[packedOIDs componentsSeparatedByString:@","];
+    EXPIDs =  [[packedOIDs componentsSeparatedByString:@","] mutableCopy]; //DHS 2/23
 } //end unpackInvoiceOids
 
 //=============(invoiceTable)=====================================================

@@ -48,6 +48,7 @@
 + (id)sharedInstance;
 
 -(BOOL) moveFiles;
+-(BOOL) isLoaded;
 -(void) dump;
 
 

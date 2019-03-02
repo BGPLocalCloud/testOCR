@@ -12,6 +12,7 @@
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 //  2/10 add download for PDF's not in cache, note retry of output folder too
+//  2/23 Fix array -> mutableArray conversion bug
 
 #import "PDFVC.h"
 
@@ -146,7 +147,7 @@
 //=============PDF VC=====================================================
 -(void) retryDownloadWithOutputFolder
 {
-    NSMutableArray *chunks = (NSMutableArray*)[_pdfFile componentsSeparatedByString:@"/"];
+    NSMutableArray *chunks = [[_pdfFile componentsSeparatedByString:@"/"] mutableCopy]; //DHS 2/23
     int ccount = (int)chunks.count;
     if (ccount > 3)
     {

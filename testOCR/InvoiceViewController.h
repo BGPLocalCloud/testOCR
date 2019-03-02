@@ -37,7 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
     int vptr;
     int selectedRow;
     spinnerView *spv;
-    
+    BOOL loadingData;
+
     NSString *selFname;
     NSString *selNumber;
 

@@ -62,6 +62,7 @@
 		725145F02200B9860074EDBF /* GenParse.m in Sources */ = {isa = PBXBuildFile; fileRef = 725145EF2200B9860074EDBF /* GenParse.m */; };
 		7257C0DC22149E8B0034A627 /* rotbut.png in Resources */ = {isa = PBXBuildFile; fileRef = 7257C0DB22149E890034A627 /* rotbut.png */; };
 		725DA97D21CB53BC0024ECF7 /* EXPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 725DA97C21CB53BC0024ECF7 /* EXPViewController.m */; };
+		7260676A22210E6E00FF24A5 /* AnalyzeVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 7260676922210E6E00FF24A5 /* AnalyzeVC.m */; };
 		72693B2B2214DEF800EEB571 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 72693B2A2214DEF700EEB571 /* www */; };
 		72693B2E2214DFDB00EEB571 /* helpVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 72693B2D2214DFDB00EEB571 /* helpVC.m */; };
 		72693B312214E7C800EEB571 /* grafNOT.png in Resources */ = {isa = PBXBuildFile; fileRef = 72693B2F2214E7C800EEB571 /* grafNOT.png */; };
@@ -207,6 +208,8 @@
 		7257C0DB22149E890034A627 /* rotbut.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = rotbut.png; path = Resources/rotbut.png; sourceTree = SOURCE_ROOT; };
 		725DA97B21CB53BC0024ECF7 /* EXPViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXPViewController.h; sourceTree = "<group>"; };
 		725DA97C21CB53BC0024ECF7 /* EXPViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EXPViewController.m; sourceTree = "<group>"; };
+		7260676822210E6E00FF24A5 /* AnalyzeVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnalyzeVC.h; sourceTree = "<group>"; };
+		7260676922210E6E00FF24A5 /* AnalyzeVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnalyzeVC.m; sourceTree = "<group>"; };
 		72693B2A2214DEF700EEB571 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; path = www; sourceTree = "<group>"; };
 		72693B2C2214DFDB00EEB571 /* helpVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = helpVC.h; sourceTree = "<group>"; };
 		72693B2D2214DFDB00EEB571 /* helpVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = helpVC.m; sourceTree = "<group>"; };
@@ -351,6 +354,8 @@
 				7206008921B64052000B26DC /* AppDelegate.m */,
 				7283813421C4A60000A2954B /* MainVC.h */,
 				7283813521C4A60000A2954B /* MainVC.m */,
+				7260676822210E6E00FF24A5 /* AnalyzeVC.h */,
+				7260676922210E6E00FF24A5 /* AnalyzeVC.m */,
 				72990757221632430021804F /* LoginVC.h */,
 				72990758221632430021804F /* LoginVC.m */,
 				72D6516B2204DA97009E2057 /* ComparisonVC.h */,
@@ -789,6 +794,7 @@
 				721C296621F56DD100631570 /* documentBox.m in Sources */,
 				725145F02200B9860074EDBF /* GenParse.m in Sources */,
 				728EECC821ED1DDB00F83129 /* invoiceCell.m in Sources */,
+				7260676A22210E6E00FF24A5 /* AnalyzeVC.m in Sources */,
 				7272C5F021D6ABFE0094D7D1 /* OCRCache.m in Sources */,
 				72435B3721C8C8EA00620F4B /* EXPTable.m in Sources */,
 				72435B3421C8C7C600620F4B /* EXPObject.m in Sources */,

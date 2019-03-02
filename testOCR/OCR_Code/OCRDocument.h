@@ -80,6 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic , assign) int numPages;
 
+-(NSString *) assembleWordFromArray : (NSMutableArray *) a : (BOOL) numeric : (int) maxLines;
 
 -(void) clearAllColumnStringData;
 -(void) addColumnStringData : (NSMutableArray*)stringArray;

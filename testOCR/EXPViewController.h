@@ -52,6 +52,7 @@
     NSString *sortBy;
     BOOL sortAscending;
     int selectedRow;
+    BOOL loadingData;
 
     UIRefreshControl *refreshControl;
     spinnerView *spv;

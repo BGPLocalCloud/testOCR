@@ -126,6 +126,13 @@ NSString *const PS_MoveProcessedFilesKey    = @"MoveProcessedFiles";
 } //end loadFromParse
 
 //=====<OCRSettings>======================================================================
+-(BOOL) isLoaded
+{
+    return loaded;
+}
+
+
+//=====<OCRSettings>======================================================================
 -(BOOL) moveFiles
 {
     BOOL moveit = FALSE;

@@ -12,6 +12,8 @@
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 //  1/9 add pull to refresh
+//  2/22 add loadingData flag
+//  2/22 moved CSV export to mainVC
 
 #import "EXPViewController.h"
 
@@ -111,6 +113,7 @@
         vendorLookup  = _searchType;
         batchIDLookup = _actData;
     }
+    loadingData = FALSE; //DHS 2/22
     [self loadEXP];
     [self updateUI];
 } //end viewWillAppear
@@ -149,6 +152,7 @@
 //=============EXP VC=====================================================
 - (IBAction)menuSelect: (id)sender
 {
+    if (_detailMode) return; //No menu in this mode
     batchIDLookup = @"*";
 
     NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:@"Menu..."];
@@ -158,38 +162,17 @@
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     [alert setValue:tatString forKey:@"attributedTitle"];
     
-    UIAlertAction *firstAction;
-    UIAlertAction *secondAction;
-    if (!_detailMode)
-    {
-       firstAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Load EXP Table",nil)
-                                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                                  [self loadEXP];
-                                                              }];
-        secondAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Load EXP Table By Vendor...",nil)
-                                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                                   [self promptForEXPVendor];
-                                                               }];
-    }
-    UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Export ALL to CSV...",nil)
-                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              [self->spv start : @"Get CSV List..."];
-                                                              // This loads CSV list, delegate callback does email
-                                                              [self->et readFullTableToCSV : 0 : TRUE];
-                                                          }];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Load EXP Table",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self loadEXP];
+                                              }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Load EXP Table By Vendor...",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self promptForEXPVendor];
+                                              }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                           }];
-    //Detail: we don't do all vendors!
-    if (!_detailMode)
-    {
-        [alert addAction:firstAction];
-        [alert addAction:secondAction];
-    }
-    [alert addAction:thirdAction];
-    
-    [alert addAction:cancelAction];
-    
+                                                           }]];
     [self presentViewController:alert animated:YES completion:nil];
     
 } //end menuSelect
@@ -357,7 +340,9 @@
 //=============EXP VC=====================================================
 -(void) loadEXP
 {
+    if (loadingData) return; //DHS 2/22
     [spv start : @"Loading EXP..."];
+    loadingData = TRUE;
     _titleLabel.text = @"Loading EXP table...";
 
     tableName = @"EXP";
@@ -382,6 +367,7 @@
 -(void) loadEXPByVendor : (NSString *)v
 {
     [spv start : @"Loading Vendor EXP"];
+    loadingData = TRUE;
     _titleLabel.text = @"Loading EXP table...";
 
     tableName = @"EXP";
@@ -527,6 +513,7 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->_table reloadData];
+        loadingData = FALSE;
         [spv stop];
         [self setLoadedTitle : @"EXP"];
         self->_sortButton.hidden   = FALSE;
@@ -535,12 +522,6 @@
 }
 
 
-//============<EXPTableDelegate>====================================================
-- (void)didReadFullTableToCSV : (NSString *)s
-{
-    [self setupEmailAndSendit : s];
-}
-
 
 #pragma mark - invoiceTableDelegate
 
@@ -548,6 +529,7 @@
 - (void)didReadInvoiceTableAsStrings : (NSMutableArray*)a
 {
     [_table reloadData];
+    loadingData = FALSE;
     [spv stop];
     [self setLoadedTitle : @"Invoices"];
 
@@ -561,60 +543,5 @@
     [_table reloadData];
 
 }
-
-//=============OCR VC=====================================================
--(void) setupEmailAndSendit : (NSString *)csvString
-{
-    [self mailit:csvString];
-}
-
-//=============OCR VC=====================================================
-//Doesn't work in simulator??? huh??
--(void) mailit : (NSString *)s
-{
-    if ([MFMailComposeViewController canSendMail])
-    {
-        MFMailComposeViewController *mail = [[MFMailComposeViewController alloc] init];
-        mail.mailComposeDelegate = self;
-        [mail setSubject:@"EXP CSV output"];
-        [mail setMessageBody:@"...see text attachment" isHTML:NO];
-        NSData *sdata = [s dataUsingEncoding:NSUTF8StringEncoding];
-        NSDate *today = [NSDate date];
-        NSDateFormatter * formatter =  [[NSDateFormatter alloc] init];
-        [formatter setDateFormat:@"MM_dd_yyyy"];
-        NSString *sfd = [formatter stringFromDate:today];
-        NSString *fname = [NSString stringWithFormat:@"EXP_%@.csv",sfd];
-        [mail addAttachmentData:sdata mimeType:@"text/plain"  fileName:fname];
-        [mail setToRecipients:@[@"fraktalmaui@gmail.com"]];
-        [self presentViewController:mail animated:YES completion:NULL];
-    }
-    else
-    {
-        NSLog(@"This device cannot send email");
-    }
-}
-
-#pragma mark - MFMailComposeViewControllerDelegate
-
-
-//==========FeedVC=========================================================================
-- (void) mailComposeController:(MFMailComposeViewController *)controller    didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
-{
-    NSLog(@" mailit: didFinishWithResult...");
-    switch (result)
-    {
-        case MFMailComposeResultSent:
-            NSLog(@" mail sent OK");
-            break;
-        case MFMailComposeResultFailed:
-            NSLog(@"Mail sent failure: %@", [error localizedDescription]);
-            break;
-        default:
-            break;
-    }
-    [controller dismissViewControllerAnimated:YES completion:NULL];
-}
-
-
 
 @end

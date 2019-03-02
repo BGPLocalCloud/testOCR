@@ -19,6 +19,8 @@
 //  2/5  Add vendors, make sure loaded b4 batch segue
 //  2/8  Changed batchListChoiceMenu
 //  2/9  Merged PDF / OCR cache clears
+//  2/22 Moved CSV Export from expVC
+//  2/23 Fix array -> mutableArray conversion bug
 #import "MainVC.h"
 
 @interface MainVC ()
@@ -43,6 +45,9 @@
     // 1/4 add genparse to clear activities
     gp = [[GenParse alloc] init];
     gp.delegate = self;
+    et = [[EXPTable alloc] init];
+    et.delegate = self;
+
     ecount = 0;
     
     vv = [Vendors sharedInstance];
@@ -142,7 +147,7 @@
 {
     [super viewWillAppear:animated];
     [act readActivitiesFromParse:nil :nil];
-    [self testit];
+    //[self testit];
 }
 
 
@@ -159,7 +164,7 @@
     }
     else NSLog(@" ...logged into Parse");
     _versionLabel.text = [NSString stringWithFormat:@"V %@",versionNumber];
-    //[self testit];
+    [self testit];
 }
 
 
@@ -174,6 +179,7 @@
 -(void) admin
 {
     NSLog(@" admin");
+    loginMode = @"admin";
     [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
 }
 
@@ -217,9 +223,19 @@
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               mappDelegate.debugMode = !mappDelegate.debugMode;
                                                           }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"PDF Analyzer",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self performSegueWithIdentifier:@"analyzerSegue" sender:@"mainVC"];
+                                              }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Logout From Dropbox",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                   [DBClientsManager unlinkAndResetClients];
+                                              }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Logout From Sashido",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [PFUser logOut];
+                                                  loginMode = @"login";
+                                                  [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
                                               }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -315,6 +331,10 @@
         [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Get Report",nil)
                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                       [self performSegueWithIdentifier:@"batchReportSegue" sender:@"mainVC"];
+                                                  }]];
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Export EXP to Excel",nil)  // 2/22
+                                                  style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                      [self exportEXPToExcel];
                                                   }]];
     } //end isbatch
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
@@ -628,7 +648,12 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     int row          = (int)indexPath.row;
     sdata            = [act getData:row];
-    if (![act isFatalError:row]) [self batchListChoiceMenu]; //Don't show list on fatal errors
+    if ([act isFatalError:row]) //Fatal error goes to batch report
+    {
+        [self performSegueWithIdentifier:@"batchReportSegue" sender:@"mainVC"];
+    }
+    else //DHS 2/27 Not an error? put up menu
+        [self batchListChoiceMenu];
 }
 
 //=============OCR MainVC=====================================================
@@ -655,7 +680,7 @@
 - (void)didReadBatchByIDs:(NSNotification *)notification
 {
     //Should be pfobjects?
-    batchPFObjects = (NSMutableArray *)notification.object;
+    batchPFObjects = [notification.object mutableCopy]; //DHS 2/23
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->spv stop];
         [self->_table reloadData];
@@ -748,7 +773,8 @@ int currentYear = 2019;
 //=============OCR MainVC=====================================================
 -(void) testit
 {
-    
+ //    [self performSegueWithIdentifier:@"analyzerSegue" sender:@"mainVC"];
+
 //    smartProducts *smartp = [[smartProducts alloc] init];
 //    [smartp saveKeywordsAndTyposToParse];
 //    return;
@@ -756,7 +782,6 @@ int currentYear = 2019;
     
 //    [self performSegueWithIdentifier:@"errorSegue" sender:@"mainVC"];
 //    return;
-    //et = [[EXPTable alloc] init];
     //[et readFullTableToCSV:0];
     
 //    GenParse *gp = [[GenParse alloc] init];
@@ -782,9 +807,32 @@ int currentYear = 2019;
 }
 
 
+//=============OCR MainVC=====================================================
+-(void) exportEXPToExcel  //2/22
+{
+    NSArray  *sItems  = [sdata componentsSeparatedByString:@":"]; //Look at the data for this item...
+    BOOL isBatch = (sItems.count > 1); //Is this a batch started / completed item?
+    if (isBatch)
+    {
+        [self->spv start:@"Get CSV List..."];
+        NSString *batchID = sItems[0];
+        [et readFullTableToCSV:0 :TRUE : batchID];
+    }
+    
+}
 
+//=============OCR MainVC=====================================================
+-(void) errorMessage : (NSString *) title :(NSString *) msg
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:
+                                NSLocalizedString(title,nil)  message:msg
+                                preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                              }]];
+     [self presentViewController:alert animated:YES completion:nil];
 
-
+} //end errorMessage
 
 
 // https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_pdf/dq_pdf.html
@@ -816,6 +864,33 @@ int currentYear = 2019;
     NSLog(@" act table err %@",errmsg);
 }
 
+
+#pragma mark - EXPTableDelegate
+
+//============<EXPTableDelegate>====================================================
+- (void)didReadFullTableToCSV : (NSString *)s
+{
+    NSLog(@" got csv list %@",s);
+    NSArray *testit = [s componentsSeparatedByString:@"\n"];
+    if (testit.count < 3) //Nothin?
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self errorMessage:@"Cannot export to Excel" :@"No Records Found"];
+        });
+    }
+    else [self mailit: s]; //OK? send CSV out via email
+
+} //end didReadFullTableToCSV
+
+//============<EXPTableDelegate>====================================================
+- (void)errorReadingFullTableToCSV : (NSString *)err;
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self errorMessage:@"Error exporting to Excel" : err];
+    });
+
+}
+
 #pragma mark - GenParseDelegate
 //=============<GenParseDelegate>=====================================================
 - (void)didDeleteAllByTableAndKey : (NSString *)s1 : (NSString *)s2 : (NSString *)s3
@@ -832,6 +907,53 @@ int currentYear = 2019;
         [self refreshIt];
     });
 
+}
+
+//=============OCR VC=====================================================
+//Doesn't work in simulator??? huh??
+-(void) mailit : (NSString *)s
+{
+    if ([MFMailComposeViewController canSendMail])
+    {
+        MFMailComposeViewController *mail = [[MFMailComposeViewController alloc] init];
+        mail.mailComposeDelegate = self;
+        [mail setSubject:@"EXP CSV output"];
+        [mail setMessageBody:@"...see text attachment" isHTML:NO];
+        NSData *sdata = [s dataUsingEncoding:NSUTF8StringEncoding];
+        NSDate *today = [NSDate date];
+        NSDateFormatter * formatter =  [[NSDateFormatter alloc] init];
+        [formatter setDateFormat:@"MM_dd_yyyy"];
+        NSString *sfd = [formatter stringFromDate:today];
+        NSString *fname = [NSString stringWithFormat:@"EXP_%@.csv",sfd];
+        [mail addAttachmentData:sdata mimeType:@"text/plain"  fileName:fname];
+        [mail setToRecipients:@[@"fraktalmaui@gmail.com"]];
+        [self presentViewController:mail animated:YES completion:NULL];
+    }
+    else
+    {
+        NSLog(@"This device cannot send email");
+    }
+}
+
+#pragma mark - MFMailComposeViewControllerDelegate
+
+
+//==========FeedVC=========================================================================
+- (void) mailComposeController:(MFMailComposeViewController *)controller    didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
+{
+    NSLog(@" mailit: didFinishWithResult...");
+    switch (result)
+    {
+        case MFMailComposeResultSent:
+            NSLog(@" mail sent OK");
+            break;
+        case MFMailComposeResultFailed:
+            NSLog(@"Mail sent failure: %@", [error localizedDescription]);
+            break;
+        default:
+            break;
+    }
+    [controller dismissViewControllerAnimated:YES completion:NULL];
 }
 
 

@@ -149,6 +149,9 @@
 - (IBAction)runSelect:(id)sender {
     if (!authorized) return ; //can't get at dropbox w/o login! 
 
+    AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    if (![bappDelegate.settings isLoaded]) return; //No settings? cannot find batch folders!
+    
     bbb.batchMonth = batchMonth;
     NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:@"Run Batches..."];
     [tatString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:25] range:NSMakeRange(0, tatString.length)];

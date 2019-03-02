@@ -24,6 +24,9 @@
 //  2/14 add username column, int/float quantity support
 //  2/15 add setDebugMode
 //  2/17 use dbt.batchFileList (sorted list of files)
+//  2/23 Fix array -> mutableArray conversion bug
+//  2/27 add batchID to all batch progress data
+//  2/28 add call to oto.readCSVThenSaveToDropbox, username to batchReport
 #import "BatchObject.h"
 
 @implementation BatchObject
@@ -358,7 +361,12 @@ static BatchObject *sharedInstance = nil;
     [act saveActivityToParse : lilStr : actData];
     [self.delegate didCompleteBatch];
     [self writeBatchReport];
-}
+    // DHS 2/28
+    //Long wait, what if user dismisses batchVC early??,
+    //   may need to break batch complete in two
+    //   around this operation!
+    [oto readCSVThenSaveToDropbox];
+} //end completeBatch
 
 
 //=============(BatchObject)=====================================================
@@ -394,7 +402,7 @@ static BatchObject *sharedInstance = nil;
         {
             if (!majorFileError) //2/10 OK?
             {
-                NSMutableArray *chunks = (NSMutableArray*)[lastFileProcessed componentsSeparatedByString:@"/"];
+                NSMutableArray *chunks = [[lastFileProcessed componentsSeparatedByString:@"/"] mutableCopy]; //DHS 2/23
                 int ccount = (int)chunks.count;
                 if (ccount > 3)
                 {
@@ -469,7 +477,7 @@ static BatchObject *sharedInstance = nil;
             oto.vendor = vendorName;
             oto.imageFileName = lastFileProcessed;
             oto.ot = ot; //Hand template down to oto
-            [oto performOCROnData : lastFileProcessed : nil : CGRectZero ];
+            [oto performOCROnData : lastFileProcessed : nil : CGRectZero : TRUE];
         }
         else
         {
@@ -578,7 +586,7 @@ static BatchObject *sharedInstance = nil;
         oto.vendor = vendorName;
         oto.imageFileName = lastFileProcessed; // DHS 1/22 was using wrong filename!
         oto.ot = ot; //Hand template down to oto
-        [oto performOCROnData : lastFileProcessed : data : imageFrame];
+        [oto performOCROnData : lastFileProcessed : data : imageFrame : TRUE];
     } //end else
 
 } //end processPDFPages
@@ -609,7 +617,7 @@ static BatchObject *sharedInstance = nil;
     oto.vendor = vendorName;
     oto.imageFileName = ipath; //@"hawaiiBeefInvoice.jpg"; //ipath;
     oto.ot = ot;
-    [oto performOCROnData : ipath : data : imageFrame ];
+    [oto performOCROnData : ipath : data : imageFrame  : TRUE];
     //  [oto stubbedOCR : oto.imageFileName : [UIImage imageNamed:oto.imageFileName]  : ot];
 } //end processPDFPages
 
@@ -629,8 +637,9 @@ static BatchObject *sharedInstance = nil;
 -(void) updateBatchProgress : (NSString *)message : (BOOL) saveActivity
 {
     [self.delegate batchUpdate : message]; //Should update UI if possible
-    NSString* arg2 = @"";
-    if (lastFileProcessed != nil) arg2 = lastFileProcessed;
+    NSString* arg2 = _batchID; //DHS 2/27 make sure batchID comes thru
+    if (lastFileProcessed != nil) arg2 = [NSString stringWithFormat:@"%@:%@",
+                                          _batchID,lastFileProcessed];
     if (saveActivity) [act saveActivityToParse : message : arg2];
 }
 
@@ -747,7 +756,13 @@ static BatchObject *sharedInstance = nil;
     //Assemble output string:
     NSString *s = @"Batch Report\n";
     //if (batchCount > 1)
-    s = [s stringByAppendingString:[NSString stringWithFormat:@"ID %@\n",_batchID]];
+    s = [s stringByAppendingString:[NSString stringWithFormat:@"ID:%@\n",_batchID]];
+    // 2/28 add username to batch report!
+    if ([PFUser currentUser] != nil)
+        s = [s stringByAppendingString:[NSString stringWithFormat:@"Username:%@\n",[PFUser currentUser].username]];
+    else
+        s = [s stringByAppendingString: @"NO USERNAME...\n"];
+
     s = [s stringByAppendingString:[NSString stringWithFormat:@"Files %@\n",batchFiles]];
 //    s = [s stringByAppendingString:[NSString stringWithFormat:@"Errors %@\n",batchErrors]];
     s = [s stringByAppendingString:[NSString stringWithFormat:@"Errors (%d found)\n",
@@ -771,7 +786,7 @@ static BatchObject *sharedInstance = nil;
 
     //Save to Dropbox...
     //break up lastFileProcessed, looks like: /inputfolder/vendor/filename.pdf
-    NSMutableArray *chunks = (NSMutableArray*)[lastFileProcessed componentsSeparatedByString:@"/"];
+    NSMutableArray *chunks = [lastFileProcessed componentsSeparatedByString:@"/"];
     if (chunks.count >= 4)
     {
         ///outputFolder/reports/fname
@@ -953,7 +968,8 @@ static BatchObject *sharedInstance = nil;
     [self addError : errMsg : @"n/a": @"n/a"];
     majorFileError = TRUE; //2/10
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self updateBatchProgress : [NSString stringWithFormat:@"Fatal OCR Error:%@",errMsg] : TRUE];
+        [self updateBatchProgress : [NSString stringWithFormat:
+                                     @"Fatal OCR Error:%@",errMsg] : TRUE];
         [self processNextFile : 2];
     });
 }
@@ -1006,6 +1022,25 @@ static BatchObject *sharedInstance = nil;
 {
     NSLog(@" majorFileError: saving Invoice: %@",err);
     majorFileError = TRUE;
+}
+
+//===========<OCRTopObjectDelegate>================================================
+// 2/28 this is from this object calling oto -> parse and back...
+//   too deep, should I just handle dropbox writes in oto????
+- (void)didReadFullTableToCSV : (NSString *) s
+{
+    //OK write to dropbox.
+    AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSString *folderPath = [NSString stringWithFormat : @"/%@/reports",bappDelegate.settings.outputFolder];
+    [dbt saveTextFile : [NSString stringWithFormat:@"%@/%@.csv",folderPath,_batchID] :s];
+    //asdf
+}
+//===========<OCRTopObjectDelegate>================================================
+- (void)errorReadingFullTableToCSV : (NSString *) s
+{
+    NSString *errMsg = [NSString stringWithFormat:@"Error reading EXP results for CSV : %@",s];
+    //Should this be a fatal error?
+    [self addWarning : errMsg : @"n/a" : @"n/a"];
 }
 
 

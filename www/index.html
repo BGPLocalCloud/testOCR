@@ -261,7 +261,7 @@ If you select items from the table, you can examine details for some activities.
 <br>
 
 <h4>Menu:</h4>
-The Menu navigates to other screens where you can create or edit templates, load Comparison Data from past months, or clear data storage from your phone. Most of the time you won`t need to use this control. More detailed instructions will be published later.  At the bottom of the Menu is the <b>Logout from Dropbox</b> command, which may be needed if you use more than one Dropbox account on your phone.
+The Menu navigates to other screens where you can create or edit templates, load Comparison Data from past months, or clear data storage from your phone. Most of the time you won`t need to use this control. More detailed instructions will be published later.  At the bottom of the Menu are the <b>Logout from Dropbox</b> and <b>Logout from Sashido</b> commands, which may be needed if you use more than one Dropbox account on your phone.
 <p>
 <h4>DB:</h4>
 This puts up another menu which lets you look at all EXP table line items from the latest batch, or the latest invoices grouped by vendor. For instance the <i>HFM Invoices</i> option will show a table of HFM invoices produced in the last batch run.
@@ -456,17 +456,11 @@ Records from the EXP table in the database can be exported in CSV format to Exce
 This assumes you just ran a batch and have corrected your errors, want to correct them later in Excel.
 <br>
 <ul>
-    <li> From the mainVC,  press the <b>DB</b> button near the bottom left. This brings up a chooser menu.</li>
-    <li> From the chooser, select <b>EXP Table at the top</b></li>
-    <li> This brings up the EXP window, and loads it with the most recent 100 records in the EXP table.
-        You can examine these records individually by selecting any one; it brings up a detail view that
-        shows every field in each record.  You can swipe left or right in this detail view to look at additional
-        records.</li>
-    <li>  At the bottom right of the EXP window, look for the <b>Menu</b> button. Select it.</li>
-    <li>  A set of options appears, choose <b>Export ALL to CSV</b></li>
+    <li> From the MainVC, find the most recent batch. Select it.</li>
+    <li> From the popup menu, select <b>Export EXP to Excel</b></li>
+    <li> This goes and loads in all the EXP data from the latest batch</li>
     <li>  An Email composer appears after the records are ready, and lets you send them as an attacehment.</li>
 </ul>
-<i>This capability will be moved into the MainVC if it becomes common</i>
 <p>
 On the other end, you can save this attachment and load it directly into Excel.  Note that the first line of the CSV file contains header labels for your convenience.
 

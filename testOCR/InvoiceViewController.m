@@ -13,6 +13,7 @@
 //
 //  2/6 add segue to PDFVC
 //  2/9 add parentUp to invoiceTable
+//  2/22 add loadingData flag
 
 #import "InvoiceViewController.h"
 
@@ -52,6 +53,7 @@
         _vendor = @"*";
     }
     _titleLabel.text  = @"Loading Invoices...";
+    loadingData = TRUE;
     [spv start : @"Loading Invoices"];
     if ([_vendor isEqualToString:@"*"]) //Get all vendors
     {
@@ -86,6 +88,7 @@
 {
     if (vptr >= vv.vNames.count) //All done??
     {
+        loadingData = FALSE;
         [spv stop];
         [_table reloadData];
         NSString *s;

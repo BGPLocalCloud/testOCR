@@ -464,7 +464,7 @@
 //=============(smartProducts)=====================================================
 -(void) loadKeywordsAndTyposFromParse
 {
-    NSLog(@"loadKeywordsAndTyposFromParse...");
+    //NSLog(@"loadKeywordsAndTyposFromParse...");
     PFQuery *query = [PFQuery queryWithClassName:@"Keywords"];
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
@@ -488,7 +488,7 @@
                 [self->typos addObject:pfo[PInv_Typo_key]];
                 [self->fixed addObject:pfo[PInv_Fixed_key]];
             }
-            NSLog(@" ...typos OK: %d objects",(int)self->typos.count);
+            //NSLog(@" ...typos OK: %d objects",(int)self->typos.count);
         }
     }];
     //Go get splits...
@@ -502,11 +502,10 @@
                 [self->splits addObject:pfo[PInv_Split_key]];
                 [self->joined addObject:pfo[PInv_Joined_key]];
             }
-            NSLog(@" ...splits OK: %d objects",(int)self->splits.count);
+            //NSLog(@" ...splits OK: %d objects",(int)self->splits.count);
         }
     }];
-
-}
+} //end loadKeywordsAndTyposFromParse
 
 
 //=============(smartProducts)=====================================================

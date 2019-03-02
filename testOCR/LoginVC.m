@@ -176,13 +176,13 @@
 //==========PuzzleVC=========================================================================
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
 {
-    NSLog(@" textFieldShouldBeginEditing ");
+    //NSLog(@" textFieldShouldBeginEditing ");
     return YES;
 }
 
 //==========PuzzleVC=========================================================================
 - (BOOL)textFieldShouldClear:(UITextField *)textField {
-    NSLog(@" textFieldShouldClear");
+    //NSLog(@" textFieldShouldClear");
 
     return YES;
 }
@@ -190,7 +190,7 @@
 // It is important for you to hide the keyboard
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    NSLog(@" textFieldShouldReturn");
+    //NSLog(@" textFieldShouldReturn");
     if (textField == _field2)
     {
         [textField resignFirstResponder];
@@ -203,14 +203,13 @@
 //==========PuzzleVC=========================================================================
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    NSLog(@" textFieldDidBeginEditing");
+    //NSLog(@" textFieldDidBeginEditing");
 } //end textFieldDidBeginEditing
 
 
 //==========PuzzleVC=========================================================================
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-    NSLog(@" asdf");
 } //end textFieldDidEndEditing
 
 

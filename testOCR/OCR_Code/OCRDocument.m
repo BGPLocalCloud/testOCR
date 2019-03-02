@@ -694,15 +694,6 @@
 {
     if (a.count == 0) return @""; //handle edge cases
     NSMutableArray *wordPairs = [self getSortedWordPairsFromArray:a];
-    NSString *output = @""; //Assemble string now, assume sorted
-    for (NSDictionary *d in wordPairs)  //Is there an easier way to assemble a string?
-    {
-        NSString* ns  = [d objectForKey:@"Word"];
-        output = [output stringByAppendingString:ns];
-        if (!numeric) output = [output stringByAppendingString:@" "];
-    }
-    return output;
-#ifdef DELETETHISOLDCRAP
     //All sorted! Now pluck'em out!
     NSString *s = @"";
     int i    = 0;
@@ -723,7 +714,6 @@
         i++;
     }
     return s;
-#endif
 } //end assembleWordFromArray
 
 
@@ -1260,9 +1250,8 @@
     for (NSNumber* n in aof)
     {
         NSString *testText = [self getNthWord:n];
-        testText = [testText stringByReplacingOccurrencesOfString:@"B" withString:@"8"]; //B? maybe 8!
-        testText = [testText stringByReplacingOccurrencesOfString:@"I" withString:@"1"]; //I? maybe 1!
-        testText = [testText stringByReplacingOccurrencesOfString:@"\"" withString:@""]; //No quotes please
+        testText = [self cleanUpNumberString:testText]; //DHS 2/28
+        testText = [testText stringByReplacingOccurrencesOfString:@"." withString:@""];//No dots either!
         if ([self isStringAnInteger:testText] ) foundLong = (long)[testText longLongValue];
     } //end for n
     return foundLong;
