@@ -16,6 +16,8 @@
 //  2/4   remove _analyzedShortDateString
 //  2/5   redid q / p / a match check again
 //  2/14  add int/float quantity support
+//  3/4   broke out keywords, typos etc read from parse,
+//          needed to make them re-entrant for large tables
 #import "smartProducts.h"
 
 @implementation smartProducts
@@ -36,13 +38,17 @@
         notwilds =  [[NSMutableArray alloc] init];
         keywords =  [[NSMutableDictionary alloc] init];
         
-        
         didInitAlready = FALSE;
+        NSLog(@" SmartProducts: Load typos from DISK");
         [self loadRulesTextFile : @"splits" : FALSE : splits : joined];
         [self loadRulesTextFile : @"typos"  : TRUE :  typos  : fixed];
         [self loadRulesTextFile : @"wild"   : TRUE :  wilds  : notwilds];
 
-        [self loadKeywordsAndTyposFromParse];
+        NSLog(@" SmartProducts: Load typos from PARSE");
+        [self loadKeywordsFromParse : 0];
+        [self loadTyposFromParse : 0];
+        [self loadSplitsFromParse : 0];
+
     }
     return self;
 }
@@ -144,6 +150,7 @@
                       @"grape juice",
                       @"juice",
                       @"lemonade",
+                      @"mix",
                       @"nectar",   // Need multiple words?",
                       @"orange juice",
                       @"raspberry tea",
@@ -462,50 +469,76 @@
 } //end saveTyposToParse
 
 //=============(smartProducts)=====================================================
--(void) loadKeywordsAndTyposFromParse
+// 3/4 broke each table out to its own re-entrant method for loading more than 100 items!
+-(void) loadKeywordsFromParse : (int) skip
 {
-    //NSLog(@"loadKeywordsAndTyposFromParse...");
     PFQuery *query = [PFQuery queryWithClassName:@"Keywords"];
+    query.skip = skip;
+    if (skip == 0) [keywords removeAllObjects];
+
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
-            [self->keywords removeAllObjects];
             for (PFObject *pfo in objects)
             {
                 NSString *keyword = pfo[PInv_Name_key];
                 NSString *cat     = pfo[PInv_Category_key];
                 [self->keywords setObject:cat forKey:keyword];
             }
+            if (objects.count == 100) [self loadKeywordsFromParse:skip+100];
+            else NSLog(@" ...found %d keywords",(int)self->keywords.count);
         }
     }];
-    //Go get typos...
-    PFQuery *query2 = [PFQuery queryWithClassName:@"Typos"];
-    [query2 findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+} //end loadKeywordsFromParse
+
+//=============(smartProducts)=====================================================
+// 3/4 broke each table out to its own re-entrant method for loading more than 100 items!
+-(void) loadTyposFromParse : (int) skip
+{
+    PFQuery *query = [PFQuery queryWithClassName:@"Typos"];
+    query.skip = skip;
+    if (skip == 0)
+    {
+        [typos removeAllObjects];
+        [fixed removeAllObjects];
+    }
+    
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
-            [self->typos removeAllObjects];
-            [self->fixed removeAllObjects];
             for (PFObject *pfo in objects)
             {
                 [self->typos addObject:pfo[PInv_Typo_key]];
                 [self->fixed addObject:pfo[PInv_Fixed_key]];
             }
-            //NSLog(@" ...typos OK: %d objects",(int)self->typos.count);
+            if (objects.count == 100) [self loadTyposFromParse:skip+100];
+            else NSLog(@" ...found %d typos",(int)self->typos.count);
         }
     }];
-    //Go get splits...
-    PFQuery *query3 = [PFQuery queryWithClassName:@"Splits"];
-    [query3 findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+} //end loadTyposFromParse
+
+//=============(smartProducts)=====================================================
+// 3/4 broke each table out to its own re-entrant method for loading more than 100 items!
+-(void) loadSplitsFromParse : (int) skip
+{
+    PFQuery *query = [PFQuery queryWithClassName:@"Splits"];
+    query.skip = skip;
+    if (skip == 0)
+    {
+        [splits removeAllObjects];
+        [joined removeAllObjects];
+    }
+    
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
-            [self->splits removeAllObjects];
-            [self->joined removeAllObjects];
             for (PFObject *pfo in objects)
             {
                 [self->splits addObject:pfo[PInv_Split_key]];
                 [self->joined addObject:pfo[PInv_Joined_key]];
             }
-            //NSLog(@" ...splits OK: %d objects",(int)self->splits.count);
+            if (objects.count == 100) [self loadSplitsFromParse:skip+100];
+            else NSLog(@" ...found %d splits",(int)self->splits.count);
         }
     }];
-} //end loadKeywordsAndTyposFromParse
+} //end loadSplitsFromParse
 
 
 //=============(smartProducts)=====================================================
@@ -740,6 +773,39 @@
             processed = FALSE;
             bulk = FALSE;
         }
+        if (!found) //DHS 3/4, look thru keywords table if still no match!
+        {
+            _analyzedUOM = @"n/a";
+            NSDictionary *uomdict = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                     @"case",   @"beverage",
+                                     @"case",   @"bread",
+                                     @"qt",     @"dairy",
+                                     @"lb",     @"drygoods",
+                                     @"lb",     @"produce",
+                                     @"lb",     @"protein",
+                                     @"case",   @"snacks",
+                                    nil];
+            
+            if (keywords[lowerCase] != nil) //Kw match?
+            {
+                NSString *cat = keywords[lowerCase];
+                if ([cat.lowercaseString isEqualToString:@"drygoods"])
+                    _analyzedCategory = @"DRY GOODS";
+                else
+                    _analyzedCategory = cat.uppercaseString;
+                processed = FALSE;
+                if ([@[@"beverage",@"bread",@"dairy",@"drygoods",@"snacks",@"supplies"]
+                    containsObject:cat]) processed = TRUE;
+                bulk = FALSE;
+                if ([@[@"beverage",@"bread",@"dairy",@"drygoods",@"produce",@"protein"]
+                     containsObject:cat]) bulk = TRUE;
+                //Use our little dictionary above for UOM's, MOVE DICT TO CLASS!
+                if (uomdict[cat] != nil) _analyzedUOM = uomdict[cat];
+                found = TRUE;
+//                NSLog(@" match %@ => %@ processed %d bulk %d uom %@",
+//                      lowerCase,cat,processed,bulk,_analyzedUOM);
+            }
+        }
         //Uom set from outside? Override!
         if (uom.length > 1) _analyzedUOM  = uom;
     }
@@ -754,6 +820,7 @@
         
     if ( //Got a product of Hawaii in description? set local flag
         [fullProductName.lowercaseString containsString:@"hawaii"] ||
+        [fullProductName.lowercaseString containsString:@"local"] || //DHS 3/4
         [fullProductName.lowercaseString containsString:@"hawa11"]
         )
         local = TRUE;

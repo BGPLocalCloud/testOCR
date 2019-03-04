@@ -864,9 +864,6 @@ static OCRTopObject *sharedInstance = nil;
 {
     NSString *its = [NSString stringWithFormat:@"%4.2f",_invoiceTotal];
     its = [od cleanupPrice:its]; //Make sure total is formatted!
-     //does this asynchronous call end here???  WEIRD!
-    //IS this even called anymore???
-    NSLog(@" OK YUP didFinishAllEXPRecords is actually being called!");
 }
 
 //=============<EXPTableDelegate>=====================================================
