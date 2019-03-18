@@ -66,6 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableArray *notwilds;
     
     NSMutableDictionary *keywords;
+    NSMutableDictionary *keywordsNo1stChar;
     BOOL didInitAlready;
     OCRCategories* occ; //Categories / processed / local lookup table
 }

@@ -23,7 +23,7 @@
 
 
 NSString * steps[] = {
-    @"Step 1: Choose a document image...",
+    @"Step 1: Choose a template image...",
     @"Step 2: Rotate / Deskew...",
     @"Step 3: Enhance..."
 
@@ -47,7 +47,7 @@ NSString * steps[] = {
     enhancing   = FALSE;
     coreImage   = [[CIImage alloc] init];
     vv          = [Vendors sharedInstance];
-
+    vendorMode  = @"templates";
     return self;
 }
 
@@ -77,8 +77,10 @@ NSString * steps[] = {
     //Get template folder contents...
     AppDelegate *tappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     templateFolder = tappDelegate.settings.templateFolder;
+    //We will choose from the templates folder...
+    [self->spv start : @"Get Template PDFs..."];
     [dbt getFolderList : templateFolder];
-    
+    // 3/17 FOR CHOOSING FROM STAGED AREA   [self customerMenu]; //DHS 3/13
 
     //First, are we coming back from something??
     if (_step != 0)
@@ -115,12 +117,17 @@ NSString * steps[] = {
                                                                    message:nil
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     [alert setValue:tatString forKey:@"attributedTitle"];
-    for (NSString *s in vv.vNames)
+    for (int i=0;i<vv.vcount;i++)  //DHS 3/6
     {
+        NSString *s = [vv getNameByIndex:i]; //DHS 3/6
         [alert addAction : [UIAlertAction actionWithTitle:s
                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                       self->_vendor = s;
-                                                      [self choiceMenu];
+                                                      if ([self->vendorMode isEqualToString:@"load"])
+                                                      {
+                                                          [self getVendorPDFFiles];
+                                                      }
+                                                      else [self choiceMenu];
                                                         }]] ;
     }
     [alert addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
@@ -163,7 +170,14 @@ NSString * steps[] = {
                                                         } //end imageExists...
                                                         else{
                                                             [self->spv start : @"Load Template Image"];
-                                                            [self->dbt downloadImages : self->imagePath];
+                                                            //3/17 choose PDF from a staged file area...
+                                                            if ([self->vendorMode isEqualToString:@"load"])
+                                                            {
+                                                                NSString *folderPath = [NSString stringWithFormat : @"%@/latestBatch/%@/%@",self->customerSelect,_vendor,fname];
+                                                                [self->dbt downloadImages : folderPath];
+                                                            }
+                                                            else // 3/17  Is this still used?
+                                                                [self->dbt downloadImages : self->imagePath];
                                                         }
                                                         
                                                     }]];
@@ -175,7 +189,15 @@ NSString * steps[] = {
     
 } //end choiceMenu
 
-
+//=============AddTemplate VC=====================================================
+// We have customer / vendor, time to see whats there...
+-(void) getVendorPDFFiles
+{
+    //AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    [self->spv start : @"Get PDF List..."];
+    NSString *folderPath = [NSString stringWithFormat : @"%@/latestBatch/%@",customerSelect,_vendor];
+    [dbt getFolderList:folderPath];  //Rest handled in delegate callback...
+} //end getVendorPDFFiles
 
 
 //=============AddTemplate VC=====================================================
@@ -227,7 +249,7 @@ NSString * steps[] = {
 //=============AddTemplate VC=====================================================
 - (IBAction)loadSelect:(id)sender
 {
-     [self displayPhotoPicker];
+    // [self displayPhotoPicker];
 }
 
 //=============AddTemplate VC=====================================================
@@ -251,7 +273,6 @@ NSString * steps[] = {
 //    UIImage *iskew = [it deskew:inputImage];
     //_skewAngleFound
 }
-
 
 
 //=============AddTemplate VC=====================================================
@@ -307,6 +328,35 @@ NSString * steps[] = {
     [self dismissViewControllerAnimated : YES completion:nil];
     
 }
+
+//=============AddTemplate VC=====================================================
+-(void) customerMenu
+{
+    AppDelegate *tappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    templateFolder = tappDelegate.settings.templateFolder;
+    
+    NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:@"Select Customer:"];
+    [tatString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:30] range:NSMakeRange(0, tatString.length)];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:
+                                NSLocalizedString(@"Select Customer:",nil)
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    [alert setValue:tatString forKey:@"attributedTitle"];
+    for (NSString *cust in tappDelegate.cust.customerNames)
+    {
+        [alert addAction: [UIAlertAction actionWithTitle:cust
+                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                       self->customerSelect = cust;
+                                                       [self vendorMenu];
+                                                   }]];
+    }
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                              }]];
+    [self presentViewController:alert animated:YES completion:nil];
+} //end customerMenu
+
 
 //=============AddTemplate VC=====================================================
 // Handles last minute VC property setups prior to segues
@@ -536,9 +586,19 @@ NSString * steps[] = {
     NSLog(@" files %@",entries);
     fileEntries = [NSMutableArray arrayWithArray:entries];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self vendorMenu];
+        [self->spv stop];
+        if ([self->vendorMode isEqualToString:@"load"])
+            [self choiceMenu];
+        else
+            [self vendorMenu];
     });
 
+}
+
+//===========<DropboxToolDelegate>================================================
+- (void)errorGettingFolderList : (NSString *)s
+{
+    NSLog(@" errorGettingFolderList %@",s);
 }
 
 //===========<DropboxToolDelegate>================================================

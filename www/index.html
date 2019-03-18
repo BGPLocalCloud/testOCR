@@ -243,17 +243,18 @@ Here`s a link to parse:
 </div>
 </center>
 
+<h1>Login:</h1>
+You must login to use this app.  Contact Heidi to get your username and password.
 
 <h1>Using the app:</h1>
 
-
-The first screen you will see is called the <i>MainVC</i>. This screen shows a table of the latest activities that have taken place, such as batch runs or template changes.
+After you have logged in, the first screen you will see is called the <i>MainVC</i>. This screen shows a table of the latest activities that have taken place, such as batch runs or template changes.
 <br>
 At the bottom of the screen are four buttons which navigate you through the app.
 <ul>
     <li>Menu : High level operations</li>
     <li>DB : Database Queries</li>
-    <li>Outputs: Graphs and Exports</li>
+    <li>Outputs: Various Graph Displays</li>
     <li>Batch: Processes Invoices</li>
 </ul>
 
@@ -268,7 +269,10 @@ This puts up another menu which lets you look at all EXP table line items from t
 See below for more information on these options.
 <p>
 <h4>Output:</h4>
-This is still under construction. More later.
+This switches apps to the BGP Charts app.  This app displays a set of canned FY data in a variety of formats,
+and it also can load the contents of the <b>EXP_Comparison</b> table, which is created from loading
+in CSV data from an Excel spreadsheet.  The same button position in the Chart App returns you
+to this app.
 <p>
 <h4>Batch:</h4>
 This takes you to the Batch Screen. At startup, the app takes up to 15 seconds to load important vendor settings from the DB and this button won`t work until the settings are present.
@@ -327,6 +331,8 @@ If all of the necessary fields are present then the line items are spell checked
 <br>
 Line items that can be recognized are then written out to the EXP table. After each page is processed, the corresponding invoice is either created or updated and stored on the vendor`s invoice table.
 <p>
+When the batch is finished, a <i>Batch Report</i> is written out to Dropbox in the appropriate vendor output file, and a <i>CSV file</i> is also made from the accumulated EXP data.  This CSV file is written out with the Batch Report
+<p>
 
 As the batch runs, all important activities are displayed on a scrolling list and some are logged to the Activity Table, which appears on the MainVC later. When the Batch is done OR if there is a major error then a message will appear at the end of the list.
 <br>
@@ -364,6 +370,7 @@ If you want to rerun a batch after halting it or because of an internet error, o
     <li>View/Fix Errors: Goes to Error Screen</li>
     <li>View/Fix Warnings: Goes to Warnings Screen</li>
     <li>Error Helper: Displays PDFs from the batch</li>
+    <li>Export EXP to Excel: Dumps/Emails EXP data for Excel</li>
     <li>Get Report: Displays batch report</li>
 </ul>
 
@@ -449,20 +456,6 @@ Once you are done fixing errors you can exit the Error Window by pressing the li
 
 <hr>
 
-<h1>Export to Excel:</h1>
-
-Records from the EXP table in the database can be exported in CSV format to Excel as email attachments.
-<br>
-This assumes you just ran a batch and have corrected your errors, want to correct them later in Excel.
-<br>
-<ul>
-    <li> From the MainVC, find the most recent batch. Select it.</li>
-    <li> From the popup menu, select <b>Export EXP to Excel</b></li>
-    <li> This goes and loads in all the EXP data from the latest batch</li>
-    <li>  An Email composer appears after the records are ready, and lets you send them as an attacehment.</li>
-</ul>
-<p>
-On the other end, you can save this attachment and load it directly into Excel.  Note that the first line of the CSV file contains header labels for your convenience.
 
 <br>
 

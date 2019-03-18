@@ -15,9 +15,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.073</string>
+	<string>1.0.079</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.073</string>
+	<string>1.0.079</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -26,6 +26,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>BGPCloud</string>
+				<string>db-di1y8828rc9ax05</string>
 			</array>
 		</dict>
 	</array>

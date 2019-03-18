@@ -29,6 +29,7 @@
 @property (nonatomic , strong) NSString* vendor;
 @property (nonatomic , strong) NSString* PDFFile;
 @property (nonatomic , strong) NSString* pageCount;
+@property (nonatomic , strong) NSString* page;
 
 
 

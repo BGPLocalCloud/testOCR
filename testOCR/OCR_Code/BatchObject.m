@@ -128,7 +128,7 @@ static BatchObject *sharedInstance = nil;
     [self.delegate batchUpdate : @"Clear old tables..."];
     selectedVendor = vindex;
     NSString *vname = @"*";
-    if (vindex != -1 && vindex < vv.vNames.count) vname = vv.vNames[vindex];
+    if (vindex != -1 && vindex < vv.vcount) vname = [vv getNameByIndex:vindex];  //DHS 3/6
     [self clearTables:vname];
 } //end clearAndRunBatches
 
@@ -141,8 +141,9 @@ static BatchObject *sharedInstance = nil;
     [gp deleteAllByTableAndKey:@"EXPFullTable"      :@"*" :@"*"];
     if ([vendor isEqualToString:@"*"]) //All vendors?
     {
-        for (NSString *vn in vv.vNames)
+        for (int i=0;i<vv.vcount;i++)  //DHS 3/6
         {
+            NSString *vn = [vv getNameByIndex:i]; //DHS 3/6
             NSString *tableName = [NSString stringWithFormat:@"I_%@",vn];
             [gp deleteAllByTableAndKey:tableName : @"*" : @"*"];
         }
@@ -210,11 +211,12 @@ static BatchObject *sharedInstance = nil;
     [vendorFileCounts removeAllObjects];
     [vendorFolders removeAllObjects];
     returnCount = 0;
-    for (NSString *vn in vv.vFolderNames)
+    for (int i=0;i<vv.vcount;i++)  //DHS 3/6
     {
+        NSString *vn = [vv getFoldernameByIndex:i]; //DHS 3/6
         [dbt countEntries : batchFolder : vn];
     }
-}
+} //end getBatchCounts
 
 //=============(BatchObject)=====================================================
 -(void) getNewBatchID
@@ -244,7 +246,7 @@ static BatchObject *sharedInstance = nil;
 // vendor vindex -1 means run ALL
 -(void) runOneOrMoreBatches : (int) vindex
 {
-    if (vindex >= (int)vv.vFolderNames.count)
+    if (vindex >= (int)vv.vcount) //DHS 3/6
     {
         NSLog(@" ERROR: illegal vendor index");
         return;
@@ -306,10 +308,10 @@ static BatchObject *sharedInstance = nil;
         return;
     }
     if (preIncrement) vendorIndex++;
-    int vfcsize = (int)vv.vFileCounts.count;
-    int vfnsize = (int)vv.vNames.count;
+    int vfcsize = (int)vv.vcount; //DHS 3/6 all one structure now
+    int vfnsize = (int)vv.vcount; //DHS 3/6
     //DHS 2/14 int/floating point quantities for this vendor?
-    NSString *intstr = vv.vIntQuantities[vendorIndex];
+    NSString *intstr = [vv getIntQuantityByIndex : vendorIndex]; //DHS 3/6
     oto.intQuantity  = [intstr.lowercaseString isEqualToString:@"true"];
     if (debugMode) NSLog(@" vfcsize %d vs vfnsize %d",vfcsize,vfnsize);
     //NOTE filecounts can be larger than vendor counts!
@@ -319,7 +321,7 @@ static BatchObject *sharedInstance = nil;
     while (vendorIndex < vfnsize && !found)
     {
         if (debugMode) NSLog(@" vendorIndex %d vs vfnsize %d",vendorIndex,vfnsize);
-        if ([self getVendorFileCount : vv.vNames[vendorIndex]] > 0) found = TRUE;
+        if ([self getVendorFileCount : [vv getNameByIndex:vendorIndex]] > 0) found = TRUE; //DHS 3/6
         else vendorIndex++;
     } //End while...
     //Hmm vendorindex never gets to vfnsize? 1/27
@@ -335,9 +337,9 @@ static BatchObject *sharedInstance = nil;
 // For each vendor: sets up batch vendor items, updates status and gets template
 -(void) startBatchForCurrentVendor
 {
-    vendorName       = vv.vNames[vendorIndex];
-    vendorFolderName = vv.vFolderNames[vendorIndex];
-    vendorRotation   = vv.vRotations[vendorIndex];  //For templates: portrait / landscape orient
+    vendorName       = [vv getNameByIndex:vendorIndex]; //DHS 3/6 3 lines
+    vendorFolderName = [vv getFoldernameByIndex:vendorIndex];
+    vendorRotation   = [vv getRotationByIndex:vendorIndex];
     [self updateParse];
     [self updateBatchProgress : [NSString stringWithFormat:@"Get Template:%@",vendorName] : FALSE];
     gotTemplate = FALSE;
@@ -835,7 +837,7 @@ static BatchObject *sharedInstance = nil;
         [vendorFolders setObject:dbt.entries forKey:vname];
     }
     returnCount++; //Count returns, did we hit all the vendors? let delegate know
-    if (returnCount == vv.vFolderNames.count)
+    if (returnCount == vv.vcount) //DHS 3/6
     {
         [self->_delegate didGetBatchCounts];
     }

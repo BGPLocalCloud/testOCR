@@ -15,6 +15,7 @@
 //  1/15 hook up filename property
 //  1/18 change 2nd scroll area  to textfield, add segue to editVC
 //  1/19 Added dropbox file save and PDF cache save
+//  3/17 changed OCRTopObject delegate callbacks to notifications...
 //
 #import "CheckTemplateVC.h"
 
@@ -49,11 +50,23 @@
     CGSize csz   = [UIScreen mainScreen].bounds.size;
     spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, csz.width, csz.height)];
     [self.view addSubview:spv];
+    
+    //3/17 notifications from OCRTopObject singleton...
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didPerformOCR:)
+                                                 name:@"didPerformOCR" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(errorPerformingOCR:)
+                                                 name:@"errorPerformingOCR" object:nil];
+
+    
+    
     // Do any additional setup after loading the view.
     _imageView.image = _photo;
     _scrollView.delegate=self;
     oto.imageFileName = _fileName; //1/15
     oto.ot = nil; //Hand template down to oto
+    [spv start:@"Perform OCR..."];
     [oto performOCROnImage : oto.imageFileName : _photo ];
 } //end viewDidLoad
 
@@ -112,8 +125,8 @@
 {
     AppDelegate *tappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSString *templateFolder  = tappDelegate.settings.templateFolder;
-    NSString *outputPath      = [NSString stringWithFormat:@"%@/template_%@.png",templateFolder,_vendor];
-    [spv start : @"Saving Template Image"];
+    NSString *outputPath      = [NSString stringWithFormat:@"/%@/template_%@.png",templateFolder,_vendor];
+    [spv start : @"Save Image..."];
     //Add image to PDF cache...
     [pc addPDFImage : _photo : outputPath : 1];
     //OK save our template image...
@@ -158,28 +171,55 @@
 
 
 
-//=============CheckTemplate VC=====================================================
 
 
 #pragma mark - OCRTopObjectDelegate
 
-//=============(BatchObject)=====================================================
-- (void)didPerformOCR : (NSString *) result
+//=============<OCRTopObjectDelegate>=====================================================
+// 3/17 OBSOLETE
+//- (void)didPerformOCR : (NSString *) result
+//{
+//    NSLog(@" OCR OK");
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        self->ocredText = [self->oto getRawResult];
+//        self->_outputTextView.text = self->ocredText;
+//    });
+//
+//}
+
+//=============<OCRTopObject notification>=====================================================
+// 3/17
+- (void)errorPerformingOCR:(NSNotification *)notification
 {
-    NSLog(@" OCR OK");
+    NSString *errmsg = (NSString*)notification.object;
     dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@" error on OCR... %@",errmsg);
+        //        [self errorMessage:@"Error Performing OCR" : errmsg];
+    });
+}
+
+//=============<OCRTopObject notification>=====================================================
+// 3/17
+- (void)didPerformOCR:(NSNotification *)notification
+{
+    NSLog(@" didPerformOCR");
+//    od = (OCRDocument*)notification.object; //Note this ISN'T a copy! don't modify it!
+//    [od setupPage:page-1]; //NOTE must change on page +/-!!
+//    NSLog(@" annnd doc is %@",od);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self->spv stop];
         self->ocredText = [self->oto getRawResult];
         self->_outputTextView.text = self->ocredText;
     });
+} //end didReadBatchByIDs
 
-}
 
-
-//=============(BatchObject)=====================================================
-- (void)errorPerformingOCR : (NSString *) errMsg
+//=============<OCRTopObjectDelegate>=====================================================
+- (void)batchUpdate : (NSString *) s
 {
-    [self errMsg:@"Error Performing OCR" :errMsg];
+    NSLog(@" ...stubbed batchUpdate %@",s);
 }
+
 
 #pragma mark - DropboxToolsDelegate
 

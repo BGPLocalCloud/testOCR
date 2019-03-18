@@ -35,9 +35,11 @@
     page      = 1; //Use PDF page count
     fname     = @"";
     ocrOutput = @"";
- 
-    clugeX = 160;
-    clugeY = 160;
+
+    obstep = 10; //Stepsize for select box size changes
+
+    clugeX =  90;
+    clugeY = 0;
     NSLog(@" init clugexy %d %d",clugeX,clugeY);
     return self;
 }
@@ -48,21 +50,19 @@
     [super viewDidLoad];
     CGSize csz   = [UIScreen mainScreen].bounds.size;
     spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, csz.width, csz.height)];
+    viewWid = csz.width;
+    viewHit = csz.height;
     [self.view addSubview:spv];
     _scrollView.delegate=self;
     
-    // Clear centered box with black border
-    _boxView.backgroundColor = [UIColor clearColor];
-    _boxView.layer.borderWidth = 2;
-    _boxView.layer.borderColor = [UIColor blackColor].CGColor;
-    //Now center it over scrollview
-    CGRect rr = _scrollView.frame;
-    CGRect br = _boxView.frame;
-    bw = bh = br.size.width;
-    br.origin.x = rr.origin.x + rr.size.width/2 - bw/2;
-    br.origin.y = rr.origin.y + rr.size.height/2 - bw/2;
-    _boxView.frame = br;
     
+    int xi,yi,xs,ys;
+    xs = ys = viewWid;
+    xi = 0;
+    yi = viewHit/2 - viewWid/2;
+    _scrollView.frame = CGRectMake(xi,yi,xs,ys);
+    _pdfImage.image = [UIImage imageNamed:@"hfm90.jpg"];
+
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didPerformOCR:)
                                                  name:@"didPerformOCR" object:nil];
@@ -84,12 +84,20 @@
     float y = p.y;
     scrollX = (int)p.x;
     scrollY = (int)p.y;
-    NSLog(@" x %f y %f",x,y);
-    NSLog(@" zxy %f %f",(float)izoom*x,(float)izoom*y);
+//    NSLog(@" SCROLL X / Y ===== %d %d",scrollX,scrollY);
+
+//    NSLog(@" zoomwh %d %d",zoomwid,zoomhit);
+//    NSLog(@" scrollframe %@",NSStringFromCGRect(scrollView.frame));
+//    NSLog(@" PDFframe    %@",NSStringFromCGRect(_pdfImage.frame));
+    //    NSLog(@" x %f y %f",x,y);
+//
+//    NSLog(@" zxy %f %f",(float)izoom*x,(float)izoom*y);
     [self getOBRect];
     [self updateOCRText];
     
 }
+
+
 
 //=============AnalyzeVC=====================================================
 - (void)viewDidAppear:(BOOL)animated {
@@ -97,16 +105,51 @@
     [self updateUI];
 } //end viewDidAppear
 
+
 //=============AnalyzeVC=====================================================
 -(void) getOBRect
 {
-    obx = (scrollX * izoom) + clugeX;
-    oby = (scrollY * izoom) + clugeY;
-    obw = izoom * 2*bw;
-    obh = izoom * 2*bh;
-    obRect = CGRectMake(obx, oby, obw, obh);
+    int topLeftX = zoomwid/4 - marginX;
+    int topLeftY = zoomhit/4 - marginY;
+    
+    NSLog(@" scrollx %d topleftX %d",scrollX,topLeftX);
+    NSLog(@" scrolly %d topleftY %d",scrollY,topLeftY);
+    NSLog(@" marginXY %d,%d",marginX,marginY);
+    
+    int xoff = scrollX - topLeftX;
+    int yoff = scrollY - topLeftY;
+    NSLog(@" ....xyoff %d %d",xoff,yoff);
 
-}
+    int fudgeWid = imagewid + 2 * marginX;
+    int fudgeHit = imagehit + 2 * marginY;
+    
+    double xPercent = (double)xoff / (double)fudgeWid;
+    double yPercent = (double)yoff / (double)fudgeHit;
+
+    //HFM! FLIPPED XY!!!
+    int docWid =  od.height;
+    int docHit =  od.width;
+#ifdef NOTHFM
+    int docWid =  od.width;
+    int docHit =  od.height;
+#endif
+    NSLog(@" ...xyoff %d %d  xyPercent %f %f",xoff,yoff,xPercent,yPercent);
+    NSLog(@"  maxWid? %d %d",fudgeWid,fudgeHit);
+    NSLog(@"   doc WH %d %d",docWid,docHit);
+    NSLog(@"  clugeXY %d %d",clugeX,clugeY);
+    if (xoff > 0 && yoff > 0)
+    {
+        obx = (int)((double)docWid*xPercent);
+        oby = (int)((double)docWid*xPercent);
+        obx += clugeX;
+        oby += clugeY;
+        obw = bw;   //Overlay black box outline size??
+        obh = bh;
+        obRect = CGRectMake(obx, oby, obw, obh);
+        NSLog(@" annnd docrect is %@",NSStringFromCGRect(obRect));
+    }
+    
+} //end getOBRect
 
 //=============AnalyzeVC=====================================================
 - (IBAction)prevPageSelect:(id)sender
@@ -125,11 +168,45 @@
     NSLog(@" clugeXY %d %d",clugeX,clugeY);
     [self updateOCRText];
 }
+//asdf
+
 
 //=============AnalyzeVC=====================================================
 - (IBAction)loadSelect:(id)sender
 {
     [self loadMenu];
+}
+
+//=============AnalyzeVC=====================================================
+-(void) updateDatShit
+{
+    [self updateSelectBox];
+    [self getOBRect];
+    [self updateOCRText];
+}
+
+//=============AnalyzeVC=====================================================
+- (IBAction)boxWMinusSelect:(id)sender {
+    bw = MAX (40,bw-10);
+    [self updateDatShit];
+}
+
+//=============AnalyzeVC=====================================================
+- (IBAction)boxWPlusSelect:(id)sender {
+    bw+=10;
+    [self updateDatShit];
+}
+
+//=============AnalyzeVC=====================================================
+- (IBAction)boxHMinusSelect:(id)sender {
+    bh = MAX (40,bh-10);
+    [self updateDatShit];
+}
+
+//=============AnalyzeVC=====================================================
+- (IBAction)boxHPlusSelect:(id)sender {
+    bh+=10;
+    [self updateDatShit];
 }
 
 //=============AnalyzeVC=====================================================
@@ -178,8 +255,9 @@
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     
     [alert setValue:tatString forKey:@"attributedTitle"];
-    for (NSString *s in vv.vNames)
+    for (int i=0;i<vv.vcount;i++)  //DHS 3/6
     {
+        NSString *s = [vv getNameByIndex:i]; //DHS 3/6
         [alert addAction: [UIAlertAction actionWithTitle:s
                                                    style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                        self->vendorSelect = s;
@@ -206,8 +284,9 @@
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     
     [alert setValue:tatString forKey:@"attributedTitle"];
-    for (NSString *s in vv.vNames)
+    for (int i=0;i<vv.vcount;i++)  //DHS 3/6
     {
+        NSString *s = [vv getNameByIndex:i]; //DHS 3/6
         [alert addAction: [UIAlertAction actionWithTitle:s
                                                    style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                        self->vendorSelect = s;
@@ -240,6 +319,14 @@
 } //end chooseVendor
 
 //=============AnalyzeVC=====================================================
+-(NSString *) getFilenameFromFullPath : (NSString*)fullpath
+{
+    NSArray  *fstrs = [fullpath componentsSeparatedByString:@"/"]; //Peel off last part of path -> filename
+    NSString *fname = fstrs[fstrs.count-1];
+    return fname;
+}
+
+//=============AnalyzeVC=====================================================
 -(void) chooseFile
 {
     NSString *tstr = [NSString stringWithFormat:@"Vendor : %@",vendorSelect];
@@ -251,9 +338,7 @@
     [alert setValue:tatString forKey:@"attributedTitle"];
     for (NSString *s in pdfFnames) //Look at our PDF list...
     {
-        NSArray *sstrs  = [s componentsSeparatedByString:@"/"]; //Peel off last part of path -> filename
-        NSString *fname = sstrs[sstrs.count-1];
-        [alert addAction: [UIAlertAction actionWithTitle:fname
+        [alert addAction: [UIAlertAction actionWithTitle:[self getFilenameFromFullPath:s]
                                                    style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                        [self loadPDF : s];
                                                    }]];
@@ -302,11 +387,11 @@
 //=============AnalyzeVC=====================================================
 -(void) updateOCRText
 {
-    NSLog(@" ocr rect %@",NSStringFromCGRect(obRect));
-    NSMutableArray *a = [od findAllWordsInRect:obRect];
+  //  NSLog(@" ocr rect %@",NSStringFromCGRect(obRect));
+    NSMutableArray *a = [od findAllWordsInDocumentRect:obRect];
     NSString *daWoids = [od assembleWordFromArray : a : false : 10];
-    NSLog(@"OCR: %d words",(int)a.count);
-    NSLog(@"     %@",daWoids);
+  //  NSLog(@"OCR: %d words",(int)a.count);
+  //  NSLog(@"     %@",daWoids);
     _ocrText.text = daWoids;
 
 }
@@ -314,26 +399,98 @@
 //=============AnalyzeVC=====================================================
 -(void) updateUI
 {
-    _titleLabel.text = fname;
+    //asdf
+    _titleLabel.text = [self getFilenameFromFullPath : fname];
     if (page == 0) _pageLabel.text  = @"...";
     else _pageLabel.text  = [NSString stringWithFormat:@"%d",page];
     _ocrText.text = ocrOutput;
-    //Zoom up by 8x
-    UIView *v = _pdfImage;
-    int vw = v.bounds.size.width;
-    int vh = v.bounds.size.height;
-    izoom = 1;
-    CGAffineTransform t = v.transform;
-    t = CGAffineTransformMakeScale(izoom,izoom);
-    v.transform = t;
-    v.center = CGPointMake(vw*izoom/2, vh*izoom/2);
-    _scrollView.contentSize = CGSizeMake(vw,vh);
-    [_scrollView setZoomScale:(float)izoom];
-//    _scrollView.contentSize = CGSizeMake(vw*izoom, vh*izoom);
-    [_scrollView setContentOffset:CGPointMake(0,0) animated:NO];
 
 
 } //end updateUI
+
+//=============AnalyzeVC=====================================================
+- (void)viewWillLayoutSubviews
+{
+    [super viewWillLayoutSubviews];
+    [self updateMinZoomScaleForSize : zoomwid : zoomhit];
+    NSLog(@" layout subviews...");
+    [self initScrollForImage];
+    [self placeBoxView];
+}
+
+//=============AnalyzeVC=====================================================
+-(void) initScrollForImage
+{
+    imagewid = _pdfImage.image.size.width;
+    imagehit = _pdfImage.image.size.height;
+    izoom = 2;
+    zoomwid  = imagewid*izoom;
+    zoomhit  = imagehit*izoom;
+    int xyd = 0;
+    if (imagewid > imagehit)
+        xyd = imagewid - imagehit;  //For landscape images, x bigger than y
+    else
+        xyd = imagehit - imagewid;  //For portrait images, y bigger than x
+    int xoff = 0;
+    int yoff = 0;
+    
+    UIView *v = _pdfImage;
+
+    _scrollView.contentSize = CGSizeMake(4*izoom*xyd,4*izoom*xyd);
+    [_scrollView setContentOffset:CGPointMake(xoff,yoff) animated:NO];
+    //If I don't do this the scrollview can't scroll to the left edge! WHY?
+    CGAffineTransform t = v.transform;
+    t = CGAffineTransformMakeScale(izoom,izoom);
+    v.transform = t;
+    v.center = CGPointMake(izoom*imagewid/2, izoom*imagehit/2);
+    //Fudge factors, WTF??? they match aspect ratio
+    marginX = 27*izoom;
+    marginY = 18*izoom;
+}
+
+
+
+//=============AnalyzeVC=====================================================
+-(void) updateMinZoomScaleForSize : (int) xw : (int) yw
+{
+    UIImage *ii = _pdfImage.image;
+    float xscale = (float)xw / (float)ii.size.width;
+    float yscale = (float)yw / (float)ii.size.height;
+    float minscale = MIN(xscale,yscale);
+    _scrollView.minimumZoomScale = minscale;
+    _scrollView.zoomScale = minscale;
+
+    
+}
+
+//=============AnalyzeVC=====================================================
+-(void) placeBoxView
+{
+    // Clear centered box with black border
+    _boxView.backgroundColor = [UIColor clearColor];
+    _boxView.layer.borderWidth = 2;
+    _boxView.layer.borderColor = [UIColor blackColor].CGColor;
+    //Now center it over scrollview
+    bw = 200;
+    bh = 60;
+    [self updateSelectBox];
+    //asdf
+    
+} //end placeBoxView
+
+//=============AnalyzeVC=====================================================
+// Box stays pinned TL, this is for size changes...
+-(void) updateSelectBox
+{
+    CGRect rr      = _scrollView.frame;
+    CGRect br      = _boxView.frame;
+    br.origin.x    = rr.origin.x; // rr.origin.x + rr.size.width/2 - bw/2;
+    br.origin.y    = rr.origin.y; // rr.origin.y + rr.size.height/2 - bw/2;
+    br.size.width  = bw;
+    br.size.height = bh;
+    _boxView.frame = br;  // annd reset the box size
+
+} //end updateSelectBox
 
 //=============AnalyzeVC=====================================================
 -(void) finishSettingPDFImage : (UIImage *)ii
@@ -425,7 +582,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self errorMessage:@"Error Performing OCR" : errmsg];
     });
-}  //end viewDidLoad
+}
 
 //=============OCR MainVC=====================================================
 - (void)didPerformOCR:(NSNotification *)notification

@@ -17,6 +17,8 @@
 //      pull cleanupProductNameString, getPost* methods
 //  2/15 add setDebugMode
 //  2/17 add cleanupNonEnglishCharacters
+//  3/10 new method names: findAllWordsInDocumentRect/TemplateRect
+//  3/14 redo findLongInArrayOfFields
 #import "OCRDocument.h"
 
 @implementation OCRDocument
@@ -196,9 +198,9 @@
 }
 
 //=============(OCRDocument)=====================================================
--(void) dumpWordsInBox : (CGRect) rr
+-(void) dumpAllWordsInDocumentRect : (CGRect) rr
 {
-    NSMutableArray *a = [self findAllWordsInRect:rr];
+    NSMutableArray *a = [self findAllWordsInDocumentRect:rr];
     [self dumpArray:a];
 }
 
@@ -227,6 +229,7 @@
 {
     NSString *outstr;
     outstr = [nstr   stringByReplacingOccurrencesOfString:@"O" withString:@"0"];
+    outstr = [outstr stringByReplacingOccurrencesOfString:@"i" withString:@"1"];
     outstr = [outstr stringByReplacingOccurrencesOfString:@"C" withString:@"0"];  //C ... really?
     outstr = [outstr stringByReplacingOccurrencesOfString:@"o" withString:@"0"];
     outstr = [outstr stringByReplacingOccurrencesOfString:@"S" withString:@"5"];
@@ -261,7 +264,8 @@
 // Makes sure price has format DDD.CC
 -(NSString *)cleanupPrice : (NSString *)s
 {
-    if (debugMode) NSLog(@" cleanup Price in [%@]",s);
+    if (debugMode)
+        NSLog(@" cleanup Price in [%@]",s);
     NSString* ptst = [s stringByReplacingOccurrencesOfString:@" " withString:@""];
     BOOL numeric = [self isStringAPrice:ptst];
     NSString *sout = @"";
@@ -282,8 +286,11 @@
         sout = [NSString stringWithFormat:@"%d.%2.2d",d,c];
 
     }
+    if (debugMode)
+        NSLog(@"     cleanedup-> [%@]",sout);
+
     return sout;
-}
+} //end cleanupPrice
 
 //=============(OCRDocument)=====================================================
 // 2/17 handles price/quantity/description now, they all need initial cleanup
@@ -392,9 +399,9 @@
 //=============OCRDocument=====================================================
 // Assumes r is in document coords, exhaustive search.
 //  are words' origin at top left or bottom left?
--(NSMutableArray *) findAllWordStringsInRect : (CGRect )rr
+-(NSMutableArray *) findAllWordStringsInDocumentRect : (CGRect )rr
 {
-    NSMutableArray *a = [self findAllWordsInRect:rr];
+    NSMutableArray *a = [self findAllWordsInDocumentRect:rr];
     if (a == nil) return nil;
     NSMutableArray *result = [[NSMutableArray alloc] init];
     //Process, get words...
@@ -407,21 +414,23 @@
 } //end findAllWordStringsInRect
 
 //=============OCRDocument=====================================================
-// Assumes r is in document coords, exhaustive search.
+// Assumes rrIn is in TEMPLATE coords, exhaustive search.
 //  are words' origin at top left or bottom left?
--(NSMutableArray *) findAllWordsInRect : (CGRect )rrIn
+-(NSMutableArray *) findAllWordsInTemplateRect : (CGRect )rrIn
 {
-    
+    return [self  findAllWordsInDocumentRect : [self  template2DocRect : rrIn]];
+} //end findAllWordsInTemplateRect
+
+//=============OCRDocument=====================================================
+// Assumes rrIn is in DOCUMENT coords, exhaustive search.
+//  are words' origin at top left or bottom left?
+-(NSMutableArray *) findAllWordsInDocumentRect : (CGRect )rrIn
+{
     int xi,yi,x2,y2,index;
-    //First: Convert from template to document space
-    //  document may be smaller than the one used to
-    //  create the template!!
-    CGRect rr = [self  template2DocRect : rrIn];
-    
-    xi = (int)rr.origin.x;  //Get bounding box limits...
-    yi = (int)rr.origin.y;
-    x2 = xi + (int)rr.size.width;
-    y2 = yi + (int)rr.size.height;
+    xi = (int)rrIn.origin.x;  //Get bounding box limits...
+    yi = (int)rrIn.origin.y;
+    x2 = xi + (int)rrIn.size.width;
+    y2 = yi + (int)rrIn.size.height;
     NSMutableArray *aout = [[NSMutableArray alloc] init]; //Results go here
     index = 0;
     for (OCRWord *ow  in allWords)
@@ -440,7 +449,7 @@
         index++;
     } //end for ow
     return aout;
-} //end findAllWordsInRect
+} //end findAllWordsInDocumentRect
 
 
 //=============(OCRDocument)=====================================================
@@ -449,7 +458,7 @@
     useIgnoreList = FALSE;
   //  rr.origin.x +=_docRect.origin.x;
   //  rr.origin.y +=_docRect.origin.y;
-    NSMutableArray *ir = [self findAllWordsInRect:rr];
+    NSMutableArray *ir = [self findAllWordsInTemplateRect:rr];
     [ignoreList addObjectsFromArray:ir];
     useIgnoreList = TRUE;
 } //end addIgnoreBoxItems
@@ -458,6 +467,12 @@
 // Look at some random words, get average height thereof
 -(void) getAverageGlyphHeight
 {
+    //DHS 3/4 handle empty words error
+    if (allWords.count < 8)
+    {
+        _glyphHeight = 12;  //Just make a guess
+        return;
+    }
     int maxlim = (int)allWords.count - 1;
     int count = 8;
     int sum = 0;
@@ -583,7 +598,7 @@
     CGRect hdrRect = CGRectMake(0, yc - _glyphHeight, _width, 2*_glyphHeight);
     //NSLog(@" full hdr rect %@",NSStringFromCGRect(hdrRect));
     //Header rect ready. Find words now.
-    NSArray *a = [self findAllWordsInRect:hdrRect];
+    NSArray *a = [self findAllWordsInTemplateRect:hdrRect];
     //[self dumpArrayFull:a];
     BOOL done = FALSE;
     int col = 0;
@@ -644,7 +659,7 @@
 {
     CGRect bigr = CGRectMake(r.origin.x, r.origin.y-expandYBy,
                              r.size.width, r.size.height+2*expandYBy);
-    NSMutableArray *a = [self findAllWordsInRect:bigr];
+    NSMutableArray *a = [self findAllWordsInTemplateRect:bigr];
    // [self dumpArrayFull:a];
     BOOL found = FALSE;
     int yTest = bigr.origin.y;
@@ -653,10 +668,17 @@
     for (NSNumber *n in a) //Look for obvious keyword now
     {
         OCRWord *ow = allWords[n.longValue];
-        if ([ow.wordtext.lowercaseString isEqualToString:@"description"])
+        if ([ow.wordtext.lowercaseString containsString:@"amount"])
+            NSLog(@" amount found %@",ow.wordtext);
+
+        if (
+            [ow.wordtext.lowercaseString isEqualToString:@"description"] ||
+            [ow.wordtext.lowercaseString isEqualToString:@"amount"]  //DHS 3/13 will this work?
+            )
             {
                 found = TRUE;
                 yTest  = ow.top.intValue;  //Document space!
+                //NSLog(@" HEADER AT %d",yTest);
                 //int xt = ow.left.intValue;
                 break;
             }
@@ -688,6 +710,17 @@
 } //end findHeader
 
 //=============(OCRDocument)=====================================================
+-(BOOL) isThisWordOK : (NSString *)daWoid
+{
+    NSArray *    nonProducts = @[
+                                 @"business",  @"charge", @"discount", @"dry items",
+                                 @"frozen items", @"payment", @"refrigerated", @"subtotal",
+                                 @"surcharge"
+                                 ];
+    return ([nonProducts indexOfObject:daWoid.lowercaseString] == NSNotFound);
+}
+
+//=============(OCRDocument)=====================================================
 // Array of words is coming in from a box, take all words and make a sentence...
 //  Numeric means don't padd with spaces...
 -(NSString *) assembleWordFromArray : (NSMutableArray *) a : (BOOL) numeric : (int) maxLines
@@ -708,8 +741,12 @@
         }
         else //Next word not too far down? append
         {
-            s = [s stringByAppendingString:[d objectForKey:@"Word"]];
-            if (!numeric) s = [s stringByAppendingString:@" "];
+            NSString *nextWord = [d objectForKey:@"Word"]; //DHS 3/7
+            if ([self isThisWordOK:nextWord])
+            {
+                s = [s stringByAppendingString:nextWord];
+                if (!numeric) s = [s stringByAppendingString:@" "];
+            }
         }
         i++;
     }
@@ -719,43 +756,48 @@
 
 
 //=============(OCRDocument)=====================================================
-// Uses rr to get column L/R boundary, uses rowY's to get top area to look at...
-// 1/18 uses finalYs, gotten from computeRowYpositions
+// 3/7 Redid, finds top item in this column and uses gaps in finalYs to
+//      find each item in the current column
 -(NSMutableArray*)  getColumnStrings: (CGRect)rr : (int) column : (NSString *)ctype
 {
     //NOTE the rowYs array is coming in in DOCUMENT coords!!!
     NSMutableArray *resultStrings = [[NSMutableArray alloc] init];
     int yc = (int)finalYs.count;
     if (debugMode) NSLog(@" getColumnStrings %d yc %d",column,yc);
-    int lastYSize = 0;
+    //NSArray *a = [self findAllWordsInTemplateRect:rr];
+    //[self dumpArrayFull:a];
+    //Get everything in this column first...
+    NSMutableArray *aall = [self findAllWordsInTemplateRect:rr];
+    int currentColumnY = 99999;
+    for (NSNumber *nn in aall) //Find top item
+    {
+        OCRWord *ow = [allWords objectAtIndex:nn.longValue];
+        int ty = ow.top.intValue;
+        if (ty < currentColumnY) currentColumnY = ty;
+    }
     
-    int bing = 0; //2/17 test
-    if ( [ctype.lowercaseString containsString:@"description"])
-        bing = 1;
-    
+    int ystepDC = 0;
+    int lastTYSize = 0;
+    currentColumnY-= 0.5*_glyphHeight;  //We have to fudge UPwards, rows don't exactly line up
     for (int i=0;i<yc;i++)
     {
         NSNumber *ny = finalYs[i];
-        //DHS Jan 10 1/10/19 This may be needed for docs that are tilted by a few degrees..
-        // What would be best would be something that follows the page's tilt.....
-        int thisY = ny.intValue - _glyphHeight; //1/9/19 Fudge by half glyph height
-        thisY = [self doc2templateY:thisY];      //Go back to template coords...
-        int nextY = thisY + lastYSize; //1/21 Assume next cell same as previous (this is for bottom case)
+        //Note: thisY and nextY are in TEMPLATE coords, finalYs are in DOCUMENT coords!
+        int thisTY = [self doc2templateY:currentColumnY];      //-> template coords...
+        int nextTY = thisTY + lastTYSize; //1/21 Assume next cell same as previous (this is for bottom case)
         if (i < yc-2)  //Not last row? get next rows Y
         {
             NSNumber *nyy = finalYs[i+1];
-            nextY = nyy.intValue - 1;
-            nextY = [self doc2templateY:nextY];
+            ystepDC = nyy.intValue - ny.intValue; //Y size of this row in DOCUMENT coords
+            nextTY = [self doc2templateY:(currentColumnY+ystepDC)];
         }
-        CGRect cr = CGRectMake(rr.origin.x, thisY, rr.size.width, nextY-thisY);
-        NSMutableArray *a = [self findAllWordsInRect:cr];
-        CGRect docRect = [self  template2DocRect : cr];
-        if (debugMode) NSLog(@" ...(col %d row %d) rect %@ thisy %d nexty %d",
-              column,i,NSStringFromCGRect(docRect),thisY,nextY);
-        if (debugMode)
-            [self dumpArrayFull:a];
+        CGRect cr = CGRectMake(rr.origin.x, thisTY, rr.size.width, nextTY-thisTY);
+        NSMutableArray *a = [self findAllWordsInTemplateRect:cr];
+        //NSLog(@" row %d ccy %d",i,currentColumnY);
+        if (debugMode) [self dumpArrayFull:a];
         [resultStrings addObject:[self assembleWordFromArray : a : FALSE : 2]];
-        lastYSize = nextY - thisY;
+        lastTYSize = nextTY - thisTY;
+        currentColumnY += ystepDC;
     }
     
     NSString *headerForThisColumn = [self getHeaderStringFromRect:rr];
@@ -789,6 +831,75 @@
 } //end getColumnStrings
 
 //=============(OCRDocument)=====================================================
+// Uses rr to get column L/R boundary, uses rowY's to get top area to look at...
+// 1/18 uses finalYs, gotten from computeRowYpositions
+-(NSMutableArray*)  OLDgetColumnStringsDeleteMe: (CGRect)rr : (int) column : (NSString *)ctype
+{
+    //NOTE the rowYs array is coming in in DOCUMENT coords!!!
+    NSMutableArray *resultStrings = [[NSMutableArray alloc] init];
+    int yc = (int)finalYs.count;
+    if (debugMode) NSLog(@" getColumnStrings %d yc %d",column,yc);
+    int lastYSize = 0;
+    
+    int bing = 0; //2/17 test
+    if ( [ctype.lowercaseString containsString:@"description"])
+        bing = 1;
+    
+    for (int i=0;i<yc;i++)
+    {
+        NSNumber *ny = finalYs[i];
+        //DHS Jan 10 1/10/19 This may be needed for docs that are tilted by a few degrees..
+        // What would be best would be something that follows the page's tilt.....
+        int thisY = ny.intValue - _glyphHeight; //1/9/19 Fudge by half glyph height
+        thisY = [self doc2templateY:thisY];      //Go back to template coords...
+        int nextY = thisY + lastYSize; //1/21 Assume next cell same as previous (this is for bottom case)
+        if (i < yc-2)  //Not last row? get next rows Y
+        {
+            NSNumber *nyy = finalYs[i+1];
+            nextY = nyy.intValue - 1;
+            nextY = [self doc2templateY:nextY];
+        }
+        CGRect cr = CGRectMake(rr.origin.x, thisY, rr.size.width, nextY-thisY);
+        NSMutableArray *a = [self findAllWordsInTemplateRect:cr];
+        CGRect docRect = [self  template2DocRect : cr];
+        if (debugMode) NSLog(@" ...(col %d row %d) rect %@ thisy %d nexty %d",
+                             column,i,NSStringFromCGRect(docRect),thisY,nextY);
+        if (debugMode) [self dumpArrayFull:a];
+        [resultStrings addObject:[self assembleWordFromArray : a : FALSE : 2]];
+        lastYSize = nextY - thisY;
+    }
+    
+    NSString *headerForThisColumn = [self getHeaderStringFromRect:rr];
+    headerForThisColumn = headerForThisColumn.lowercaseString;
+    //let's see what it contains:
+    if ([headerForThisColumn containsString:@"item"] || [ctype.lowercaseString containsString:@"item"])
+        _itemColumn = column;
+    if ([headerForThisColumn containsString:@"quantity"] || [ctype.lowercaseString containsString:@"quantity"])
+        _quantityColumn = column;
+    if ([headerForThisColumn containsString:@"description"] || [ctype.lowercaseString containsString:@"description"])
+        _descriptionColumn = column;
+    if ([headerForThisColumn containsString:@"price"] || [ctype.lowercaseString containsString:@"price"])
+        _priceColumn = column;
+    if ([headerForThisColumn containsString:@"amount"] || [ctype.lowercaseString containsString:@"amount"])
+        _amountColumn = column;
+    if (debugMode) NSLog(@" column header[%d] %@ ic %d qc %d dc %d pc %d ac %d",column,headerForThisColumn,
+                         _itemColumn,_quantityColumn,_descriptionColumn,_priceColumn,_amountColumn);
+    
+    //Special debug: outputs prompt to UI w/ debug data
+    if ( ([debugString isEqualToString:@"quantity"]    && (column == _quantityColumn)) ||
+        ([debugString isEqualToString:@"price"]       && (column == _priceColumn))    ||
+        ([debugString isEqualToString:@"amount"]      && (column == _amountColumn))   ||
+        ([debugString isEqualToString:@"description"] && (column == _descriptionColumn)) )
+    {   //Set up title and message strings
+        NSString* tstr = [NSString stringWithFormat:@"%@ Column (raw)",debugString];
+        NSString* mstr = [NSString stringWithFormat:@"%@",[resultStrings componentsJoinedByString:@"\n"]];
+        [self debugOutputPrompt : debugParent : tstr : mstr];
+    }
+    
+    return resultStrings;
+} //end getColumnStrings
+
+//=============(OCRDocument)=====================================================
 // Incoming rect is a template rect!!! (passed in by parent)
 -(NSString*) getHeaderStringFromRect : (CGRect)rr
 {
@@ -808,7 +919,7 @@
 -(NSMutableArray *) getColumnYPositionsInRect : (CGRect )rr : (BOOL) numeric
 {
     //Get all content within this rect, assume one item per line!
-    NSMutableArray *a = [self findAllWordsInRect:rr];
+    NSMutableArray *a = [self findAllWordsInTemplateRect:rr];
     if (debugMode) NSLog(@" getColumnYPositionsInRect %d,%d : %d,%d",(int)rr.origin.x,(int)rr.origin.y,(int)rr.size.width,(int)rr.size.height);
     //[self dumpArrayFull:a];
     NSMutableArray *colPairs = [[NSMutableArray alloc] init];
@@ -845,14 +956,20 @@
     {
         return -1; //ERROR
     }
-    
+    //This can FUCK things up if it's too high: parts of the header get included in columns,
+    //  and then the Y locations for finding items in each column go bad
     int columnDataTop = [self doc2templateY:_headerYpos] + 1.5*_glyphHeight;
-    
+
     //Get Y position of data in both price and amount columns...
     rp.origin.y = columnDataTop; //Start just below found headerY
     //NOTE: rowYs and rowY2s are already in DOCUMENT coords!
+    NSArray *a = [self findAllWordsInTemplateRect:rp];  
+    //[self dumpArrayFull:a]; //DHS 3/7 DEBUG
+    
     NSMutableArray* rowYs = [self getColumnYPositionsInRect:rp : TRUE];
     ra.origin.y = columnDataTop; //Start just below found headerY
+    a = [self findAllWordsInTemplateRect:ra]; //DHS 3/7 DEBUG
+    //[self dumpArrayFull:a]; //DHS 3/7 DEBUG
     NSMutableArray* rowY2s = [self getColumnYPositionsInRect:ra : TRUE];
     //Merge these two together, toss dupes (redudancy in case of missing or smudged column data)
     NSMutableArray *allys = [NSMutableArray arrayWithArray:rowYs];
@@ -866,11 +983,12 @@
         if (dy > _glyphHeight)
         {
             [finalYs addObject:nextY];
+            if (debugMode) NSLog(@" finalys[%d] %f",(int)finalYs.count-1,nextY.doubleValue);
         }
         lastY = nextY;
     }
     return 0; //OK
-} //end getRowYpositions'
+} //end computeRowYpositions'
 
 
 //=============(OCRDocument)=====================================================
@@ -1004,7 +1122,7 @@
         index++;
     }
     return  [self getWordRectByIndex:foundit];
-}
+} //end getRightmostTopRect
 
 //=============(OCRDocument)=====================================================
 // Leftmost item in top 10%
@@ -1030,8 +1148,7 @@
         index++;
     }
     return  [self getWordRectByIndex:foundit];
-
-}
+}  // end getLeftmostTopRect
 
 //=============(OCRDocument)=====================================================
 -(CGRect) getTLRect
@@ -1114,6 +1231,15 @@
     NSCharacterSet *inStringSet = [NSCharacterSet characterSetWithCharactersInString:s];
     return [alphaNums isSupersetOfSet:inStringSet];
 } //end isStringAnInteger
+
+//=============(OCRDocument)=====================================================
+// 3/4 utility for debugging
+-(NSMutableArray *) getArrayOfIndicesAsStrings : (NSArray *)a
+{
+    NSMutableArray *outArray = [[NSMutableArray alloc] init];
+    for (NSNumber *nn in a) [outArray addObject: [self getNthWord :nn]];
+    return outArray;
+}
 
 //=============(OCRDocument)=====================================================
 -(NSString*)getNthWord : (NSNumber*)n
@@ -1247,6 +1373,12 @@
 -(long) findLongInArrayOfFields : (NSArray*)aof
 {
     long foundLong = 0;
+    //3/14 redo: hook up array into a string and try that...
+    NSString *assembledText = [self assembleWordFromArray : [aof mutableCopy] : TRUE : 1];
+    assembledText = [self cleanUpNumberString:assembledText];
+    if ([self isStringAnInteger:assembledText] ) foundLong = (long)[assembledText longLongValue];
+    return foundLong;
+#ifdef DELETETHISCRAPASAP
     for (NSNumber* n in aof)
     {
         NSString *testText = [self getNthWord:n];
@@ -1255,6 +1387,7 @@
         if ([self isStringAnInteger:testText] ) foundLong = (long)[testText longLongValue];
     } //end for n
     return foundLong;
+#endif
 } //end findLongInArrayOfFields
 
 //=============(OCRDocument)=====================================================
@@ -1328,7 +1461,7 @@
         return;
     }
     //NSLog(@" parseHeaderColumns: dump of bigrect:");
-    //[self dumpArrayFull:[self findAllWordsInRect:hr]];
+    //[self dumpArrayFull:[self findAllWordsInTemplateRect:hr]];
     //Let's get some header rects first, using colRectz...
     //NSMutableArray *cr = [[NSMutableArray alloc] init];
     int i = 0;
@@ -1342,7 +1475,7 @@
         rcFrame.origin.y -=_glyphHeight;
         rcFrame.size.height +=2*_glyphHeight;
         //NSLog(@" annnd headerRect for column %d is %@",i,NSStringFromCGRect(rcFrame));
-        //NSMutableArray *a = [self findAllWordsInRect:rcFrame];
+        //NSMutableArray *a = [self findAllWordsInTemplateRect:rcFrame];
         //[self dumpArrayFull:a];
         i++;
     }
@@ -1512,7 +1645,7 @@
 
 //=============OCR VC=====================================================
 // Used in OCR batch runs...
--(void) setupDocumentWithRect : (CGRect) r : (NSDictionary *)d
+-(void) setupDocumentWithRectAndParseJSON : (CGRect) r : (NSDictionary *)d
 {
     _scannedName  = @"nada";
     _width        = r.size.width;
@@ -1539,11 +1672,13 @@
     tlTemplateRect = tlr;
     trTemplateRect = trr;
     
+    //These are the LH and RH extremes in the top 10%
     topmostLeftRect  = [self getLeftmostTopRect];
     topmostRightRect = [self getRightmostTopRect];
     //NSLog(@" tmleftRect %@",NSStringFromCGRect(topmostLeftRect));
     //NSLog(@" tmriteRect %@",NSStringFromCGRect(topmostRightRect));
 
+    //These first two are the very top L/R corner items
     tlDocumentRect = [self getTLRect];
     trDocumentRect = [self getTRRect];
     blDocumentRect = [self getBLRect];
@@ -1553,8 +1688,15 @@
     //NSLog(@"w/h computed %d %d",_width,_height);
     double hsizeTemplate   = (double)(trTemplateRect.origin.x + trTemplateRect.size.width) -
                          (double)(tlTemplateRect.origin.x);
-    double hsizeDocument = (double)(topmostRightRect.origin.x + topmostRightRect.size.width) -
+    double hsizeDocument;
+    //DHS 3/6 NEW horiz scaling, use TL/TR anchor strings to determine which sets of TL/TR rects to use
+    if ([_TLAnchor isEqualToString:@"topmostleft"]) //Use Leftmost/Rightmost items in top 10%: HFM
+            hsizeDocument = (double)(topmostRightRect.origin.x + topmostRightRect.size.width) -
                          (double)(topmostLeftRect.origin.x);
+    else //Use very top  L/R corner items for scaling (most invoices)
+        hsizeDocument = (double)(trDocumentRect.origin.x + trDocumentRect.size.width) -
+                        (double)(tlDocumentRect.origin.x);
+
     if (hsizeTemplate == 0 ||
         (hsizeTemplate != 0 && hsizeDocument == hsizeTemplate)) //unit scale or error!
     {
@@ -1576,8 +1718,13 @@
 -(int) doc2templateX : (int) x
 {
     if (unitScale) return x;
-    //DHS 12/31
-    double bx = (double)x - (double)topmostLeftRect.origin.x;
+    //DHS   3/6
+    double bx = 0.0;
+    if ([_TLAnchor isEqualToString:@"topmostleft"]) //Use Leftmost/Rightmost items in top 10%: HFM
+        bx = (double)x - (double)topmostLeftRect.origin.x;
+    else
+        bx = (double)x - (double)tlDocumentRect.origin.x; //Or very top left item!
+
     //...convert to template space...
     double outx;
     outx = (double)tlTemplateRect.origin.x + bx/hScale;
@@ -1589,8 +1736,12 @@
 -(int) doc2templateY : (int) y
 {
     if (unitScale) return y;
-    //DHS 12/31
-    double by = (double)y - (double)topmostLeftRect.origin.y;
+    //DHS 3/6
+    double by = 0.0;
+    if ([_TLAnchor isEqualToString:@"topmostleft"]) //Use Leftmost/Rightmost items in top 10%: HFM
+        by = (double)y - (double)topmostLeftRect.origin.y;
+    else
+        by = (double)y - (double)tlDocumentRect.origin.y; //Or very top left item!
     //...convert to template space...
     double outy;
     outy = (double)tlTemplateRect.origin.y + by/vScale;
@@ -1634,9 +1785,18 @@
     double by = (double)r.origin.y - (double)tlTemplateRect.origin.y;
     //...convert to template space...
     double outx,outy,outw,outh;
-    //DHS 12/31: OK try this as the origin???
-    outx = (double)topmostLeftRect.origin.x + bx*hScale;
-    outy = (double)topmostLeftRect.origin.y + by*vScale;
+    //DHS  3/6 use anchors to determine corners
+    if ([_TLAnchor isEqualToString:@"topmostleft"]) //Use Leftmost/Rightmost items in top 10%: HFM
+    {
+        outx = (double)topmostLeftRect.origin.x + bx*hScale;
+        outy = (double)topmostLeftRect.origin.y + by*vScale;
+    }
+    else
+    {
+        outx = (double)tlDocumentRect.origin.x + bx*hScale;
+        outy = (double)tlDocumentRect.origin.y + by*vScale;
+    }
+
     outw = hScale * (double)r.size.width;
     outh = vScale * (double)r.size.height;
     

@@ -337,7 +337,6 @@
 
     }
     
-    NSLog(@"duh ");
     //Now find start / end bin limits
     int sbin = -1;
     int ebin = -1;

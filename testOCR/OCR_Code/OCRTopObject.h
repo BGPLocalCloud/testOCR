@@ -69,8 +69,14 @@
     //CGRect blRect,brRect;
     OCRCache *oc;
     
-    CGRect headerRect; 
+    CGRect headerRect;
+    int headerY;
+
     BOOL debugMode;   //2/7 For verbose logging...
+    
+    NSString* debugString; //3/4 for arbitrary debugging
+    UIViewController *debugParent; //3/4 Top level VC for debug output
+
     
 }
 

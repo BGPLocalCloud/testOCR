@@ -17,6 +17,7 @@
 #import "OCRSettings.h"
 #import "Reachability/Reachability.h"
 #import "SessionManager.h"
+#import "Customers.h"
 #import "Vendors.h"
 
 #define VERBOSITY_DELIVERY 101
@@ -27,6 +28,9 @@
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 {
 }
+
+@property (nonatomic , strong) Vendors* vv;      //DHS 3/6
+@property (nonatomic , strong) Customers* cust;  //DHS 3/13
 
 @property(nonatomic) BOOL authSuccessful;
 @property (strong, nonatomic) NSString *batchID;

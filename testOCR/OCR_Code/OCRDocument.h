@@ -57,6 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableSet *gL50;   //Left half
     CGRect topmostLeftRect;
     CGRect topmostRightRect;
+    
 
     BOOL debugMode;   //2/7 For verbose logging...
     NSString* debugString; //2/13 for arbitrary debugging
@@ -64,6 +65,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @property (nonatomic , strong) UIImage* scannedImage;
 @property (nonatomic , strong) NSString* scannedName;
+@property (nonatomic , strong) NSString* TLAnchor;  //DHS 3/6
+@property (nonatomic , strong) NSString* TRAnchor;
+
 
 @property (nonatomic , assign) int width;
 @property (nonatomic , assign) int height;
@@ -92,22 +96,22 @@ NS_ASSUME_NONNULL_BEGIN
 -(void) computeScaling: (CGRect )tlr : (CGRect )trr;
 -(void) dumpArrayFull : (NSArray*)a;
 -(void) dumpArray : (NSArray*)a;
--(void) dumpWordsInBox : (CGRect) rr;
+-(void) dumpAllWordsInDocumentRect : (CGRect) rr;
 -(int) doc2templateX : (int) x;
 -(int) doc2templateY : (int) y;
-
-
-
--(NSMutableArray *) findAllWordsInRect : (CGRect )rr;
--(NSMutableArray *) findAllWordStringsInRect : (CGRect )rr;
+-(NSMutableArray *) findAllWordsInDocumentRect : (CGRect )rr;
+-(NSMutableArray *) findAllWordsInTemplateRect : (CGRect )rr;
+-(NSMutableArray *) findAllWordStringsInDocumentRect : (CGRect )rr;
 -(int) findHeader : (CGRect)r : (int) expandYBy;
 -(int) findIntInArrayOfFields : (NSArray*)aof;
 -(long) findLongInArrayOfFields : (NSArray*)aof;
 -(float) findPriceInArrayOfFields : (NSArray*)aof;
 -(NSDate *) findDateInArrayOfFields : (NSArray*)aof;
 -(NSString *) findTopStringInArrayOfFields : (NSArray*)aof;
+-(NSMutableArray *) getArrayOfIndicesAsStrings : (NSArray *)a;
 -(NSMutableArray*)  getColumnStrings: (CGRect)rr : (int) index : (NSString*)ctype;
 -(NSArray*)  getHeaderNames;
+-(NSString*) getNthWord : (NSNumber*)n;
 -(void) getWordHistogram : (int) ytop : (int) numLines;
 
 -(CGRect) getDocRect;
@@ -127,7 +131,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(NSDate *) isItADate : (NSString *)tstr;
 -(void) parseHeaderColumns : (NSMutableArray*)rectz : (CGRect) hr ;
 -(void) setupDocumentAndParseJDON : (NSString*) ifname : (NSDictionary *)d : (BOOL) flipped90;
--(void) setupDocumentWithRect : (CGRect) r : (NSDictionary *)d;
+-(void) setupDocumentWithRectAndParseJSON : (CGRect) r : (NSDictionary *)d;
 -(void) setupPage : (int) page;
 @end
 

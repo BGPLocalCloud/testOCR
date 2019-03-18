@@ -15,8 +15,9 @@
 // 2/5  cleanup, use invoiceObject instead of property list
 // 2/7  add debugMode for logging, add EXPIDs
 // 2/8  add invoiceNumber to readFromParseAsStrings
-//  2/9 add parentUp flag to avoid delegate callback crashes on dismissed VC
-//  2/23 Fix array -> mutableArray conversion bug
+// 2/9  add parentUp flag to avoid delegate callback crashes on dismissed VC
+// 2/23 Fix array -> mutableArray conversion bug
+// 3/12 add page field
 #import "invoiceTable.h"
 
 @implementation invoiceTable
@@ -100,6 +101,7 @@
     _iobj.batchID        = [pfo objectForKey:PInv_BatchID_key];
     _iobj.PDFFile        = [pfo objectForKey:PInv_PDFFile_key];
     _iobj.pageCount      = [pfo objectForKey:PInv_PageCount_key];
+    _iobj.page           = [pfo objectForKey:PInv_Page_key];
     _iobj.vendor         = [pfo objectForKey:PInv_Vendor_key];
     [self unpackInvoiceOids]; //asdf
     return _iobj;
@@ -174,6 +176,7 @@
     iRecord[PInv_VersionNumber]     = _versionNumber;
     iRecord[PInv_PDFFile_key]       = _iobj.PDFFile;
     iRecord[PInv_PageCount_key]     = _iobj.pageCount;
+    iRecord[PInv_Page_key]          = _iobj.page;
 
     if (debugMode) NSLog(@" itable savetoParse...");
     [iRecord saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
@@ -230,8 +233,9 @@
 
 
 //=============(invoiceTable)=====================================================
+// DHS 3/12 add page
 -(void) setBasicFields : (NSDate *) ddd : (NSString*)num : (NSString*)total :
-                    (NSString*)vendor : (NSString*)customer : (NSString*)PDFFile : (NSString*)pageCount
+(NSString*)vendor : (NSString*)customer : (NSString*)PDFFile : (NSString*)page : (NSString*)pageCount
 {
     _iobj.date          = ddd;
     _iobj.itotal        = total;
@@ -239,6 +243,7 @@
     _iobj.vendor        = vendor;
     _iobj.customer      = customer;
     _iobj.PDFFile       = PDFFile;
+    _iobj.page          = page;
     _iobj.pageCount     = pageCount;
     //Main delegate knows what batch is running
     AppDelegate *iappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -265,7 +270,8 @@
         NSLog(@" Invoice #%@ / date %@",iobj.invoiceNumber,iobj.date);
         NSLog(@"   batchID  %@ objectID  %@",iobj.batchID,iobj.objectID);
         NSLog(@"   customer %@ vendor    %@",iobj.customer,iobj.vendor);
-        NSLog(@"   PDFFile  %@ pageCount %@",iobj.PDFFile,iobj.pageCount);
+        NSLog(@"   PDFFile  %@ page      %@ pageCount %@",
+              iobj.PDFFile,iobj.page,iobj.pageCount);
         NSLog(@"   total    %@",iobj.itotal);
         NSLog(@"   EXPOIDs  %@",packedOIDs);
     }

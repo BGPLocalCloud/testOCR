@@ -18,6 +18,11 @@
 //  2/14  add int/float quantity support
 //  3/4   broke out keywords, typos etc read from parse,
 //          needed to make them re-entrant for large tables
+//          removed wilds / notwilds
+//  3/13  analyze: bail on empty product name
+//  3/15  add keywordsNo1stChar dictionary
+//        add even price/amount comparison check (bad math)
+//        made zero quantity a major error (not warning)
 #import "smartProducts.h"
 
 @implementation smartProducts
@@ -34,15 +39,13 @@
         fixed    =  [[NSMutableArray alloc] init];
         splits   =  [[NSMutableArray alloc] init];
         joined   =  [[NSMutableArray alloc] init];
-        wilds    =  [[NSMutableArray alloc] init];
-        notwilds =  [[NSMutableArray alloc] init];
         keywords =  [[NSMutableDictionary alloc] init];
-        
+        keywordsNo1stChar =  [[NSMutableDictionary alloc] init]; //3/15
+
         didInitAlready = FALSE;
         NSLog(@" SmartProducts: Load typos from DISK");
         [self loadRulesTextFile : @"splits" : FALSE : splits : joined];
         [self loadRulesTextFile : @"typos"  : TRUE :  typos  : fixed];
-        [self loadRulesTextFile : @"wild"   : TRUE :  wilds  : notwilds];
 
         NSLog(@" SmartProducts: Load typos from PARSE");
         [self loadKeywordsFromParse : 0];
@@ -109,6 +112,16 @@
     return result;
 } //end getKeyword
 
+
+//=============(smartProducts)=====================================================
+// DHS 3/15 check for even prices (no pennies)
+-(BOOL) hasZeroCents : (float) fnum
+{
+    float ftest = (float)( (int)fnum);
+    return (ftest == fnum);
+}
+
+
 //=============(smartProducts)=====================================================
 //STUBBED FOR NOW, use DB
 -(void) loadTables
@@ -127,6 +140,8 @@
 
     nonProducts = @[  //CANNED stuff that never is a product
                     @"business",
+                    @"cash",
+                    @"certify",
                     @"charge",
                     @"discount",
                     @"dry items",
@@ -134,7 +149,8 @@
                     @"payment",
                     @"refrigerated",
                     @"subtotal",
-                    @"surcharge"
+                    @"surcharge",
+                    @"tax"
                     ];
         
     beverageNames = @[
@@ -363,6 +379,7 @@
                       @"apron",
                       @"bowl",
                       @"cont",
+                      @"cup",
                       @"cups",
                       @"degreaser",
                       @"delimer",
@@ -474,7 +491,11 @@
 {
     PFQuery *query = [PFQuery queryWithClassName:@"Keywords"];
     query.skip = skip;
-    if (skip == 0) [keywords removeAllObjects];
+    if (skip == 0)
+    {
+        [keywords          removeAllObjects];
+        [keywordsNo1stChar removeAllObjects];
+    }
 
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
@@ -483,9 +504,13 @@
                 NSString *keyword = pfo[PInv_Name_key];
                 NSString *cat     = pfo[PInv_Category_key];
                 [self->keywords setObject:cat forKey:keyword];
+                // 3/15 partial keywords, first char missing
+                NSString *catkey = [NSString stringWithFormat:@"%@:%@",cat,keyword];
+                [self->keywordsNo1stChar setObject:catkey forKey:[keyword substringFromIndex:1]];
             }
             if (objects.count == 100) [self loadKeywordsFromParse:skip+100];
-            else NSLog(@" ...found %d keywords",(int)self->keywords.count);
+            else NSLog(@" ...found %d keywords %d nofirstchars",
+                       (int)self->keywords.count,(int)self->keywordsNo1stChar.count);
         }
     }];
 } //end loadKeywordsFromParse
@@ -646,6 +671,7 @@
 
 //=============(smartProducts)=====================================================
 // Does ALL analyzing...non-zero return value means FAIL: Don't ADD!
+//  VERY long method, could benefit from breaking up into smaller chunks
 -(int) analyze
 {
     [self clearOutputs]; //Get rid of residue from last pass...
@@ -656,6 +682,12 @@
     _nonProduct = FALSE;
     int aerror  = 0;
     _majorError = 0;
+    //3/13 Bail on empty product:
+    if ([fullProductName isEqualToString:@""]) 
+    {
+        _nonProduct = TRUE;
+        return ANALYZER_NONPRODUCT;
+    }
     //Bail on any weird product names, or obviously NON-product items found in this column...
     for (NSString *nps in nonProducts)
     {
@@ -673,6 +705,7 @@
     _analyzedCategory = @"EMPTY";
     NSArray *pItems = [fullProductName componentsSeparatedByString:@" "]; //Separate words
     
+    NSLog(@" Smart?Analyze: %@",fullProductName);
     // Get product category / processed / local / bulk / etc....
     //Try matching with built-in CSV file cat.txt first...
     BOOL found = FALSE;
@@ -696,7 +729,8 @@
 #endif
     //Miss? Try matching words in the product name with some generic lists of items...
     //  Must do it word-by-word, so it's SLOW...
-    for (NSString *nextWord in pItems) //Note we bail this section immediately if found is true
+    //Note we bail this section immediately if found is true
+    for (NSString *nextWord in pItems) if (nextWord.length > 1) //3/14 ignore 1 char fragments
     {
         if (found) break;
         NSString *lowerCase = [nextWord lowercaseString]; //Always match on lowercase
@@ -786,17 +820,20 @@
                                      @"case",   @"snacks",
                                     nil];
             
-            if (keywords[lowerCase] != nil) //Kw match?
+            NSString *cat = nil; //DHS 3/15 look thru 2 sets of keywords now...
+            if (keywords[lowerCase] != nil) cat = keywords[lowerCase];
+            if (cat != nil) //Kw match?
             {
-                NSString *cat = keywords[lowerCase];
                 if ([cat.lowercaseString isEqualToString:@"drygoods"])
                     _analyzedCategory = @"DRY GOODS";
                 else
                     _analyzedCategory = cat.uppercaseString;
                 processed = FALSE;
+                // Commonly PROCESSED categories...
                 if ([@[@"beverage",@"bread",@"dairy",@"drygoods",@"snacks",@"supplies"]
                     containsObject:cat]) processed = TRUE;
                 bulk = FALSE;
+                // Commonly BULK categories...
                 if ([@[@"beverage",@"bread",@"dairy",@"drygoods",@"produce",@"protein"]
                      containsObject:cat]) bulk = TRUE;
                 //Use our little dictionary above for UOM's, MOVE DICT TO CLASS!
@@ -808,20 +845,20 @@
         }
         //Uom set from outside? Override!
         if (uom.length > 1) _analyzedUOM  = uom;
-    }
+    } //end for nextword...
     _analyzedProductName = fullProductName; // pass result to output
 
     if (!found)
     {
-        NSLog(@" analyze ... no product found %@",fullProductName);
+        NSLog(@" analyze ... no product found [%@]",fullProductName);
+        if ([fullProductName isEqualToString:@""]) NSLog(@" EMPTY::::????");
         _majorError = ANALYZER_NO_PRODUCT_FOUND;
         return ANALYZER_NO_PRODUCT_FOUND; //Indicate failure
     }
         
     if ( //Got a product of Hawaii in description? set local flag
         [fullProductName.lowercaseString containsString:@"hawaii"] ||
-        [fullProductName.lowercaseString containsString:@"local"] || //DHS 3/4
-        [fullProductName.lowercaseString containsString:@"hawa11"]
+        [fullProductName.lowercaseString containsString:@"local"] 
         )
         local = TRUE;
     
@@ -854,7 +891,17 @@
     BOOL zeroQuantity = ((_intQuantity && qint == 0) || (!_intQuantity && qfloat == 0.0));
     BOOL zeroPrice    = (pfloat == 0.0);
     BOOL zeroAmount   = (afloat == 0.0);
+    BOOL evenPrice    = [self hasZeroCents:pfloat];
+    BOOL evenAmount   = [self hasZeroCents:afloat];
+    BOOL priceAmountClose = (ABS(pfloat-afloat) < 1.0);
     //NSLog(@" above [%@] priceFix q p a %d %f %f",fullProductName,qint,pfloat,afloat);
+
+    if (priceAmountClose) //3/15 Price and amount are curiously close together?
+    {
+        if (evenPrice && !evenAmount) pfloat = afloat; //Wups! fix price
+        if (!evenPrice && evenAmount) afloat = pfloat; //Wups! fix amount
+    }
+
     //2/5 Missing 2 / 3 values is a failure...
     if (( zeroPrice    && zeroAmount)   || //2/14 2/3 zero fields?
         ( zeroQuantity && zeroAmount) ||
@@ -899,7 +946,7 @@
                 qfloat = afloat / pfloat;      // 2/14
                 if (qfloat == 0) qfloat = 1.0;
             }
-            aerror = ANALYZER_ZERO_QUANTITY;
+            _majorError = ANALYZER_ZERO_QUANTITY;
         }
         else if (zeroPrice)
         {
@@ -915,17 +962,18 @@
         {
             if (afloat < 0.0) afloat = -1.0 * afloat; //Just negate any negatives!
             if (pfloat < 0.0) pfloat = -1.0 * pfloat;
-            if (!_intQuantity) NSLog(@" ...bad math  q %4.2f p %4.2f a %4.2f q*p %4.2f",qfloat,pfloat,afloat,qfloat*pfloat);
+            //if (!_intQuantity) NSLog(@" ...bad math  q %4.2f p %4.2f a %4.2f q*p %4.2f",
+            //  qfloat,pfloat,afloat,qfloat*pfloat);
             if ((_intQuantity && (qint == 1)) || (!_intQuantity && (qfloat == 1.0)) ) //Mismatch price/amount, defer to amount
             {
                 pfloat = afloat;
             }
-            else //Bogus quantity maybe?
+            else //Bogus quantity? or price/amount read incompletely?
             {
-                if (_intQuantity)
-                    qint = (int)(afloat / pfloat);
-                else
-                    qfloat = afloat/pfloat;
+                    if (_intQuantity)
+                        qint = (int)(afloat / pfloat);
+                    else
+                        qfloat = afloat/pfloat;
             }
             _majorError = ANALYZER_BAD_MATH;
         }
@@ -1091,45 +1139,16 @@
 } //end removePunctuationFromString
 
 //=============(smartProducts)=====================================================
-// Disassembles / reassembles a sentence, fixes any product name typos therein
+// Disassembles sentence, fix typos word-by-word, reassembles sentence
 -(NSString *) fixSentenceTypo : (NSString *)sentence
 {
-    //1/18: Get rid of punctuation: ALL punctuation!
-    NSString *sNoPunct = [self removePunctuationFromString:sentence];
-    NSArray *sItems = [[sNoPunct lowercaseString] componentsSeparatedByString:@" "]; //Separate words
-    BOOL bing = FALSE;
-    int wcount = (int)sItems.count;
-    NSMutableArray *outputWords = [[NSMutableArray alloc] init];
-    for (int i=0;i<wcount;i++)
-    {
-        NSString *s = sItems[i];
-        NSString *t = [self fixTypo:s];
-        NSString *w = [self fixWildSplits:t];
-        if (![s isEqualToString:t])  bing = TRUE; //Typo got fixed?
-        if (![w isEqualToString:t])  bing = TRUE; //Wildcard got fixed?
-        [outputWords addObject:w];
-    }
-    NSString *output = [outputWords componentsJoinedByString:@" "];
-    //NSLog(@" fixit %@ -> %@",sentence,output);
-    return output;
+    NSString *sNoPunct = [self removePunctuationFromString:sentence]; //Replace punc w/ spaces
+    NSArray *sItems    = [[sNoPunct lowercaseString] componentsSeparatedByString:@" "]; //Separate words
+    NSMutableArray *ow = [[NSMutableArray alloc] init];
+    for (int i=0;i<(int)sItems.count;i++) //Loop over words 3/4 remove wilds, cleanup
+        [ow addObject:[self fixTypo:sItems[i]]];
+    return [ow componentsJoinedByString:@" "];
 } //end fixSentenceTypo
-
-//=============(smartProducts)=====================================================
-// Looking for strange OCR errors with non-ascii characters...
--(NSString *) fixWildSplits : (NSString *)testString
-{
-    int i=0;
-    for (NSString *s in wilds) //Assume abc*def  format...
-    {
-        NSArray *wslr    = [s componentsSeparatedByString:@"*"]; //Lh/Rh sides of *
-        //Crude, check for both halves... but really should check to make sure
-        //  RH side is TO RIGHT of LH side!
-        if ([testString containsString:wslr[0]] && [testString containsString:wslr[1]])
-            return [notwilds objectAtIndex:i];
-        i++;
-    }
-    return testString; //Nothing to fix
-} //end fixWildSplits
 
 //=============(smartProducts)=====================================================
 // 2 table lookup: typos and fixed spellings, simple array match / replace
@@ -1139,6 +1158,12 @@
     if (index != NSNotFound)
     {
         return [fixed objectAtIndex:index];
+    }
+    //DHS 3/15 look for keywords w/ first char missing...
+    if (keywordsNo1stChar[testString] != nil)  //These will be in format "category:keyword"
+    {
+        NSArray *wordz = [keywordsNo1stChar[testString] componentsSeparatedByString:@":"]; //break up a:b
+        if (wordz.count > 1) return wordz[1]; //should be proper keyword now
     }
     return testString; //Nothing to fix
 } //end fixTypo

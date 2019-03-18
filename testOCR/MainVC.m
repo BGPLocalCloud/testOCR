@@ -21,6 +21,7 @@
 //  2/9  Merged PDF / OCR cache clears
 //  2/22 Moved CSV Export from expVC
 //  2/23 Fix array -> mutableArray conversion bug
+//  3/12 Add help option
 #import "MainVC.h"
 
 @interface MainVC ()
@@ -202,10 +203,10 @@
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self performSegueWithIdentifier:@"templateSegue" sender:@"mainVC"];
                                                           }]];
-    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Load Comparison EXP File...",nil)
-                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              [self performSegueWithIdentifier:@"comparisonSegue" sender:@"mainVC"];
-                                                          }]];
+//    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Load Comparison EXP File...",nil)
+//                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+//                                                              [self performSegueWithIdentifier:@"comparisonSegue" sender:@"mainVC"];
+//                                                          }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Clear Local Caches",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self clearCacheMenu];
@@ -227,6 +228,10 @@
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                   [self performSegueWithIdentifier:@"analyzerSegue" sender:@"mainVC"];
                                               }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Dump Settings",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self dumpSettings];
+                                              }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Logout From Dropbox",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                   [DBClientsManager unlinkAndResetClients];
@@ -234,8 +239,12 @@
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Logout From Sashido",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                   [PFUser logOut];
-                                                  loginMode = @"login";
+                                                  self->loginMode = @"login";
                                                   [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
+                                              }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Help",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self performSegueWithIdentifier:@"helpSegue" sender:@"mainVC"];
                                               }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -262,16 +271,15 @@
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
                                                           }]];
-    int vindex = 0;
-    for (NSString *s in vv.vNames)
+    for (int vindex = 0;vindex < vv.vcount;vindex++)
     {
+        NSString *s = [vv getNameByIndex:vindex]; //DHS 3/6
         NSString *nextChoice = [NSString stringWithFormat:@"%@ Invoices",s];
             [alert addAction: [UIAlertAction actionWithTitle:nextChoice
                                                        style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                            self->selVendor = s;
                                                            [self performSegueWithIdentifier:@"invoiceSegue" sender:@"mainVC"];
                                                        }]];
-        vindex++;
     }
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -279,6 +287,23 @@
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
 } //end dbmenu
+
+//=============OCR MainVC=====================================================
+-(void) dumpSettings
+{
+    AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSString *s = [mappDelegate.settings getDumpString];
+    UIAlertController *alertController =
+    [UIAlertController alertControllerWithTitle:@"Settings Dump"
+                                        message:s
+                                 preferredStyle:(UIAlertControllerStyle)UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"OK"
+                                                        style:(UIAlertActionStyle)UIAlertActionStyleCancel
+                                                      handler:nil]];
+    [self presentViewController:alertController animated:YES completion:nil];
+    
+}
+
 
 //=============OCR MainVC=====================================================
 // if you click on a batch item, this gets invoked
@@ -769,12 +794,12 @@
 
 int currentYear = 2019;
 
-
 //=============OCR MainVC=====================================================
 -(void) testit
 {
- //    [self performSegueWithIdentifier:@"analyzerSegue" sender:@"mainVC"];
-
+    
+//    [self performSegueWithIdentifier:@"addTemplateSegue" sender:@"mainVC"];
+    return;
 //    smartProducts *smartp = [[smartProducts alloc] init];
 //    [smartp saveKeywordsAndTyposToParse];
 //    return;

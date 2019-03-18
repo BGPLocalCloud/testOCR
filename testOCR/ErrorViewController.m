@@ -191,6 +191,7 @@
                       
                       ];
     errKeysNumeric = @[   //CANNED
+                       PInv_Item_key ,  //DHS 3/9
                        PInv_Quantity_key ,
                        PInv_TotalPrice_key ,
                        PInv_PricePerUOM_key
@@ -360,11 +361,11 @@
         if (row == 3)
             NSLog(@"bing");
         NSString *oid = [self getIDFromErrorString : fullErr];
-        NSLog(@" id from err %@ is %@",fullErr,oid);
+        //NSLog(@" id from err %@ is %@",fullErr,oid);
         if (oid != nil && oid.length > 0)
         {
             EXPObject *e = [expRecordsByID objectForKey:oid];
-            NSLog(@" object for id %@",oid);
+            //NSLog(@" object for id %@",oid);
             [e dump];
             if (e != nil)
             {

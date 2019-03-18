@@ -54,6 +54,11 @@
          }
          else
          {
+             if (error != nil)
+             {
+                 NSString * message = [self getErrorMessage:error];
+                 NSLog(@" DBT ERROR! %@ : %@",message,searchPath);
+             }
              [self->_delegate didCountEntries:vendorFolder :0];
          }
      }];
@@ -164,6 +169,12 @@
                 [self->_delegate didGetFolderList : result.entries];
              }
          }
+         else
+         {
+             NSString *message = [self getErrorMessage:error];
+             [self->_delegate errorGettingFolderList : message];
+         }
+
      }];
 
 } //end getFolderList

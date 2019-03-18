@@ -102,6 +102,7 @@
 		72A4B0882206023E00B02F9F /* EXPStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 72A4B0872206023E00B02F9F /* EXPStats.m */; };
 		72A4FDCB21F2633E00203A50 /* grecoShrunk3.png in Resources */ = {isa = PBXBuildFile; fileRef = 72A4FDCA21F2633E00203A50 /* grecoShrunk3.png */; };
 		72A9828921CCAC7400D5EAC6 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72A9828821CCAC7300D5EAC6 /* WebKit.framework */; };
+		72ACEA3222398D5A00AB973E /* Customers.m in Sources */ = {isa = PBXBuildFile; fileRef = 72ACEA3122398D5A00AB973E /* Customers.m */; };
 		72AFBE9421D4AEA400B75388 /* CheckTemplateVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AFBE9321D4AEA400B75388 /* CheckTemplateVC.m */; };
 		72B787B521ED30DA00459AD4 /* redX.png in Resources */ = {isa = PBXBuildFile; fileRef = 72B787B421ED30DA00459AD4 /* redX.png */; };
 		72B787B921ED310B00459AD4 /* emptyDoc.png in Resources */ = {isa = PBXBuildFile; fileRef = 72B787B821ED310B00459AD4 /* emptyDoc.png */; };
@@ -126,6 +127,7 @@
 		72F0D8C421D932BE005979D2 /* Vendors.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F0D8C221D932BD005979D2 /* Vendors.m */; };
 		72F394FF21E91AD4009E59C4 /* lilGreenCheck.png in Resources */ = {isa = PBXBuildFile; fileRef = 72F394FE21E91AD3009E59C4 /* lilGreenCheck.png */; };
 		72F6DC2A21E5C0D900EDF9A4 /* bluecheck.png in Resources */ = {isa = PBXBuildFile; fileRef = 72F6DC2921E5C0D800EDF9A4 /* bluecheck.png */; };
+		72FD6AE422308D4300FCBC20 /* VendorObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 72FD6AE322308D4300FCBC20 /* VendorObject.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -264,6 +266,8 @@
 		72A4B0872206023E00B02F9F /* EXPStats.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EXPStats.m; sourceTree = "<group>"; };
 		72A4FDCA21F2633E00203A50 /* grecoShrunk3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grecoShrunk3.png; sourceTree = "<group>"; };
 		72A9828821CCAC7300D5EAC6 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		72ACEA3022398D5A00AB973E /* Customers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Customers.h; sourceTree = "<group>"; };
+		72ACEA3122398D5A00AB973E /* Customers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Customers.m; sourceTree = "<group>"; };
 		72AFBE9221D4AEA400B75388 /* CheckTemplateVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CheckTemplateVC.h; sourceTree = "<group>"; };
 		72AFBE9321D4AEA400B75388 /* CheckTemplateVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CheckTemplateVC.m; sourceTree = "<group>"; };
 		72B787B421ED30DA00459AD4 /* redX.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = redX.png; path = Resources/redX.png; sourceTree = SOURCE_ROOT; };
@@ -302,6 +306,8 @@
 		72F0D8C321D932BE005979D2 /* Vendors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Vendors.h; path = /Users/davescruton/Desktop/testOCR/testOCR/OCR_Code/Vendors.h; sourceTree = "<absolute>"; };
 		72F394FE21E91AD3009E59C4 /* lilGreenCheck.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = lilGreenCheck.png; path = Resources/lilGreenCheck.png; sourceTree = SOURCE_ROOT; };
 		72F6DC2921E5C0D800EDF9A4 /* bluecheck.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bluecheck.png; path = Resources/bluecheck.png; sourceTree = SOURCE_ROOT; };
+		72FD6AE222308D4300FCBC20 /* VendorObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VendorObject.h; sourceTree = "<group>"; };
+		72FD6AE322308D4300FCBC20 /* VendorObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VendorObject.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -364,16 +370,16 @@
 				72BA4D2421CE175000F432E9 /* BatchViewController.m */,
 				720FB49E21EC679F00C0F320 /* BatchReportController.h */,
 				720FB49F21EC679F00C0F320 /* BatchReportController.m */,
+				720C17B821CCC1150059CA2D /* AddTemplateViewController.h */,
+				72E785AB21CCBFC600EEEF1F /* AddTemplateViewController.m */,
+				72AFBE9221D4AEA400B75388 /* CheckTemplateVC.h */,
+				72AFBE9321D4AEA400B75388 /* CheckTemplateVC.m */,
 				7206008B21B64052000B26DC /* EditTemplateVC.h */,
 				7206008C21B64052000B26DC /* EditTemplateVC.m */,
 				7209159121E0908B00F94258 /* ErrorViewController.h */,
 				7209159221E0908C00F94258 /* ErrorViewController.m */,
 				7299F7692213B43A00FC0814 /* ErrorHelperVC.h */,
 				7299F76A2213B43A00FC0814 /* ErrorHelperVC.m */,
-				720C17B821CCC1150059CA2D /* AddTemplateViewController.h */,
-				72E785AB21CCBFC600EEEF1F /* AddTemplateViewController.m */,
-				72AFBE9221D4AEA400B75388 /* CheckTemplateVC.h */,
-				72AFBE9321D4AEA400B75388 /* CheckTemplateVC.m */,
 				725DA97B21CB53BC0024ECF7 /* EXPViewController.h */,
 				725DA97C21CB53BC0024ECF7 /* EXPViewController.m */,
 				728EECC321ED1B5B00F83129 /* InvoiceViewController.h */,
@@ -530,8 +536,12 @@
 				7209609A21B81FB900D49C63 /* OCRTemplate.m */,
 				7209608721B7FBB000D49C63 /* OCRWord.h */,
 				7209608821B7FBB000D49C63 /* OCRWord.m */,
+				72ACEA3022398D5A00AB973E /* Customers.h */,
+				72ACEA3122398D5A00AB973E /* Customers.m */,
 				72F0D8C321D932BE005979D2 /* Vendors.h */,
 				72F0D8C221D932BD005979D2 /* Vendors.m */,
+				72FD6AE222308D4300FCBC20 /* VendorObject.h */,
+				72FD6AE322308D4300FCBC20 /* VendorObject.m */,
 			);
 			path = OCR_Code;
 			sourceTree = "<group>";
@@ -780,6 +790,7 @@
 				7283812021C4A17300A2954B /* NavButtons.m in Sources */,
 				7209159321E0908C00F94258 /* ErrorViewController.m in Sources */,
 				7206009821B64055000B26DC /* main.m in Sources */,
+				72ACEA3222398D5A00AB973E /* Customers.m in Sources */,
 				7290229C21D58FF900885EF9 /* activityCell.m in Sources */,
 				7206008A21B64052000B26DC /* AppDelegate.m in Sources */,
 				72BA4D2B21CF52B600F432E9 /* BatchObject.m in Sources */,
@@ -800,6 +811,7 @@
 				72435B3421C8C7C600620F4B /* EXPObject.m in Sources */,
 				72E785AC21CCBFC600EEEF1F /* AddTemplateViewController.m in Sources */,
 				72C90B9D21F447510032875D /* spinnerView.m in Sources */,
+				72FD6AE422308D4300FCBC20 /* VendorObject.m in Sources */,
 				7283813621C4A60000A2954B /* MainVC.m in Sources */,
 				7209608C21B8164F00D49C63 /* imageTools.m in Sources */,
 				72D6516D2204DA97009E2057 /* ComparisonVC.m in Sources */,

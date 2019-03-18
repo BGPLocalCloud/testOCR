@@ -62,9 +62,14 @@
 //Batch table...
 #define PInv_BatchSOIDs_key  @"BatchSOIDs"
 
+//Customers table...
+#define PInv_CustomerName_key     @"CustomerName"
+
 //Vendor table...
 #define PInv_Rotated_key     @"Rotated"
 #define PInv_IntQuantity_key @"IntQuantity"
+#define PInv_TLTemplateAnchor @"TLTemplateAnchor"
+#define PInv_TRTemplateAnchor @"TRTemplateAnchor"
 
 //Keyword,Typos,Splits, etc table...
 #define PInv_Name_key      @"Name"

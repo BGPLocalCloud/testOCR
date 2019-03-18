@@ -33,12 +33,8 @@ static Vendors *sharedInstance = nil;
 {
     if (self = [super init])
     {
-        _vNames         = [[NSMutableArray alloc] init]; // Vendor names
-        _vFolderNames   = [[NSMutableArray alloc] init]; //  and matching folder names
-        _vRotations     = [[NSMutableArray alloc] init]; //  invoices rotated?
-        _vFileCounts    = [[NSMutableArray alloc] init]; //  runtime filecounts of PDF/CSV's to process
-        _vIntQuantities = [[NSMutableArray alloc] init]; //  integer/float quantity flags
-        vNamesLC        = [[NSMutableArray alloc] init]; // Vendor names
+        _vobjs          = [[NSMutableArray alloc] init]; // Vendor names
+        _vFileCounts    = [[NSMutableArray alloc] init]; // Vendor names
         _loaded         = FALSE;
         [self readFromParse];
     }
@@ -46,37 +42,98 @@ static Vendors *sharedInstance = nil;
 }
 
 //=============(Vendors)=====================================================
+// Given vendor name, find appropriate folder name
 -(NSString *) getFolderName : (NSString *)vmatch
 {
-    NSInteger n = [_vNames indexOfObject:vmatch];
-    if (n != NSNotFound) return [_vFolderNames objectAtIndex:n];
+    for (VendorObject *vvo in _vobjs)
+    {
+        if ([vvo.vName isEqualToString:vmatch]) return vvo.vFolderName;
+    }
+    return @"";
+} //end getFolderName
+
+//=============(Vendors)=====================================================
+-(NSString *) getTLAnchorByVendor : (NSString *)vmatch
+{
+    for (VendorObject *vvo in _vobjs)
+    {
+        if ([vvo.vName isEqualToString:vmatch]) return vvo.vTLTemplate;
+    }
     return @"";
 }
 
 //=============(Vendors)=====================================================
+-(NSString *) getTRAnchorByVendor : (NSString *)vmatch
+{
+    for (VendorObject *vvo in _vobjs)
+    {
+        if ([vvo.vName isEqualToString:vmatch]) return vvo.vTRTemplate;
+    }
+    return @"";
+}
+
+
+//=============(Vendors)=====================================================
+// Given vendor name, find index to vobjs array
 -(int)  getVendorIndex : (NSString *)vname
 {
-    NSString *vlc = vname.lowercaseString;
     int i=0;
-    for (NSString *vn in vNamesLC)
+    NSString *vlc = vname.lowercaseString;
+    for (VendorObject *vvo in _vobjs)
     {
-        if ([vlc containsString:vn]) return i;//Match?
+        if ([vvo.vNameLC isEqualToString:vlc]) return i;
         i++;
     }
     return 0;
-}
+} //end getVendorIndex
+
+//=============(Vendors)=====================================================
+-(NSString *) getIntQuantityByIndex : (int)index
+{
+    if (index < 0 || index >= _vobjs.count) return @"";
+    VendorObject *vvo = _vobjs[index];
+    return vvo.vIntQuantity;
+} //end getNameByIndex
 
 
 //=============(Vendors)=====================================================
+-(NSString *) getNameByIndex : (int)index
+{
+    if (index < 0 || index >= _vobjs.count) return @"";
+    VendorObject *vvo = _vobjs[index];
+    return vvo.vName;
+} //end getNameByIndex
+
+//=============(Vendors)=====================================================
+-(NSString *) getFoldernameByIndex : (int)index
+{
+    if (index < 0 || index >= _vobjs.count) return @"";
+    VendorObject *vvo = _vobjs[index];
+    return vvo.vFolderName;
+} //end getNameByIndex
+
+//=============(Vendors)=====================================================
+-(NSString *) getRotationByIndex : (int)index
+{
+    if (index < 0 || index >= _vobjs.count) return @"";
+    VendorObject *vvo = _vobjs[index];
+    return vvo.vRotation;
+} //end getRotationByIndex
+
+
+//=============(Vendors)=====================================================
+// Given vendor name, find typical invoice rotation
 -(NSString *) getRotationByVendorName : (NSString *)vname
 {
-    NSUInteger index = [_vNames indexOfObject:vname];
-    if (index == NSNotFound) return @"0";
-    return [_vRotations objectAtIndex:index];
-}
+    NSString *vlc = vname.lowercaseString;
+    for (VendorObject *vvo in _vobjs)
+        if ([vvo.vNameLC isEqualToString:vlc]) return vvo.vRotation;
+    return @"0";
+} //end getRotationByVendorName
 
 
 //=============(Vendors)=====================================================
+// 3/6 loads up array of vendorObjects instead of multiple arrays now
 -(void) readFromParse
 {
     if (_loaded) return; //No need to do 2x
@@ -89,23 +146,26 @@ static Vendors *sharedInstance = nil;
                 [self.delegate errorReadingVendorsFromParse];
                 return;
             }
-            [self->_vNames         removeAllObjects];
-            [self->_vFolderNames   removeAllObjects];
-            [self->_vRotations     removeAllObjects];
-            [self->_vIntQuantities removeAllObjects];
+            [self->_vobjs removeAllObjects];
+            self->_vcount = 0;
             for( PFObject *pfo in objects)  //Save all our vendor names...
             {
-                NSString *s = [pfo objectForKey:PInv_Vendor_key];
-                [self->_vNames addObject:s];
-                [self-> vNamesLC addObject:s.lowercaseString]; //Strings to match by
+                VendorObject *vvo = [[VendorObject alloc] init];
+                NSString *s  = [pfo objectForKey:PInv_Vendor_key];
+                vvo.vName    = s;
+                vvo.vNameLC  = s.lowercaseString; //LC Strings to match by
                 //Generate a legal filename, too, no whitespace, dots, apostrophes or commas...
                 NSString *sf = [s  stringByReplacingOccurrencesOfString:@" " withString:@"_"];
                 sf = [sf stringByReplacingOccurrencesOfString:@"." withString:@"_"];
                 sf = [sf stringByReplacingOccurrencesOfString:@"," withString:@"_"];
                 sf = [sf stringByReplacingOccurrencesOfString:@"\'" withString:@"_"];
-                [self->_vFolderNames   addObject:sf];
-                [self->_vRotations     addObject:[pfo objectForKey:PInv_Rotated_key]];
-                [self->_vIntQuantities addObject:[pfo objectForKey:PInv_IntQuantity_key]];
+                vvo.vFolderName  = sf;
+                vvo.vRotation    = [pfo objectForKey:PInv_Rotated_key];
+                vvo.vIntQuantity = [pfo objectForKey:PInv_IntQuantity_key];
+                vvo.vTLTemplate  = [pfo objectForKey:PInv_TLTemplateAnchor];
+                vvo.vTRTemplate  = [pfo objectForKey:PInv_TRTemplateAnchor];
+                [self->_vobjs addObject:vvo];
+                self->_vcount++;
             }
             NSLog(@" ...loaded all vendors");
             self->_loaded = TRUE;
@@ -119,11 +179,8 @@ static Vendors *sharedInstance = nil;
 -(int) stringHasVendorName : (NSString *)s
 {
     int i = 0;
-    for (NSString *ts in _vNames)
-    {
-        if ([s.lowercaseString containsString:ts.lowercaseString]) return i;
-        i++;
-    }
+    for (VendorObject *vvo in _vobjs)
+        if ([s.lowercaseString containsString : vvo.vNameLC]) return i;
     return -1;
 } //end stringHasVendorName
 

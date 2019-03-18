@@ -136,7 +136,8 @@
     else{
         photo   = testPhoto;
         pastEnd = FALSE;
-        NSString* vrstr = vv.vRotations[vindex];
+        //DHS 3/6
+        NSString* vrstr = [vv getRotationByVendorName:_vendor];
         if ([vrstr isEqualToString:@"-90"])  //Rotate to make readable
             photo = [itools rotate90CCW:photo];
     }

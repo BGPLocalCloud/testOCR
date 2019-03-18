@@ -224,7 +224,7 @@
     {
         if (amounts[i] > 0) //Got somethign for this vendor?
         {
-            NSLog(@"Vendor: %@",vv.vNames[i]);
+            NSLog(@"Vendor: %@",[vv getNameByIndex:i]); //DHS 3/6
             float ftotal = (float)amounts[i] / 100.0;
             tstr = [smartp getDollarsAndCentsString:ftotal];
             NSLog(@" Total $%@",tstr);

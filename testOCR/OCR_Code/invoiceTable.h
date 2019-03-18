@@ -44,7 +44,7 @@
 
 -(void) addInvoiceItemByObjectID:(NSString *)oid;
 -(void) setBasicFields : (NSDate *) ddd : (NSString*)num : (NSString*)total :
-                (NSString*)vendor : (NSString*)customer : (NSString*)PDFFile : (NSString*)pageCount;
+(NSString*)vendor : (NSString*)customer : (NSString*)PDFFile : (NSString*)page : (NSString*)pageCount;
 -(void) clearObjectIds;
 -(int)  getItemCount;
 -(void) readFromParse : (NSString *)vendor : (NSString *)invoiceNumberstring;

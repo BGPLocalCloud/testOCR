@@ -49,6 +49,7 @@
 
 -(BOOL) moveFiles;
 -(BOOL) isLoaded;
+-(NSString *)getDumpString;
 -(void) dump;
 
 

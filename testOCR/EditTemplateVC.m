@@ -25,6 +25,7 @@
 //
 //  In Adjust mode, zoom in??
 //  1/13 Added more detail to activity outputs...
+//  3/17 Added hookups for checkVC passed image/OCRtext
 #import "EditTemplateVC.h"
 
  
@@ -89,6 +90,12 @@
     viewH2  = viewHit/2;
 }
 
+//=============AddTemplate VC=====================================================
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+}
+
+
 //=============OCR VC=====================================================
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -105,6 +112,21 @@
         }
         
 
+    }
+    else // 3/17 load up our incoming image...
+    {
+        _inputImage.image = _incomingImage;
+        NSData *jsonData = [_incomingOCRText dataUsingEncoding:NSUTF8StringEncoding];
+        NSError *e;
+        NSDictionary *jdict = [NSJSONSerialization JSONObjectWithData:jsonData
+                                                              options:NSJSONReadingMutableContainers error:&e];
+        docFlipped90 = ([_incomingVendor isEqualToString:@"HFM"]);
+        selectFnameForTemplate = @"dog.png"; //DO I need this?
+        
+        [od setupDocumentAndParseJDON : selectFnameForTemplate : jdict : docFlipped90]; //Last arg is flip: true for HFM
+
+//
+        
     }
         
     
@@ -771,7 +793,7 @@
 -(void) addTag : (NSString*)tag
 {
     NSLog(@" addTag %@",tag);
-    [ot addTag:adjustSelect:tag];
+    [ot addTag:adjustSelect:tag];  //passed down to OCRBox:addTag
     [ot saveTemplatesToDisk:supplierName];
     spinner.hidden = FALSE;
     [spinner startAnimating];
@@ -984,7 +1006,7 @@
     NSLog(@" xywh %d %d : %d %d",xi,yi,xs,ys);
     CGRect r2 =CGRectMake(xi, yi, xs, ys);
     //NSLog(@" ...docrect %@",NSStringFromCGRect(r2));
-    NSMutableArray *a = [od findAllWordStringsInRect:r2];
+    NSMutableArray *a = [od findAllWordStringsInDocumentRect:r2];
     NSString* wstr = @"";
     int count = 0;
     for (NSString *s in a)
@@ -1222,7 +1244,7 @@
     [it setupVendorTableName : supplierName];
     NSString *its = [NSString stringWithFormat:@"%4.2f",invoiceTotal];
     its = [od cleanupPrice:its]; //Make sure total is formatted!
-    [it setBasicFields:invoiceDate :invoiceNumberString : its : supplierName : invoiceCustomer : @"EmptyPDF" : @"1"];
+    [it setBasicFields:invoiceDate :invoiceNumberString : its : supplierName : invoiceCustomer : @"EmptyPDF" : @"0" : @"1"];  //DGS 3/12
     for (NSString *objID in a) [it addInvoiceItemByObjectID : objID];
     [it saveToParse:FALSE]; //BOOL is lastPage arg...T/F???
 } //end didSaveEXPTable
@@ -1262,6 +1284,12 @@
 - (void)errorSavingEXP : (NSString *) errMsg : (NSString*) objectID : (NSString*) productName
 {
     NSLog(@" errorSavingEXP %@:%@:%@",errMsg,objectID,productName);
+}
+
+//=============<OCRTopObjectDelegate>=====================================================
+- (void)batchUpdate : (NSString *) s
+{
+    NSLog(@" ...stubbed batchUpdate %@",s);
 }
 
 

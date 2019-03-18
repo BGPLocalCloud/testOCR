@@ -12,6 +12,7 @@
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 //  2/13 add debugMenu
+//  3/4  added new debug options
 
 #import "BatchViewController.h"
 
@@ -87,9 +88,7 @@
                                           }];
     } //End need auth
     haltingBatchToExitVC = FALSE;
-    //Canned month for now...
-    batchMonth = @"08-FEB";
-    [self->_monthButton setTitle:batchMonth forState:UIControlStateNormal];
+    [self setupInitialFiscalMonth];
 
 } //end viewDidAppear
 
@@ -107,15 +106,15 @@
 {
    // NSLog(@" updateui step %d showr %d",step,showRotatedImage);
     NSString *s = @"Staged Files by Vendor:\n\n";
-    for (NSString *vn in vv.vFolderNames)
+    for (int i=0;i<vv.vcount;i++)  //DHS 3/6
     {
-        int vc = [bbb getVendorFileCount:vn];
+        NSString *vn = [vv getFoldernameByIndex:i]; //DHS 3/6
+        int       vc = [bbb getVendorFileCount:vn];
         //NSLog(@" v[%@]: %d",vn,vc);
         s = [s stringByAppendingString:[NSString stringWithFormat:@"%@ :%d\n",vn,vc]];
-        
     }
     _outputText.text = s;
-    
+    [self->_monthButton setTitle:batchMonth forState:UIControlStateNormal];
 } //end updateUI
 
 
@@ -160,10 +159,14 @@
                                                                    message:nil
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     [alert setValue:tatString forKey:@"attributedTitle"];
-    int vindex = 0;
-    for (NSString *s in vv.vNames)
+//    int vindex = 0;
+    
+    for (int vindex=0;vindex<vv.vcount;vindex++)  //DHS 3/6
     {
-        int vc = [bbb getVendorFileCount:vv.vFolderNames[vindex]];
+        [vv.vFileCounts removeAllObjects]; //DHS 3/6 ...all changes below
+        NSString *vn = [vv getFoldernameByIndex:vindex];  
+        int       vc = [bbb getVendorFileCount:vn];
+        NSString *s  = [vv getNameByIndex:vindex];
         [vv.vFileCounts addObject: [NSNumber numberWithInt: vc]]; //Save filecounts for later
         if (vc > 0) //Don't add a batch run option for empty batch folders!
         {
@@ -175,7 +178,6 @@
                                                       [self->bbb clearAndRunBatches : vindex];
                                                   }]];
         }
-        vindex++; //Update vendor index (for checking vendor filecounts)
     }
     UIAlertAction *allAction    = [UIAlertAction actionWithTitle:NSLocalizedString(@"Run All",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -198,14 +200,13 @@
 }
 
 //=============Batch VC=====================================================
+// 3/4 added fields
 -(void) debugMenu
 {
-    NSArray *debugShite = @[  //CANNED stuff that never is a product
-                    @"quantity",
-                    @"description",
-                    @"price",
-                    @"amount",
-                    @"nothing"
+    NSArray *debugShite = @[
+                            @"date", @"number", @"customer", @"supplier",      // invoice fields
+                            @"quantity", @"description", @"price", @"amount", // invoice columns
+                            @"nothing"
                     ];
 
     NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:@"Debug Functions"];
@@ -284,6 +285,22 @@
     [self presentViewController:alert animated:YES completion:nil];
     
 } //end monthMenu
+
+//=============Batch VC=====================================================
+// 3/4 make sure batch chooser is OK
+-(void) setupInitialFiscalMonth
+{
+    NSDateFormatter * formatter =  [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"MMM"];
+    NSString *cmon = [formatter stringFromDate:[NSDate date]]; //Get Current Month
+    for (NSString *mmm in fiscalMonths) //Loop over fiscal year
+    {
+        if ([mmm.lowercaseString containsString:cmon.lowercaseString])
+            {batchMonth = mmm;
+             break;
+            }
+    }
+} //end setupInitialFiscalMonth
 
 
 #pragma mark - batchObjectDelegate

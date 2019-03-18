@@ -27,6 +27,8 @@
 //  2/15 add setDebugMode
 //  2/23 add isBatch flag to performOCROnData
 //  2/28 add E: to missing invoice fields for format matching in errorVC
+//  3/4  add support for debugging invoice date from UI
+//  3/12 add page field to invoice
 #import "OCRTopObject.h"
 
 @implementation OCRTopObject
@@ -80,14 +82,19 @@ static OCRTopObject *sharedInstance = nil;
     // these to scale invoice by:
     CGRect tlTemplate = [ot getTLOriginalRect];
     CGRect trTemplate = [ot getTROriginalRect];
+    AppDelegate *oappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    od.TLAnchor = [oappDelegate.vv getTLAnchorByVendor:_vendor]; //DHS 3/6 new for scaling
+    od.TRAnchor = [oappDelegate.vv getTRAnchorByVendor:_vendor];
     [od computeScaling : tlTemplate : trTemplate];
     if (debugMode) NSLog(@"applyTemplate...");
     if (page == 0) //DHS 1/31 ONLY clear on first page!
     {
-        _invoiceNumber   = 0L;
-        _invoiceDate     = nil;
-        _invoiceCustomer = nil;
-        _invoiceVendor   = nil;
+        _invoiceNumber       = 0L;
+        _invoiceDate         = [NSDate date]; //DHS 3/6 clear to non-nils
+        _invoiceCustomer     = @"";
+        _invoiceVendor       = @"";
+        _invoiceNumberString = @"";
+        headerY = 0; //DHS 3/4
     }
     
     //First add any boxes of content to ignore...
@@ -100,22 +107,22 @@ static OCRTopObject *sharedInstance = nil;
             [od addIgnoreBoxItems:rr];
         }
     }
-    int headerY = 0;
     int columnDataTop = 0;
     for (int i=0;i<[ot getBoxCount];i++) //Loop over our boxes...
     {
         //OK, let's go and get the field name to figure out what to do w data...
         NSString* fieldName = [ot getBoxFieldName:i];
         CGRect rr = [ot getBoxRect:i]; //In document coords!
-        NSMutableArray *a = [od findAllWordsInRect:rr];
+        NSMutableArray *a = [od findAllWordsInTemplateRect:rr];
         if (debugMode) NSLog(@" [%@] fieldname is [%@], %d items",_imageFileName,fieldName,(int)a.count);
         if (a.count > 0) //Found a match!
         {
             //DHS 2/5 look for invoice number / date EVERY PAGE
             if ( [fieldName isEqualToString:INVOICE_NUMBER_FIELD]) //Looking for a number?
             {
+                if ([debugString isEqualToString:@"number"])      //Debug? Convert our array to a bunch of strings...
+                    [self displayDebugPrompt : debugString : a]; // and output it in a prompt
                 long testNum = [od findLongInArrayOfFields:a];
-                [od dumpArrayFull : a];
                 if (testNum != 0)
                 {
                     _invoiceNumber = testNum;
@@ -130,7 +137,9 @@ static OCRTopObject *sharedInstance = nil;
             }
             else if ( [fieldName isEqualToString:INVOICE_DATE_FIELD]) //Looking for a date?
             {
-                //[od dumpArrayFull : a];
+                //[od dumpArrayFull:a];
+                if ([debugString isEqualToString:@"date"])      //Debug? Convert our array to a bunch of strings...
+                    [self displayDebugPrompt : debugString : a]; // and output it in a prompt
                 NSDate* testDate = [od findDateInArrayOfFields:a]; //Find date-like string?
                 if (testDate == nil) //Bogus?  1/27 redid
                 {
@@ -142,6 +151,8 @@ static OCRTopObject *sharedInstance = nil;
             }
             else if (page == 0 && [fieldName isEqualToString:INVOICE_CUSTOMER_FIELD]) //Looking for Customer?
             {
+                if ([debugString isEqualToString:@"customer"])      //Debug? Convert our array to a bunch of strings...
+                    [self displayDebugPrompt : debugString : a]; // and output it in a prompt
                 _invoiceCustomer = [od findTopStringInArrayOfFields:a]; //Just get first line of template area
                 if (debugMode) NSLog(@" Customer %@",_invoiceCustomer);
                 if (_invoiceCustomer == nil) //DHS 2/22
@@ -152,6 +163,8 @@ static OCRTopObject *sharedInstance = nil;
             }
             else if (page == 0 && [fieldName isEqualToString:INVOICE_SUPPLIER_FIELD]) //Looking for Supplier?
             {
+                if ([debugString isEqualToString:@"supplier"])      //Debug? Convert our array to a bunch of strings...
+                    [self displayDebugPrompt : debugString : a]; // and output it in a prompt
                 _invoiceVendor = [od findTopStringInArrayOfFields:a]; //Just get first line of template area
                 BOOL matches = [ot isSupplierAMatch:_invoiceVendor]; //Check for rough match
                 if (debugMode) NSLog(@" Supplier %@, match %d",_invoiceVendor,matches);
@@ -165,16 +178,20 @@ static OCRTopObject *sharedInstance = nil;
             {
                 //headerY = [od autoFindHeader];
                 // Get header ypos (document coords!!)
-                headerY = [od findHeader:rr :300]; //1/30 changed expandby to 300
-                if (headerY == -1)
+                int testHeaderY = [od findHeader:rr :300]; //1/30 changed expandby to 300
+                if (testHeaderY == -1)  //Missing header? will use 1st page headerY 
                 {
                     [self->_delegate errorPerformingOCR:@"E:Missing Invoice Header"];
-                    return;
+                    if (page == 0) return; //Wups! first page? Bail!
                 }
-                columnDataTop = [od doc2templateY:headerY] + 1.5*od.glyphHeight;
+                else headerY = testHeaderY;  //DHS 3/4
+//              DHS 3/6 the 1.5 factor was too much for Hawaii Beef Producers!
+                // THIS MAY have to vary by vendor!
+//                columnDataTop = [od doc2templateY:headerY] + 1.5*od.glyphHeight;
+                columnDataTop = [od doc2templateY:headerY] + 1.0*od.glyphHeight; // 3/7
                 headerY -= 10;  //littie jiggle up...
                 rr.origin.y = [od doc2templateY:headerY];  //Adjust our header rect to new header position!
-                a = [od findAllWordsInRect:rr]; //Do another search now...
+                a = [od findAllWordsInTemplateRect:rr]; //Do another search now...
                 headerRect = rr; //Save our header rect for later...
                 _columnHeaders = [od getHeaderNames];
             }
@@ -247,6 +264,13 @@ static OCRTopObject *sharedInstance = nil;
     }
 } //end applyTemplate
 
+//=============(OCRTopObject)=====================================================
+-(void) displayDebugPrompt : (NSString*)fieldName : (NSArray *)a
+{
+    NSMutableArray *wa = [od  getArrayOfIndicesAsStrings : a];
+    [self debugOutputPrompt : debugParent : [NSString stringWithFormat:@"Invoice %@",fieldName] :
+                [wa componentsJoinedByString:@"\n"]];
+}
 
 //=============(OCRTopObject)=====================================================
 // passes buck down to exptable. unique record count throughout batch
@@ -254,6 +278,24 @@ static OCRTopObject *sharedInstance = nil;
 {
     [et clearBatchCounter];
 }
+
+//=============(OCRTopObject)=====================================================
+// Used to dump debug info to window
+-(void) debugOutputPrompt : (UIViewController*) p : (NSString *) dtitle : (NSString*) msg
+{
+    //2/25 This may be called on a bkgd thread!
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:dtitle
+                                                                       message:msg
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK",nil)
+                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                            }];
+        //DHS 3/13: Add owner's ability to delete puzzle
+        [alert addAction:yesAction];
+        [p presentViewController:alert animated:YES completion:nil];
+    });
+} //end debugOutputPrompt
 
 
 //=============(OCRTopObject)=====================================================
@@ -557,7 +599,14 @@ static OCRTopObject *sharedInstance = nil;
             NSNumber *isErr = [self->OCRJSONResult valueForKey:@"IsErroredOnProcessing"];
             NSArray* ea = [self->OCRJSONResult valueForKey:@"ErrorMessage"];
             NSString* errMsg = ea[0];
-            if (isErr.boolValue)
+            if (self->OCRJSONResult == nil) //DHS 3/4 WEIRD ERROR
+            {
+                errMsg = self->rawOCRResult; //Assume OCR has some info?
+                [self->_delegate fatalErrorPerformingOCR:[NSString stringWithFormat:@"%@ %@",errMsg,self->_imageFileName]];
+                //DHS 2/22 lots of objects use this now
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"errorPerformingOCR" object:errMsg userInfo:nil];
+            }
+            else if (isErr.boolValue)
             {
                 //1/27 pass fname AND error back...
                 [self->_delegate fatalErrorPerformingOCR:[NSString stringWithFormat:@"%@ %@",errMsg,self->_imageFileName]];
@@ -589,10 +638,10 @@ static OCRTopObject *sharedInstance = nil;
         pagesReturned = 0;
         // This eats up the json and creates a set of OCR boxes, in
         //  an array: one set per page...
-        [od setupDocumentWithRect : r : OCRJSONResult ];
+        [od setupDocumentWithRectAndParseJSON : r : OCRJSONResult ];
         pageCount = od.numPages; //OK! now we know how many pages we have
         _totalLines = 0; //Overall line count...
-        currentPage = 0;
+        currentPage = 0; //asdf
         //DHS 2/22 lots of objects use this now
         [[NSNotificationCenter defaultCenter] postNotificationName:@"didPerformOCR" object:od userInfo:nil];
         if (isBatch) [self handleNextPage : FALSE];
@@ -609,7 +658,8 @@ static OCRTopObject *sharedInstance = nil;
         return;
     }
     
-    if (debugMode) NSLog(@" handleNextPage.... %d/%d",currentPage,pageCount);
+    if (debugMode)
+        NSLog(@" handleNextPage.... %d/%d",currentPage,pageCount);
     //Hand progress up to parent for UI update...
     [self.delegate batchUpdate : [NSString stringWithFormat:@"...Page %d/%d -> OCR",currentPage+1,od.numPages]];
     [od setupPage:currentPage];
@@ -646,6 +696,8 @@ static OCRTopObject *sharedInstance = nil;
 // 2/13 send debug display info down to children..
 -(void) setVisualDebug  : (UIViewController*) p : (NSString*)dbs
 {
+    debugString = dbs.lowercaseString;  //3/4
+    debugParent = p;
     [od setVisualDebug : p : dbs];
 }
 
@@ -658,7 +710,7 @@ static OCRTopObject *sharedInstance = nil;
     OCRJSONResult = [self readTxtToJSON:stubbedDocName];
     [self setupTestDocumentJSON:OCRJSONResult];
     CGRect r = CGRectMake(0, 0, imageToOCR.size.width, imageToOCR.size.height);
-    [od setupDocumentWithRect : r : OCRJSONResult ];
+    [od setupDocumentWithRectAndParseJSON : r : OCRJSONResult ];
     [self applyTemplate:ot : 1];
     [self writeEXPToParse : 0];
 
@@ -722,7 +774,7 @@ static OCRTopObject *sharedInstance = nil;
 -(void) setupDocumentFrameAndParseJSON : (CGRect) r
 {
     if (debugMode) NSLog(@" setupDocumentFrameAndParseJSON...");
-    [od setupDocumentWithRect : r : OCRJSONResult ];
+    [od setupDocumentWithRectAndParseJSON : r : OCRJSONResult ];
 }
 
 
@@ -830,26 +882,29 @@ static OCRTopObject *sharedInstance = nil;
 //  then the invoice gets saved!
 - (void)didSaveEXPTable  : (NSArray *)a
 {
+    pagesReturned++; //DHS 3/14
     if (a == nil || a.count == 0) //EMPTY page? go on to next one
     {
         [self handleNextPage : TRUE];
         return;
     }
-    if (debugMode) NSLog(@"didSaveEXPTable, page %d of %d",pagesReturned+1,pageCount); //DHS 2/4 add +1 to page arg
+    if (debugMode)
+        NSLog(@"didSaveEXPTable, page %d of %d",pagesReturned,pageCount); //DHS 2/4 add +1 to page arg
     if (![_invoiceNumberString isEqualToString:_oldInvoiceNumberString]) //New invoice?
-//2/5    if (pagesReturned == 0) //First page, set up invoice
     {
         //2/5 need to check if invoice # is changing from page to page...
-        if (debugMode) NSLog(@"New invoice:init %@ vs %@",_oldInvoiceNumberString,_invoiceNumberString);
+        if (debugMode)
+            NSLog(@"New invoice:init %@ vs %@",_oldInvoiceNumberString,_invoiceNumberString);
+        _totalLines = 0; //DHS 3/14 reset linecount accumulator
         //Time to setup invoice object too!
         [it setupVendorTableName : _vendor];
         if (_invoiceCustomer == nil) _invoiceCustomer = @"No Customer"; //DHS 1/28 no nils!
-        [it setBasicFields:_invoiceDate : _invoiceNumberString : @"" : _vendor : _invoiceCustomer : _imageFileName : @"1"];
+        [it setBasicFields:_invoiceDate : _invoiceNumberString : @"" : _vendor : _invoiceCustomer : _imageFileName :
+            [NSString stringWithFormat:@"%d",currentPage]: @"1"];
         _oldInvoiceNumberString = _invoiceNumberString; //Remember our invoice for later checks...
     }
     [it clearObjectIds]; //clear object IDs
     for (NSString *objID in a) [it addInvoiceItemByObjectID : objID];
-    pagesReturned++;
     NSString *astr = [NSString stringWithFormat:@"...saved EXP page %d of %d",pagesReturned,pageCount];
     [act saveActivityToParse : astr : _invoiceNumberString];
     [it updateInvoice : _vendor : _invoiceNumberString : _batchID : (currentPage+1==pageCount)];

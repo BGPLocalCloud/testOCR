@@ -15,6 +15,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "AppDelegate.h"
 #import "CheckTemplateVC.h"
 #import "DropboxTools.h"
 #import "ImageTools.h"
@@ -43,6 +44,8 @@ NS_ASSUME_NONNULL_BEGIN
     
     NSString *templateFolder;
     
+    NSString *customerSelect;
+    
     CIImage *coreImage;
     float brightness;
     float contrast;
@@ -51,6 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
     BOOL enhancing;
     NSString* imagePath;
     Vendors *vv;
+    NSString *vendorMode;
     
 }
 // UI stuff

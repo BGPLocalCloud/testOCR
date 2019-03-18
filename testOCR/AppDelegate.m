@@ -8,6 +8,7 @@
 //  Dec 18: add PDF support in info.plist (CFBundleDocumentTypes setup)
 //          change bundle id to com.bgpcloud.testOCR,
 //          for setup with google cloud API
+//  3/13    Add customers object
 
 #import "AppDelegate.h"
 
@@ -51,8 +52,9 @@
     
     //Settings...
     _settings = [OCRSettings sharedInstance];
-    Vendors* vv = [Vendors sharedInstance];
-    [vv readFromParse];
+    _vv = [Vendors sharedInstance]; //DHS 3/6 made property
+    [_vv readFromParse];
+    _cust = [Customers sharedInstance]; //DHS 3/13 new table
 
     
     //Reachability...

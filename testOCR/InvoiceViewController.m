@@ -86,7 +86,7 @@
 //=============Invoice VC=====================================================
 -(void) loadNextVendorInvoice
 {
-    if (vptr >= vv.vNames.count) //All done??
+    if (vptr >= vv.vcount) //All done??  /6
     {
         loadingData = FALSE;
         [spv stop];
@@ -109,7 +109,7 @@
 
         return;
     }
-    NSString*vname = vv.vNames[vptr];
+    NSString* vname = [vv getNameByIndex:vptr];  //DHS 3/6
     //NSLog(@"  ...load next vendor %@",vname);
     [it readFromParseAsStrings : vname : @"*" : _invoiceNumber];
     vptr++;

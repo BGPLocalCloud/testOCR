@@ -70,6 +70,7 @@
 - (void)didDownloadCSVFile : (NSString *)vendor : (NSString *)result;
 - (void)errorDownloadingCSV : (NSString *)s;
 - (void)didGetFolderList : (NSArray *)entries;
+- (void)errorGettingFolderList : (NSString *)s;
 - (void)errorDownloadingImages : (NSString *)s;
 - (void)didUploadImageFile : (NSString *)fname;
 - (void)errorUploadingImage : (NSString *)s;

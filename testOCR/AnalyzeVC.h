@@ -34,6 +34,9 @@
     PDFCache *pc;
     Vendors *vv;
     spinnerView *spv;
+    int viewWid,viewHit;
+    int imagewid,imagehit;
+    int zoomwid,zoomhit;
     int page;
     NSString* fname;
     int bx,by,bw,bh;
@@ -43,10 +46,11 @@
     NSString *vendorSelect;
     NSString *folderPath;
 
-    int obx,oby,obw,obh; //OCR box in document
+    int obx,oby,obw,obh,obstep; //OCR box in document
     CGRect obRect;
     int scrollX,scrollY;
     int clugeX,clugeY;
+    int marginX,marginY;
     NSString* ocrOutput;
 
     NSArray *pdfFnames;  //Fetched list of PDF files from batch folder
@@ -64,6 +68,10 @@
 - (IBAction)prevPageSelect:(id)sender;
 - (IBAction)nextPageSelect:(id)sender;
 - (IBAction)loadSelect:(id)sender;
+- (IBAction)boxWMinusSelect:(id)sender;
+- (IBAction)boxWPlusSelect:(id)sender;
+- (IBAction)boxHMinusSelect:(id)sender;
+- (IBAction)boxHPlusSelect:(id)sender;
 
 
 

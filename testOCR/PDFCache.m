@@ -180,7 +180,7 @@ static PDFCache *sharedInstance = nil;
     //Prepare filename for appending to master file...
     const char *utfString = [recordToWrite UTF8String];
     NSData *myData = [NSData dataWithBytes: utfString length: strlen(utfString)];
-    NSLog(@" PDFCache:update master file %@ with %@",path,latestFilename);
+    //NSLog(@" PDFCache:update master file %@ with %@",path,latestFilename);
     //ok, get file handle for master...
     file = [NSFileHandle fileHandleForUpdatingAtPath:path];
     if (file == nil) //nuttin yet?
