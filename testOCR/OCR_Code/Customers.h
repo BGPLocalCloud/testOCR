@@ -27,6 +27,7 @@
 @property (nonatomic, unsafe_unretained) id <CustomersDelegate> delegate; // receiver of completion messages
 @property (nonatomic , assign) BOOL loaded;
 @property (nonatomic , strong) NSMutableArray* customerNames;
+@property (nonatomic , strong) NSMutableArray* fullNames;
 
 + (id)sharedInstance;
 

@@ -70,6 +70,7 @@
 @property (weak, nonatomic) IBOutlet NSString *searchType;
 @property (weak, nonatomic) IBOutlet UIButton *sortButton;
 @property (weak, nonatomic) IBOutlet UIButton *sortDirButton;
+@property (weak, nonatomic) IBOutlet NSString *scustomer;
 
 @property (weak, nonatomic) IBOutlet NSString *invoiceNumber;
 

@@ -85,8 +85,35 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="binonion.png" translatesAutoresizingMaskIntoConstraints="NO" id="MoT-2Y-4cV">
+                                <rect key="frame" x="-9" y="40" width="80" height="60"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="OAi-SC-Fob"/>
+                                    <constraint firstAttribute="width" constant="80" id="rNc-Im-giU"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="BGP Cloud" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uTG-RE-BGC">
+                                <rect key="frame" x="71" y="40" width="304" height="60"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="MNU-J8-dwY"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="47"/>
+                                <color key="textColor" name="controlLightHighlightColor" catalog="System" colorSpace="catalog"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YDY-UX-nbN">
+                                <rect key="frame" x="0.0" y="100" width="375" height="20"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="Z1p-AJ-tDK"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="17"/>
+                                <color key="textColor" red="0.9770507812" green="0.9770507812" blue="0.9770507812" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="MRb-uB-nhA">
-                                <rect key="frame" x="0.0" y="104" width="375" height="513"/>
+                                <rect key="frame" x="0.0" y="120" width="375" height="497"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" rowHeight="80" id="OxJ-sz-cGL" customClass="activityCell">
@@ -176,23 +203,6 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="binonion.png" translatesAutoresizingMaskIntoConstraints="NO" id="MoT-2Y-4cV">
-                                <rect key="frame" x="-9" y="40" width="80" height="64"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="64" id="OAi-SC-Fob"/>
-                                    <constraint firstAttribute="width" constant="80" id="rNc-Im-giU"/>
-                                </constraints>
-                            </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="BGP Cloud" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uTG-RE-BGC">
-                                <rect key="frame" x="70" y="40" width="305" height="64"/>
-                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="64" id="MNU-J8-dwY"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="47"/>
-                                <color key="textColor" name="controlLightHighlightColor" catalog="System" colorSpace="catalog"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0000000000" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2hX-97-BNc">
                                 <rect key="frame" x="305" y="40" width="70" height="15"/>
                                 <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -220,21 +230,25 @@
                         <constraints>
                             <constraint firstItem="MRb-uB-nhA" firstAttribute="centerX" secondItem="JJ2-wG-LeA" secondAttribute="centerX" id="2Gu-Il-NjO"/>
                             <constraint firstItem="JJ2-wG-LeA" firstAttribute="trailing" secondItem="2hX-97-BNc" secondAttribute="trailing" id="Df1-7Y-AQI"/>
-                            <constraint firstItem="uTG-RE-BGC" firstAttribute="leading" secondItem="MoT-2Y-4cV" secondAttribute="trailing" constant="-1" id="Fbd-6p-ysD"/>
+                            <constraint firstItem="YDY-UX-nbN" firstAttribute="centerX" secondItem="JJ2-wG-LeA" secondAttribute="centerX" id="F9L-tv-AUA"/>
+                            <constraint firstItem="uTG-RE-BGC" firstAttribute="leading" secondItem="MoT-2Y-4cV" secondAttribute="trailing" id="Fbd-6p-ysD"/>
                             <constraint firstItem="uTG-RE-BGC" firstAttribute="top" secondItem="MoT-2Y-4cV" secondAttribute="top" id="Gop-Jh-uM6"/>
                             <constraint firstItem="2hX-97-BNc" firstAttribute="top" secondItem="JJ2-wG-LeA" secondAttribute="top" constant="20" id="YPQ-ZN-7xe"/>
                             <constraint firstItem="JJ2-wG-LeA" firstAttribute="leading" secondItem="MoT-2Y-4cV" secondAttribute="leading" constant="9" id="a0m-Pv-vIT"/>
                             <constraint firstItem="uTG-RE-BGC" firstAttribute="trailing" secondItem="JJ2-wG-LeA" secondAttribute="trailing" id="fda-Jr-asi"/>
+                            <constraint firstItem="YDY-UX-nbN" firstAttribute="top" secondItem="JJ2-wG-LeA" secondAttribute="top" constant="80" id="gm1-If-JMc"/>
                             <constraint firstItem="MoT-2Y-4cV" firstAttribute="top" secondItem="JJ2-wG-LeA" secondAttribute="top" constant="20" id="iPC-Fp-UCe"/>
+                            <constraint firstItem="MRb-uB-nhA" firstAttribute="top" secondItem="JJ2-wG-LeA" secondAttribute="top" constant="100" id="mdA-ga-qgl"/>
                             <constraint firstItem="JJ2-wG-LeA" firstAttribute="top" secondItem="dtv-GX-NAo" secondAttribute="top" constant="20" id="rOg-4v-K7T"/>
+                            <constraint firstItem="YDY-UX-nbN" firstAttribute="width" secondItem="AMP-k0-VvO" secondAttribute="width" id="rul-y2-NX6"/>
                             <constraint firstItem="MRb-uB-nhA" firstAttribute="width" secondItem="AMP-k0-VvO" secondAttribute="width" id="ta4-uO-cRu"/>
                             <constraint firstItem="JJ2-wG-LeA" firstAttribute="trailing" secondItem="dtv-GX-NAo" secondAttribute="trailing" id="tuE-Op-Ftn"/>
                             <constraint firstItem="JJ2-wG-LeA" firstAttribute="bottom" secondItem="MRb-uB-nhA" secondAttribute="bottom" constant="50" id="w7q-Wv-ryn"/>
-                            <constraint firstItem="MRb-uB-nhA" firstAttribute="top" secondItem="uTG-RE-BGC" secondAttribute="bottom" id="wJk-Md-dgd"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="JJ2-wG-LeA"/>
                     </view>
                     <connections>
+                        <outlet property="customerLabel" destination="YDY-UX-nbN" id="2qw-56-gLK"/>
                         <outlet property="logoLabel" destination="uTG-RE-BGC" id="nzn-9E-HBV"/>
                         <outlet property="logoView" destination="MoT-2Y-4cV" id="OeP-Z6-LS3"/>
                         <outlet property="table" destination="MRb-uB-nhA" id="oU8-GD-z9m"/>
@@ -2402,11 +2416,10 @@
                                 </subviews>
                                 <color key="backgroundColor" red="0.96326953172683716" green="0.88007274250273271" blue="0.85884201855796194" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </scrollView>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="LGn-fU-d2e">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" text="..." textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="LGn-fU-d2e">
                                 <rect key="frame" x="16" y="293" width="240" height="128"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
@@ -2870,7 +2883,7 @@
         <image name="tgrid50.png" width="400" height="500"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="lcM-JM-DIo"/>
+        <segue reference="1jN-gk-huX"/>
         <segue reference="rxd-eE-W54"/>
     </inferredMetricsTieBreakers>
 </document>

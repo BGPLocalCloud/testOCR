@@ -14,6 +14,7 @@
 //  2/6 add segue to PDFVC
 //  2/9 add parentUp to invoiceTable
 //  2/22 add loadingData flag
+//  3/22 debug pass multi-customers
 
 #import "InvoiceViewController.h"
 
@@ -86,20 +87,18 @@
 //=============Invoice VC=====================================================
 -(void) loadNextVendorInvoice
 {
-    if (vptr >= vv.vcount) //All done??  /6
+    if (vptr >= vv.vcount) //All done??
     {
         loadingData = FALSE;
         [spv stop];
         [_table reloadData];
         NSString *s;
         //2/8 redid
-        if (![_batchID isEqualToString:@"*"])
-        {
+        if (![_batchID isEqualToString:@"*"]) //Specific batch?
             s = [NSString stringWithFormat:@"Invoices:Batch %@",_batchID];
-        }
-        else if (![_vendor isEqualToString:@"*"])
+        else if (![_vendor isEqualToString:@"*"])   //Specific vendor?
             s = [NSString stringWithFormat:@"Invoices:Vendor %@",_vendor];
-        else if (![_invoiceNumber isEqualToString:@"*"])
+        else if (![_invoiceNumber isEqualToString:@"*"]) //Specific invoice #?
             s = [NSString stringWithFormat:@"Invoice:%@",_invoiceNumber];
         else
         {
@@ -110,8 +109,8 @@
         return;
     }
     NSString* vname = [vv getNameByIndex:vptr];  //DHS 3/6
-    //NSLog(@"  ...load next vendor %@",vname);
-    [it readFromParseAsStrings : vname : @"*" : _invoiceNumber];
+    NSLog(@"  ...load next vendor %@",vname);
+    [it readFromParseAsStrings : vname : _batchID : _invoiceNumber]; //3/22 add batchID
     vptr++;
 } //end loadNextVendorInvoice
 
@@ -241,10 +240,13 @@
 #pragma mark - invoiceTableDelegate
 
 //=============EXP VC=====================================================
+//May come thru multiple times for vendors, add results up and go for more
 - (void)didReadInvoiceTableAsStrings : (NSMutableArray*)a
 {
     [iobjs addObjectsFromArray:(NSArray*)a];
     [self loadNextVendorInvoice];
 }
+
+
 
 @end

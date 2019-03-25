@@ -29,6 +29,7 @@
 //  2/28 add E: to missing invoice fields for format matching in errorVC
 //  3/4  add support for debugging invoice date from UI
 //  3/12 add page field to invoice
+//  3/20 add multi-customer support
 #import "OCRTopObject.h"
 
 @implementation OCRTopObject
@@ -59,6 +60,7 @@ static OCRTopObject *sharedInstance = nil;
         it.delegate = self;
         et = [[EXPTable alloc] init];   // Parse DB: EXP line item storage
         et.delegate = self;
+        [et setTableNameForCurrentCustomer]; //3/20 multi-customer support
         act = [[ActivityTable alloc] init];
 
         _batchMonth = @"01-JUL"; //DHS this needs to be INPUT? from DB?ß
@@ -114,12 +116,14 @@ static OCRTopObject *sharedInstance = nil;
         NSString* fieldName = [ot getBoxFieldName:i];
         CGRect rr = [ot getBoxRect:i]; //In document coords!
         NSMutableArray *a = [od findAllWordsInTemplateRect:rr];
-        if (debugMode) NSLog(@" [%@] fieldname is [%@], %d items",_imageFileName,fieldName,(int)a.count);
+        if (debugMode) NSLog(@" [%@] fieldname is [%@], %d items docrect %@",
+                             _imageFileName,fieldName,(int)a.count,NSStringFromCGRect([od template2DocRect:rr]));
         if (a.count > 0) //Found a match!
         {
             //DHS 2/5 look for invoice number / date EVERY PAGE
             if ( [fieldName isEqualToString:INVOICE_NUMBER_FIELD]) //Looking for a number?
             {
+                [od dumpArrayFull:a];
                 if ([debugString isEqualToString:@"number"])      //Debug? Convert our array to a bunch of strings...
                     [self displayDebugPrompt : debugString : a]; // and output it in a prompt
                 long testNum = [od findLongInArrayOfFields:a];
@@ -133,7 +137,11 @@ static OCRTopObject *sharedInstance = nil;
                 {
                     if (page == 0) _invoiceNumberString = @"ERRMISSING"; //2/28 ONLY flag error on page 1
                 }
-                if (debugMode) NSLog(@" invoice# %ld [%@]",_invoiceNumber,_invoiceNumberString);
+                if (debugMode)
+                {
+                    NSLog(@" invoice# %ld [%@]",_invoiceNumber,_invoiceNumberString);
+                    [od dumpArrayFull:a];
+                }
             }
             else if ( [fieldName isEqualToString:INVOICE_DATE_FIELD]) //Looking for a date?
             {
@@ -420,6 +428,7 @@ static OCRTopObject *sharedInstance = nil;
                     NSDate *liDate = [dateFormatter dateFromString:dateStr];
                     _invoiceDate = liDate; //This the right place?
                     [smartp clear];
+                    smartp.intQuantity = _intQuantity; //DHS 3/24 was missing!
                     [smartp addVendor:avendor]; //Is this the right string?
                     [smartp addProductName:liDescription];
                     [smartp addDate:liDate];
@@ -802,6 +811,7 @@ static OCRTopObject *sharedInstance = nil;
         //NSString *item        = ac[od.itemColumn];
         NSString *productName = ac[od.descriptionColumn];  
         [smartp clear];
+        smartp.intQuantity = _intQuantity; //DHS 3/24 was missing!
         [smartp addVendor:_vendor]; //Is this the right string?
         [smartp addProductName:productName];
         [smartp addDate:_invoiceDate];

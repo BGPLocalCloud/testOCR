@@ -13,7 +13,7 @@
 //
 //  2/13 add debugMenu
 //  3/4  added new debug options
-
+//  3/20 moved verbose debug from mainVC, add batchCustomer
 #import "BatchViewController.h"
 
 
@@ -64,6 +64,7 @@
     _runButton.hidden = TRUE;
     AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSLog(@"Verbose Debug Output %d",mappDelegate.debugMode);
+    batchCustomer = mappDelegate.selectedCustomer;
     [bbb getBatchCounts];
 }
 
@@ -217,6 +218,17 @@
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     [alert setValue:tatString forKey:@"attributedTitle"];
 
+    //3/20 Debug mode: stored in app delegate, flag can be flipped here
+    NSString* t = @"Set Verbose Debug Output";
+    AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    if (bappDelegate.debugMode) t = @"Set Normal Debug Output";
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(t,nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  bappDelegate.debugMode = !bappDelegate.debugMode;
+                                                  NSLog(@" debug output now %d",bappDelegate.debugMode);
+                                              }]];
+    
+    
     for (NSString *dbs in debugShite)
     {
         [alert addAction:[UIAlertAction actionWithTitle:[NSString stringWithFormat:@"Dump %@",dbs]
@@ -313,7 +325,8 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self updateUI];
         self->_runButton.hidden = FALSE; //OK we can run batches now
-        self->_titleLabel.text = @"Batch Processor Ready";;
+        self->_titleLabel.text = [NSString stringWithFormat:@"Batch Ready[%@]",batchCustomer]; // 3/20
+        //self->_titleLabel.text = @"Batch Processor Ready";;
         [self->spv stop];
     });
 }

@@ -54,6 +54,7 @@
     BOOL runAllBatches;
     int selectedVendor; //Chosen vendor to run batch on, stays constant
     int vendorIndex;  //Index to vendors object for currentbatch
+    NSString *customerName; //3/20 multi-customer support
     NSString *vendorName; //Whose batch we're running
     NSString *vendorRotation; //Are pages rotated typically?
     NSString *vendorFolderName;  
@@ -79,7 +80,8 @@
     int batchTotal;
     int batchPage;
     int batchTotalPages;
-    NSString *tableName;
+    NSString *batchTableName;
+    NSString *expTableName;
     int returnCount;
 
     OCRCache *oc;

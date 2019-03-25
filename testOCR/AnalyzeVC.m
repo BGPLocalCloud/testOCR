@@ -1,4 +1,12 @@
 //
+//
+//     _                _             __     ______
+//    / \   _ __   __ _| |_   _ ______\ \   / / ___|
+//   / _ \ | '_ \ / _` | | | | |_  / _ \ \ / / |
+//  / ___ \| | | | (_| | | |_| |/ /  __/\ V /| |___
+// /_/   \_\_| |_|\__,_|_|\__, /___\___| \_/  \____|
+//                        |___/
+//
 //  AnalyzeVC.m
 //  testOCR
 //
@@ -6,6 +14,7 @@
 //  Copyright © 2019 Beyond Green Partners. All rights reserved.
 //   Scrolling tutorial 
 //  https://www.raywenderlich.com/560-uiscrollview-tutorial-getting-started
+//  3/20 new folder structure
 
 #import "AnalyzeVC.h"
 
@@ -80,18 +89,10 @@
 {
     NSLog(@" didscroll");
     CGPoint p = scrollView.contentOffset;
-    float x = p.x;
-    float y = p.y;
+//    float x = p.x;
+//    float y = p.y;
     scrollX = (int)p.x;
     scrollY = (int)p.y;
-//    NSLog(@" SCROLL X / Y ===== %d %d",scrollX,scrollY);
-
-//    NSLog(@" zoomwh %d %d",zoomwid,zoomhit);
-//    NSLog(@" scrollframe %@",NSStringFromCGRect(scrollView.frame));
-//    NSLog(@" PDFframe    %@",NSStringFromCGRect(_pdfImage.frame));
-    //    NSLog(@" x %f y %f",x,y);
-//
-//    NSLog(@" zxy %f %f",(float)izoom*x,(float)izoom*y);
     [self getOBRect];
     [self updateOCRText];
     
@@ -308,10 +309,12 @@
     AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     if (stagedSelect)
     {
-        folderPath = [NSString stringWithFormat : @"/%@",bappDelegate.settings.batchFolder];
+        //folderPath = [NSString stringWithFormat : @"/%@",bappDelegate.settings.batchFolder];
+        folderPath = [bappDelegate getBatchFolderPath]; // 3/20
     }
     else{
-        folderPath = [NSString stringWithFormat : @"/%@",bappDelegate.settings.outputFolder];
+        //folderPath = [NSString stringWithFormat : @"/%@",bappDelegate.settings.outputFolder];
+        folderPath = [bappDelegate getOutputFolderPath]; // 3/20
     }
     [spv start : @"Get Folder List"];
     [dbt getBatchList : folderPath : vendorSelect];

@@ -91,6 +91,9 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    //3/22 multi-customer support...
+    [et setTableNameForCurrentCustomer];
+
     NSLog(@"ERRVC: adata %@",_batchData);
     NSArray* bItems    = [_batchData componentsSeparatedByString:@":"];
     if (bItems.count > 0)
@@ -106,6 +109,7 @@
     
     // Top field: product Name : DO NOT CLEAR!
     _field0Value.clearsOnBeginEditing = NO;
+    
 
 } //end viewWillAppear
 

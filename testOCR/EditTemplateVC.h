@@ -93,6 +93,7 @@
     
     //OCR'ed results...
     NSString *supplierName;
+    NSString *vendor;
     NSString *fieldName;
     NSString *fieldNameShort;
     NSString *fieldFormat;

@@ -19,6 +19,7 @@
 #import "CheckTemplateVC.h"
 #import "DropboxTools.h"
 #import "ImageTools.h"
+#import "OCRTemplate.h"
 #import "PDFCache.h"
 #import "spinnerView.h"
 #import "Vendors.h"
@@ -26,7 +27,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface AddTemplateViewController : UIViewController <UIImagePickerControllerDelegate,
-                        UINavigationControllerDelegate,DropboxToolsDelegate>
+                        UINavigationControllerDelegate,DropboxToolsDelegate,OCRTemplateDelegate>
 {
     int viewWid,viewHit,viewW2,viewH2;
     int photoPixWid,photoPixHit;
@@ -39,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
     spinnerView *spv;
     imageTools *it;
     DropboxTools *dbt;
+    OCRTemplate *ot;
     PDFCache *pc;
     NSMutableArray *fileEntries;
     

@@ -69,7 +69,8 @@
     clugex = 84;
     
     _incomingOCRText = @"";
-    
+    _incomingVendor  = @"";
+
     smartCount = 0;
     
     _versionNumber    = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
@@ -107,16 +108,17 @@
         if (OCR_mode == 1) //Stubbed mode vs live OCR
         {
             [self loadStubbedOCRData];
-            [ot readFromParse:supplierName]; //Unpacks template and loads it from DB
-            //XMAS STUB [ot loadTemplatesFromDisk:supplierName];
+            [ot readFromParse:vendor]; //Unpacks template and loads it from DB
+            //XMAS STUB [ot loadTemplatesFromDisk:vendor];
         }
         
 
     }
-    else // 3/17 load up our incoming image...
+    else // 3/17 coming in from checkTemplateVC...load up our incoming image...
     {
+        vendor            = _incomingVendor;
         _inputImage.image = _incomingImage;
-        NSData *jsonData = [_incomingOCRText dataUsingEncoding:NSUTF8StringEncoding];
+        NSData *jsonData  = [_incomingOCRText dataUsingEncoding:NSUTF8StringEncoding];
         NSError *e;
         NSDictionary *jdict = [NSJSONSerialization JSONObjectWithData:jsonData
                                                               options:NSJSONReadingMutableContainers error:&e];
@@ -124,9 +126,19 @@
         selectFnameForTemplate = @"dog.png"; //DO I need this?
         
         [od setupDocumentAndParseJDON : selectFnameForTemplate : jdict : docFlipped90]; //Last arg is flip: true for HFM
-
-//
+        tlRect = [od getTLRect];
+        trRect = [od getTRRect];
+        //NOTE: BL rect may be same as TLrect because it looks for leftmost AND bottommost!
+        blRect = [od getBLRect];
+        brRect = [od getBRRect];
+        docRect = [od getDocRect]; //Get min/max limits of printed text
+        [ot setOriginalRects : tlRect : trRect];
+        ot.supplierName = vendor; //Pass along supplier name to template
+        ot.pdfFile      = selectFnameForTemplate;
         
+        //Set unit scaling
+        [od computeScaling : tlRect : trRect];
+        [self clearFields]; //This clears vendor Parse entry too!
     }
         
     
@@ -152,7 +164,7 @@
     spinner.hidden = TRUE;
     
     //Canned starting stuff...
-    //    supplierName = @"HFM";
+    //    vendor = @"HFM";
     //    selectFnameForTemplate  = @"hfm90.jpg";
     //    selectFname  = @"hfm.jpg";
     //    [_inputImage setImage:[UIImage imageNamed:selectFnameForTemplate]];
@@ -343,7 +355,7 @@
     if (docnum == 1)
     {
         stubbedDocName = @"hfm";
-        supplierName   = @"HFM";
+        vendor   = @"HFM";
         selectFname    = @"hfm.jpg";
         selectFnameForTemplate = @"hfm90.jpg"; //This should be rotated for user
         docFlipped90 = TRUE;
@@ -351,7 +363,7 @@
     if (docnum == 2)
     {
         stubbedDocName = @"beef";
-        supplierName   = @"Hawaii Beef Producers";
+        vendor   = @"Hawaii Beef Producers";
         selectFname    = @"hawaiiBeefInvoice.jpg";
         selectFnameForTemplate = @"hawaiiBeefInvoice.jpg";  //This should be rotated for user
         docFlipped90 = FALSE;
@@ -359,7 +371,7 @@
     if (docnum == 3)
     {
         stubbedDocName = @"gordon";
-        supplierName   = @"Gordon";
+        vendor   = @"Gordon";
         selectFname    = @"gordon";
         selectFnameForTemplate = @"gordon.png";  //This should be rotated for user
         docFlipped90 = FALSE;
@@ -367,7 +379,7 @@
     if (docnum == 4)
     {
         stubbedDocName = @"greco";
-        supplierName   = @"Greco";
+        vendor   = @"Greco";
         selectFname    = @"greco";
         selectFnameForTemplate = @"grecoShrunk3.png";  //This should be rotated for user
         docFlipped90 = FALSE;
@@ -395,7 +407,7 @@
         brRect = [od getBRRect];
         docRect = [od getDocRect]; //Get min/max limits of printed text
         [ot setOriginalRects : tlRect : trRect];
-        ot.supplierName = supplierName; //Pass along supplier name to template
+        ot.supplierName = vendor; //Pass along supplier name to template
         ot.pdfFile      = selectFnameForTemplate;
         
         //Set unit scaling
@@ -434,7 +446,7 @@
         oto.batchID = @"STUBBED";
         [self loadStubbedOCRData]; //asdf
         oto.imageFileName = selectFname; //selectFnameForTemplate;
-        oto.vendor        = supplierName; //TEST
+        oto.vendor        = vendor; //TEST
         NSDictionary *d = [self readTxtToJSON:stubbedDocName]; //TEST: only works for beef invoice!
         [oto setupTestDocumentJSON:d];
         UIImage *imageToOCR = [UIImage imageNamed:selectFnameForTemplate];
@@ -505,8 +517,8 @@
 {
     [ot clearFields];
     // ...save to PInv_ActivityType_key and PInv_ActivityData keys...
-    [act saveActivityToParse:@"Clear Template" : supplierName];
-    [ot saveToParse:self->supplierName];
+    [act saveActivityToParse:@"Clear Template" : vendor];
+    [ot saveToParse:self->vendor];
     // Set limits where text was found at top / left / right,
     //  used for re-scaling if invoice was shrunk or whatever
     [ot setOriginalRects:tlRect :trRect];
@@ -522,9 +534,9 @@
 {
     //Multiple columns are desired, other types of fields are one-only!
     // 2/15 make a special array for here...
-    if ([@[INVOICE_NUMBER_FIELD,INVOICE_DATE_FIELD,INVOICE_SUPPLIER_FIELD,
-           INVOICE_CUSTOMER_FIELD,INVOICE_HEADER_FIELD ,INVOICE_TOTAL_FIELD]
-        containsObject: ftype])
+    if (![ftype isEqualToString:INVOICE_COLUMN_FIELD] &&
+        ![ftype isEqualToString:INVOICE_IGNORE_FIELD] &&
+        [ot gotFieldAlready:ftype])
     {
         [self alertMessage:@"Field in Use" :@"This field is already used."];
         return;
@@ -718,12 +730,12 @@
     UIAlertAction *secondAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Delete this box",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                                [self->ot deleteBox:self->adjustSelect];
-                                                               [self->ot saveTemplatesToDisk:self->supplierName];
+                                                               [self->ot saveTemplatesToDisk:self->vendor];
                                                                self->spinner.hidden = FALSE;
                                                                [self->spinner startAnimating];
                                                                [self->act saveActivityToParse:@"...template:deleteBox" : fn];
 
-                                                               [self->ot saveToParse:self->supplierName];
+                                                               [self->ot saveToParse:self->vendor];
                                                                [self refreshOCRBoxes];
                                                            }];
     UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Add Tag...",nil)
@@ -736,11 +748,11 @@
         fourthAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Clear Tags",nil)
                                                 style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                     [self->ot clearTags:self->adjustSelect];
-                                                    [self->ot saveTemplatesToDisk:self->supplierName];
+                                                    [self->ot saveTemplatesToDisk:self->vendor];
                                                     self->spinner.hidden = FALSE;
                                                     [self->spinner startAnimating];
                                                     [self->act saveActivityToParse:@"...template:clearTags" : fn];
-                                                    [self->ot saveToParse:self->supplierName];
+                                                    [self->ot saveToParse:self->vendor];
                                                 }];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -794,11 +806,11 @@
 {
     NSLog(@" addTag %@",tag);
     [ot addTag:adjustSelect:tag];  //passed down to OCRBox:addTag
-    [ot saveTemplatesToDisk:supplierName];
+    [ot saveTemplatesToDisk:vendor];
     spinner.hidden = FALSE;
     [spinner startAnimating];
     [act saveActivityToParse:@"...template:addTag" : tag];
-    [ot saveToParse:supplierName];
+    [ot saveToParse:vendor];
 } //end addTag
 
 
@@ -829,11 +841,11 @@
     [ot addBox : r : fieldName : fieldFormat];
     editing = adjusting = FALSE;
     [ot dump];
-    [ot saveTemplatesToDisk:supplierName];
+    [ot saveTemplatesToDisk:vendor];
     spinner.hidden = FALSE;
     [spinner startAnimating];
     [act saveActivityToParse:@"...template:addBox" : fieldName];
-    [ot saveToParse:supplierName];
+    [ot saveToParse:vendor];
     [self clearScreenAfterEdit];
     [self stopMagView];
 } //end finishAndAddBox
@@ -1028,14 +1040,14 @@
     [self clearOverlay];
     if (OCR_mode == 1) //Get stubbed data...
     {
-        NSLog(@" ocrmode 1:  nextdoc[%d] %@",docnum,supplierName);
+        NSLog(@" ocrmode 1:  nextdoc[%d] %@",docnum,vendor);
         [self loadStubbedOCRData];
         spinner.hidden = FALSE;
         [spinner startAnimating];
-        [ot readFromParse:supplierName]; //Unpacks template and loads it from DB
+        [ot readFromParse:vendor]; //Unpacks template and loads it from DB
     }
     else{ //Do Full OCR
-        NSLog(@" ocrmode 2: nextdoc[%d] %@",docnum,supplierName);
+        NSLog(@" ocrmode 2: nextdoc[%d] %@",docnum,vendor);
 
     }
 }
@@ -1197,7 +1209,7 @@
 
 #pragma mark - OCRTemplateDelegate
 
-//=============OCR VC=====================================================
+//===========<OCRTemplateDelegate>===============================================
 - (void)didReadTemplate
 {
     NSLog(@" didReadTemplate...");
@@ -1241,10 +1253,10 @@
     NSLog(@" EXP TABLE SAVED (OCR VC)");
     //Time to setup invoice object too!
     [it clearObjectIds];
-    [it setupVendorTableName : supplierName];
+    [it setupVendorTableName : vendor];
     NSString *its = [NSString stringWithFormat:@"%4.2f",invoiceTotal];
     its = [od cleanupPrice:its]; //Make sure total is formatted!
-    [it setBasicFields:invoiceDate :invoiceNumberString : its : supplierName : invoiceCustomer : @"EmptyPDF" : @"0" : @"1"];  //DGS 3/12
+    [it setBasicFields:invoiceDate :invoiceNumberString : its : vendor : invoiceCustomer : @"EmptyPDF" : @"0" : @"1"];  //DGS 3/12
     for (NSString *objID in a) [it addInvoiceItemByObjectID : objID];
     [it saveToParse:FALSE]; //BOOL is lastPage arg...T/F???
 } //end didSaveEXPTable

@@ -237,7 +237,10 @@
 - (void)errorUploadingImage : (NSString *)s
 {
     NSLog(@" errorUploadingImage[%@] ",s);
-    [spv stop];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self->spv stop];
+        [self errMsg:@"Error saving Template Image" :s];
+    });
 }
 
 

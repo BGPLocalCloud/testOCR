@@ -22,6 +22,8 @@
 //  2/22 Moved CSV Export from expVC
 //  2/23 Fix array -> mutableArray conversion bug
 //  3/12 Add help option
+//  3/20 New: multi-customer support, new folder structure
+
 #import "MainVC.h"
 
 @interface MainVC ()
@@ -59,6 +61,8 @@
     fixingErrors = TRUE;
     
     fatalErrorSelect = FALSE;
+    
+    scustomer = @"KCH";  //DHS 3/20
 
     //Test only, built-in OCR crap...
     //[self loadBuiltinOCRToCache];
@@ -148,6 +152,8 @@
 {
     [super viewWillAppear:animated];
     [act readActivitiesFromParse:nil :nil];
+    AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    _customerLabel.text = mappDelegate.selectedCustomerFullName;
     //[self testit];
 }
 
@@ -195,6 +201,10 @@
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     
     [alert setValue:tatString forKey:@"attributedTitle"];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Change Customer",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self customerMenu];
+                                              }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add Template",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self performSegueWithIdentifier:@"addTemplateSegue" sender:@"mainVC"];
@@ -215,22 +225,9 @@
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self clearActivityMenu];
                                                           }]];
-    //Debug mode: stored in app delegate, flag can be flipped here
-    NSString* t = @"Set Verbose Debug Output";
-    AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    if (mappDelegate.debugMode) t = @"Set Normal Debug Output";
-    
-    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(t,nil)
-                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              mappDelegate.debugMode = !mappDelegate.debugMode;
-                                                          }]];
-    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"PDF Analyzer",nil)
+     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"PDF Analyzer",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                   [self performSegueWithIdentifier:@"analyzerSegue" sender:@"mainVC"];
-                                              }]];
-    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Dump Settings",nil)
-                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                  [self dumpSettings];
                                               }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Logout From Dropbox",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -254,6 +251,41 @@
 
 } //end menu
 
+
+
+//=============OCR MainVC=====================================================
+// 3/20 New: multi-customer support
+-(void) customerMenu
+{
+    AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSString *cstr = [NSString stringWithFormat:@"Current Customer [%@]",mappDelegate.selectedCustomer];
+    NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:cstr];
+    [tatString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:30] range:NSMakeRange(0, tatString.length)];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:
+                                NSLocalizedString(cstr,nil)
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    [alert setValue:tatString forKey:@"attributedTitle"];
+    int i = 0;
+    for (NSString *nextCust in mappDelegate.cust.customerNames)
+    {
+        NSString *cfull = mappDelegate.cust.fullNames[i];
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(nextCust,nil)
+                                                  style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                      [mappDelegate updateCustomerDefaults:nextCust :cfull];
+                                                      _customerLabel.text = cfull;
+                                                  }]];
+        i++;
+    }
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                              }]];
+    [self presentViewController:alert animated:YES completion:nil];
+    
+    
+} //end customerMenu
+
 //=============OCR MainVC=====================================================
 // For selecting databases...
 -(void) dbmenu
@@ -269,6 +301,8 @@
 
     [alert addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"EXP Table",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                              AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+                                                              scustomer = mappDelegate.selectedCustomer; //3/20
                                                               [self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
                                                           }]];
     for (int vindex = 0;vindex < vv.vcount;vindex++)
@@ -317,7 +351,7 @@
 {
     NSArray  *sItems  = [sdata componentsSeparatedByString:@":"]; //Look at the data for this item...
     BOOL isBatch = (sItems.count > 1); //Is this a batch started / completed item?
-    
+    if (sItems.count > 2) scustomer = sItems[2];  //3/20
     NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:@"Batch Retreival"];
     [tatString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:25] range:NSMakeRange(0, tatString.length)];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:
@@ -494,6 +528,7 @@
         vc.actData    = sdata; //Pass selected objectID's from activity, if any...
         vc.searchType = stype;
         vc.detailMode = FALSE;
+        vc.scustomer  = scustomer; //3/20
     }
     else if([[segue identifier] isEqualToString:@"invoiceSegue"])
     {
@@ -692,7 +727,7 @@
     {
         NSString *actData = [act getData:i]; //Get batch data, Separate fields
         NSArray  *aItems  = [actData componentsSeparatedByString:@":"];
-        if (aItems.count == 2)
+        if (aItems.count >= 2) //3/22 Batch activities have 2 or more items
         {
             NSString *izzitAnID = aItems[0];
             if ([izzitAnID containsString:@"B_"]) [bids addObject:izzitAnID];
@@ -841,6 +876,7 @@ int currentYear = 2019;
     {
         [self->spv start:@"Get CSV List..."];
         NSString *batchID = sItems[0];
+        [et setTableNameForCurrentCustomer]; //DHS 3/20
         [et readFullTableToCSV:0 :TRUE : batchID];
     }
     
@@ -915,6 +951,7 @@ int currentYear = 2019;
     });
 
 }
+
 
 #pragma mark - GenParseDelegate
 //=============<GenParseDelegate>=====================================================

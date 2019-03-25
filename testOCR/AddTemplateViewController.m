@@ -38,6 +38,9 @@ NSString * steps[] = {
     it  = [[imageTools alloc] init];
     dbt = [[DropboxTools alloc] init];
     dbt.delegate = self;
+    ot = [[OCRTemplate alloc] init];
+    ot.delegate = self;  //1/16 WHY WASN'T THIS HERE!?
+
     
     pc  = [PDFCache sharedInstance];
     
@@ -78,9 +81,7 @@ NSString * steps[] = {
     AppDelegate *tappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     templateFolder = tappDelegate.settings.templateFolder;
     //We will choose from the templates folder...
-    [self->spv start : @"Get Template PDFs..."];
-    [dbt getFolderList : templateFolder];
-    // 3/17 FOR CHOOSING FROM STAGED AREA   [self customerMenu]; //DHS 3/13
+    [self vendorMenu];
 
     //First, are we coming back from something??
     if (_step != 0)
@@ -122,12 +123,9 @@ NSString * steps[] = {
         NSString *s = [vv getNameByIndex:i]; //DHS 3/6
         [alert addAction : [UIAlertAction actionWithTitle:s
                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                      self->_vendor = s;
-                                                      if ([self->vendorMode isEqualToString:@"load"])
-                                                      {
-                                                          [self getVendorPDFFiles];
-                                                      }
-                                                      else [self choiceMenu];
+                                                          self->_vendor = s;
+                                                          [self->spv start : @"Check Template Exists..."];
+                                                          [self->ot checkVendorTemplate:s];
                                                         }]] ;
     }
     [alert addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
@@ -198,6 +196,16 @@ NSString * steps[] = {
     NSString *folderPath = [NSString stringWithFormat : @"%@/latestBatch/%@",customerSelect,_vendor];
     [dbt getFolderList:folderPath];  //Rest handled in delegate callback...
 } //end getVendorPDFFiles
+
+//=============AddTemplate VC=====================================================
+// We have customer / vendor, time to see whats there...
+-(void) getTemplatePDFFiles
+{
+    //AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    [self->spv start : @"Get PDF List..."];
+    NSString *folderPath = [NSString stringWithFormat : @"/%@",templateFolder];
+    [dbt getFolderList:folderPath];  //Rest handled in delegate callback...
+} //end getTemplatePDFFiles
 
 
 //=============AddTemplate VC=====================================================
@@ -575,22 +583,47 @@ NSString * steps[] = {
     [self getProcessedImageBkgd];
 
 
-}
+} //end removeColorSelect
+
+
+
+//=============AddTemplate VC=====================================================
+-(void) clearTemplateMessage
+{
+    UIAlertController * alert = [UIAlertController
+                                 alertControllerWithTitle:@"Template already exists..."
+                                 message:@"Do you want to overwrite this template?"
+                                 preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction
+                      actionWithTitle:@"OK"
+                      style:UIAlertActionStyleDefault
+                      handler:^(UIAlertAction * action) {
+                          [self getTemplatePDFFiles];
+                      }]];
+    [alert addAction:[UIAlertAction
+                      actionWithTitle:@"Cancel"
+                      style:UIAlertActionStyleDefault
+                      handler:^(UIAlertAction * action) {
+                          [self dismiss];
+                      }]];
+    [self presentViewController:alert animated:YES completion:nil];
+} //end alertMessage
+
+
+
 
 
 #pragma mark - DropboxToolsDelegate
 
 //===========<DropboxToolDelegate>================================================
+// We now have PDF list, goto chooser ..
 - (void)didGetFolderList : (NSArray *)entries
 {
     NSLog(@" files %@",entries);
     fileEntries = [NSMutableArray arrayWithArray:entries];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->spv stop];
-        if ([self->vendorMode isEqualToString:@"load"])
-            [self choiceMenu];
-        else
-            [self vendorMenu];
+        [self choiceMenu];
     });
 
 }
@@ -626,5 +659,31 @@ NSString * steps[] = {
     });
 
 }
+
+
+#pragma mark - OCRTemplateDelegate
+
+
+//===========<OCRTemplateDelegate>===============================================
+- (void)didCheckTemplate : (int) count
+{
+    NSLog(@" didCheckTemplate, count %d",count);
+    [spv stop];
+    if (count == 0) //no template? proceed!
+    {
+        [self getTemplatePDFFiles];
+    }
+    else
+    {
+        [self clearTemplateMessage]; //Prompt user to overwrite template
+    }
+}
+
+//===========<OCRTemplateDelegate>===============================================
+- (void)errorCheckingTemplate : (NSString *)errmsg
+{
+    
+}
+
 
 @end

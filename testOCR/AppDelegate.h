@@ -31,6 +31,8 @@
 
 @property (nonatomic , strong) Vendors* vv;      //DHS 3/6
 @property (nonatomic , strong) Customers* cust;  //DHS 3/13
+@property (nonatomic , strong) NSString* selectedCustomer;      //DHS 3/20
+@property (nonatomic , strong) NSString* selectedCustomerFullName; //DHS 3/20
 
 @property(nonatomic) BOOL authSuccessful;
 @property (strong, nonatomic) NSString *batchID;
@@ -39,6 +41,12 @@
 @property (strong, nonatomic) OCRSettings* settings;
 @property (nonatomic , assign) BOOL networkStatus;
 @property(nonatomic) BOOL debugMode;
+
+-(NSString *)getBatchFolderPath;
+-(NSString *)getOutputFolderPath;
+-(NSString *)getReportsFolderPath;
+-(void) updateCustomerDefaults : (NSString *)customerString : (NSString *)customerFullString;
+
 
 
 @end

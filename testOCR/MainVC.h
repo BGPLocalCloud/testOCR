@@ -55,6 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
     int selectedRow;
     NSString* stype;
     NSString* sdata;
+    NSString* scustomer;
     UIRefreshControl *refreshControl;
     OCRCache *oc;
     PDFCache *pc;
@@ -74,6 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UILabel *logoLabel;
+@property (weak, nonatomic) IBOutlet UILabel *customerLabel;
 
 @property (weak, nonatomic) IBOutlet UITableView *table;
 

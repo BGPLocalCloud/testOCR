@@ -758,7 +758,7 @@
 //=============(OCRDocument)=====================================================
 // 3/7 Redid, finds top item in this column and uses gaps in finalYs to
 //      find each item in the current column
--(NSMutableArray*)  getColumnStrings: (CGRect)rr : (int) column : (NSString *)ctype
+-(NSMutableArray*)  NEWgetColumnStringsHASPROBLEMS: (CGRect)rr : (int) column : (NSString *)ctype
 {
     //NOTE the rowYs array is coming in in DOCUMENT coords!!!
     NSMutableArray *resultStrings = [[NSMutableArray alloc] init];
@@ -833,7 +833,7 @@
 //=============(OCRDocument)=====================================================
 // Uses rr to get column L/R boundary, uses rowY's to get top area to look at...
 // 1/18 uses finalYs, gotten from computeRowYpositions
--(NSMutableArray*)  OLDgetColumnStringsDeleteMe: (CGRect)rr : (int) column : (NSString *)ctype
+-(NSMutableArray*)  getColumnStrings: (CGRect)rr : (int) column : (NSString *)ctype
 {
     //NOTE the rowYs array is coming in in DOCUMENT coords!!!
     NSMutableArray *resultStrings = [[NSMutableArray alloc] init];
@@ -841,9 +841,8 @@
     if (debugMode) NSLog(@" getColumnStrings %d yc %d",column,yc);
     int lastYSize = 0;
     
-    int bing = 0; //2/17 test
-    if ( [ctype.lowercaseString containsString:@"description"])
-        bing = 1;
+    int numRowsToScan = 1; //3/24 make sure only description gets 2 rows
+    if ( [ctype.lowercaseString containsString:@"description"]) numRowsToScan = 2;
     
     for (int i=0;i<yc;i++)
     {
@@ -865,7 +864,8 @@
         if (debugMode) NSLog(@" ...(col %d row %d) rect %@ thisy %d nexty %d",
                              column,i,NSStringFromCGRect(docRect),thisY,nextY);
         if (debugMode) [self dumpArrayFull:a];
-        [resultStrings addObject:[self assembleWordFromArray : a : FALSE : 2]];
+        //DHS 3/24 BUG in quantity column! smushes next qusntity into current one, producing roundoff errors
+        [resultStrings addObject:[self assembleWordFromArray : a : FALSE : numRowsToScan]];
         lastYSize = nextY - thisY;
     }
     
@@ -1370,15 +1370,18 @@
 } //end findIntInArrayOfFields
 
 //=============(OCRDocument)=====================================================
+// 3/24 went back to original algo, the new bit was supposed to fix split numbers
+//       but failed if there was text in the array...
 -(long) findLongInArrayOfFields : (NSArray*)aof
 {
     long foundLong = 0;
+#ifdef WHYDOESNTTHISNEWIDEAWORK
     //3/14 redo: hook up array into a string and try that...
     NSString *assembledText = [self assembleWordFromArray : [aof mutableCopy] : TRUE : 1];
     assembledText = [self cleanUpNumberString:assembledText];
     if ([self isStringAnInteger:assembledText] ) foundLong = (long)[assembledText longLongValue];
     return foundLong;
-#ifdef DELETETHISCRAPASAP
+#endif
     for (NSNumber* n in aof)
     {
         NSString *testText = [self getNthWord:n];
@@ -1387,7 +1390,6 @@
         if ([self isStringAnInteger:testText] ) foundLong = (long)[testText longLongValue];
     } //end for n
     return foundLong;
-#endif
 } //end findLongInArrayOfFields
 
 //=============(OCRDocument)=====================================================

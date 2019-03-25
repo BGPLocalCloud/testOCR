@@ -27,6 +27,8 @@
 //  2/23 Fix array -> mutableArray conversion bug
 //  2/27 add batchID to all batch progress data
 //  2/28 add call to oto.readCSVThenSaveToDropbox, username to batchReport
+//  3/20 new folder structure, report output
+//  3/24 change PDF renamer for multi-customer 
 #import "BatchObject.h"
 
 @implementation BatchObject
@@ -70,8 +72,11 @@ static BatchObject *sharedInstance = nil;
         ot  = [[OCRTemplate alloc] init];
         ot.delegate = self;
         AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        batchFolder = bappDelegate.settings.batchFolder;        //@"latestBatch";
-        
+        // 3/20 multi-customer support
+        customerName = bappDelegate.selectedCustomer;
+        expTableName = [NSString stringWithFormat:@"EXP_%@",customerName];
+        //batchFolder = bappDelegate.settings.batchFolder;        //@"latestBatch";
+        batchFolder = [bappDelegate getBatchFolderPath]; // 3/20
         oto = [OCRTopObject sharedInstance];
         oto.delegate = self;
 
@@ -84,8 +89,8 @@ static BatchObject *sharedInstance = nil;
         cachesDirectory = [paths objectAtIndex:0];
         [self createBatchFolder];
         
-        tableName   = @"Batch";
-        _batchMonth = @"01-JUL";
+        batchTableName = @"Batch"; //3/20
+        _batchMonth    = @"01-JUL";
 
         _authorized = FALSE;
         
@@ -125,7 +130,7 @@ static BatchObject *sharedInstance = nil;
 //   Convoluted enuf?
 -(void) clearAndRunBatches : (int) vindex
 {
-    [self.delegate batchUpdate : @"Clear old tables..."];
+    [self.delegate batchUpdate : @"Clear old EXP records..."];
     selectedVendor = vindex;
     NSString *vname = @"*";
     if (vindex != -1 && vindex < vv.vcount) vname = [vv getNameByIndex:vindex];  //DHS 3/6
@@ -137,22 +142,25 @@ static BatchObject *sharedInstance = nil;
 //=============(BatchObject)=====================================================
 -(void) clearTables : (NSString *) vendor
 {
-   // [gp deleteAllByTableAndKey:@"Batch"    :@"*" :@"*"];
-    [gp deleteAllByTableAndKey:@"EXPFullTable"      :@"*" :@"*"];
+    // 3/20 multi-customers
+    [gp deleteAllByTableAndKey : expTableName : @"*" : @"*"];
+    //3/20 there may be invoices from other customers, leave them be??
+#ifdef CLEAR_INVOICES_TOO
     if ([vendor isEqualToString:@"*"]) //All vendors?
     {
         for (int i=0;i<vv.vcount;i++)  //DHS 3/6
         {
             NSString *vn = [vv getNameByIndex:i]; //DHS 3/6
-            NSString *tableName = [NSString stringWithFormat:@"I_%@",vn];
-            [gp deleteAllByTableAndKey:tableName : @"*" : @"*"];
+            NSString *itableName = [NSString stringWithFormat:@"I_%@",vn];
+            [gp deleteAllByTableAndKey:itableName : @"*" : @"*"];
         }
     }
     else
     {
-        NSString *tableName = [NSString stringWithFormat:@"I_%@",vendor];
-        [gp deleteAllByTableAndKey:tableName : @"*" : @"*"];
+        NSString *itableName = [NSString stringWithFormat:@"I_%@",vendor];
+        [gp deleteAllByTableAndKey:itableName : @"*" : @"*"];
     }
+#endif
 } //end clearTables
 
 //=============(BatchObject)=====================================================
@@ -243,7 +251,7 @@ static BatchObject *sharedInstance = nil;
 
 
 //=============(BatchObject)=====================================================
-// vendor vindex -1 means run ALL
+// vendor vindex -1 means run ALL; called by gp delegate return!
 -(void) runOneOrMoreBatches : (int) vindex
 {
     if (vindex >= (int)vv.vcount) //DHS 3/6
@@ -253,7 +261,7 @@ static BatchObject *sharedInstance = nil;
     }
     if (!_authorized) return; //can't get at dropbox w/o login!
     [self getNewBatchID];
-    NSString *actData = [NSString stringWithFormat:@"%@:%@",_batchID,vendorName];
+    NSString *actData = [NSString stringWithFormat:@"%@:%@:%@",_batchID,vendorName,customerName];
     [act saveActivityToParse:@"Batch Started" : actData];
     
     AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -340,6 +348,8 @@ static BatchObject *sharedInstance = nil;
     vendorName       = [vv getNameByIndex:vendorIndex]; //DHS 3/6 3 lines
     vendorFolderName = [vv getFoldernameByIndex:vendorIndex];
     vendorRotation   = [vv getRotationByIndex:vendorIndex];
+    NSString *intstr = [vv getIntQuantityByIndex : vendorIndex]; //DHS 3/24 wups need this here!
+    oto.intQuantity  = [intstr.lowercaseString isEqualToString:@"true"];
     [self updateParse];
     [self updateBatchProgress : [NSString stringWithFormat:@"Get Template:%@",vendorName] : FALSE];
     gotTemplate = FALSE;
@@ -356,7 +366,7 @@ static BatchObject *sharedInstance = nil;
     _batchStatus = BATCH_STATUS_COMPLETED;
     [self updateParse];
     
-    NSString *actData     = [NSString stringWithFormat:@"%@:%@",_batchID,vendorName];
+    NSString *actData     = [NSString stringWithFormat:@"%@:%@:%@",_batchID,vendorName,customerName];
     NSString *lilStr      = [NSString stringWithFormat:@"Batch Completed E:%d W:%d",
                              (int)errorList.count,(int)warningList.count];
     if (haltFlag) lilStr  = @"Batch Halted";
@@ -408,10 +418,8 @@ static BatchObject *sharedInstance = nil;
                 int ccount = (int)chunks.count;
                 if (ccount > 3)
                 {
-                    chunks[ccount-3] = bappDelegate.settings.outputFolder;
-                    //2/10 outputfolder + supplier name + filename
-                    NSString *outputPath = [NSString stringWithFormat:@"/%@/%@/%@",
-                                            bappDelegate.settings.outputFolder,chunks[ccount-2],chunks[ccount-1]];
+                    NSString *outputPath = [NSString stringWithFormat:@"/%@/%@/%@", //3/24 multi-customer support
+                                            [bappDelegate getOutputFolderPath],chunks[ccount-2],chunks[ccount-1]];
                     NSLog(@" rename %@ -> %@",lastFileProcessed , outputPath);
                     [dbt renameFile:lastFileProcessed : outputPath];
                     [self updateBatchProgress : [NSString stringWithFormat:@"...processed OK, move to output"] : FALSE];
@@ -649,7 +657,7 @@ static BatchObject *sharedInstance = nil;
 //=============(BatchObject)=====================================================
 -(void) readFromParseByID : (NSString *) bID
 {
-    PFQuery *query = [PFQuery queryWithClassName:tableName];
+    PFQuery *query = [PFQuery queryWithClassName:batchTableName];
     [query whereKey:PInv_BatchID_key equalTo:bID];   //Look for our batch
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) { //Query came back...
@@ -659,6 +667,7 @@ static BatchObject *sharedInstance = nil;
                 PFObject *pfo = objects[0];
                 //Load internal fields...
                 self->vendorName       = pfo[PInv_Vendor_key];
+                self->customerName     = pfo[PInv_CustomerName_key];
                 self->batchFiles       = pfo[PInv_BatchFiles_key];
                 self->_batchStatus     = pfo[PInv_BatchStatus_key];
                 self->batchProgress    = pfo[PInv_BatchProgress_key];
@@ -687,7 +696,7 @@ static BatchObject *sharedInstance = nil;
 // Just dumps result to notifications...
 -(void) readFromParseByIDs : (NSArray *) bIDs
 {
-    PFQuery *query = [PFQuery queryWithClassName:tableName];
+    PFQuery *query = [PFQuery queryWithClassName:batchTableName];
     [query whereKey:PInv_BatchID_key containedIn:bIDs];
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) { //Query came back...
@@ -704,7 +713,7 @@ static BatchObject *sharedInstance = nil;
 //=============(BatchObject)=====================================================
 -(void) updateParse
 {
-    PFQuery *query = [PFQuery queryWithClassName:tableName];
+    PFQuery *query = [PFQuery queryWithClassName:batchTableName];
     if (_batchID == nil)
     {
         NSLog(@" ERROR: update batchObject with null ID");
@@ -717,10 +726,11 @@ static BatchObject *sharedInstance = nil;
             if (objects.count > 0) //Got something? Update...
                 pfo = objects[0];
             else
-                pfo = [PFObject objectWithClassName:self->tableName];
+                pfo = [PFObject objectWithClassName:self->batchTableName];
             pfo[PInv_BatchID_key]       = self->_batchID;
             pfo[PInv_BatchStatus_key]   = self->_batchStatus;
             pfo[PInv_Vendor_key]        = self->vendorName;
+            pfo[PInv_CustomerName_key]  = self->customerName; //3/20
             pfo[PInv_BatchFiles_key]    = self->batchFiles;
             pfo[PInv_BatchProgress_key] = self->batchProgress;
             //Pack up errors / fixed...
@@ -757,7 +767,9 @@ static BatchObject *sharedInstance = nil;
     NSString *path = [NSString stringWithFormat:@"%@/%@.txt",cacheFolderPath,_batchID];
     //Assemble output string:
     NSString *s = @"Batch Report\n";
-    //if (batchCount > 1)
+    //DHS 3/20 multi-customers
+    AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate]; 
+    s = [s stringByAppendingString:[NSString stringWithFormat:@"Customer:%@\n",bappDelegate.selectedCustomerFullName]];
     s = [s stringByAppendingString:[NSString stringWithFormat:@"ID:%@\n",_batchID]];
     // 2/28 add username to batch report!
     if ([PFUser currentUser] != nil)
@@ -788,13 +800,13 @@ static BatchObject *sharedInstance = nil;
 
     //Save to Dropbox...
     //break up lastFileProcessed, looks like: /inputfolder/vendor/filename.pdf
-    NSMutableArray *chunks = [lastFileProcessed componentsSeparatedByString:@"/"];
+    NSArray *chunks = [lastFileProcessed componentsSeparatedByString:@"/"];
     if (chunks.count >= 4)
     {
         ///outputFolder/reports/fname
         AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        NSString *folderPath = [NSString stringWithFormat : @"/%@/reports",bappDelegate.settings.outputFolder];
-        [dbt createFolderIfNeeded:folderPath]; //Delegate callback handles reset
+        NSString *reportPath = [bappDelegate getReportsFolderPath]; // DHS 3/20
+        [dbt createFolderIfNeeded:reportPath]; //Delegate callback handles reset
     }
     return;
 } //end writeBatchReport
@@ -897,10 +909,11 @@ static BatchObject *sharedInstance = nil;
 #pragma mark - GenParseDelegate
 
 //===========<GenParseDelegate>================================================
+// IMPORTANT: this is called at start of batch, ALL batches run thru here!
 - (void)didDeleteAllByTableAndKey : (NSString *)s1 : (NSString *)s2 : (NSString *)s3
 {
     if (debugMode) NSLog(@" delete OK %@/%@/%@",s1,s2,s3);
-    if ([s1 isEqualToString:@"EXPFullTable"]) //Usually the longest table..
+    if ([s1 isEqualToString:expTableName]) //Usually the longest table..
     {
         //OK continue running batch...
         [self runOneOrMoreBatches : selectedVendor];
@@ -1035,7 +1048,6 @@ static BatchObject *sharedInstance = nil;
     AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSString *folderPath = [NSString stringWithFormat : @"/%@/reports",bappDelegate.settings.outputFolder];
     [dbt saveTextFile : [NSString stringWithFormat:@"%@/%@.csv",folderPath,_batchID] :s];
-    //asdf
 }
 //===========<OCRTopObjectDelegate>================================================
 - (void)errorReadingFullTableToCSV : (NSString *) s

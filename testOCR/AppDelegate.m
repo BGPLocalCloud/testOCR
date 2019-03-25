@@ -9,6 +9,7 @@
 //          change bundle id to com.bgpcloud.testOCR,
 //          for setup with google cloud API
 //  3/13    Add customers object
+// 3/20    new folder structure
 
 #import "AppDelegate.h"
 
@@ -55,8 +56,9 @@
     _vv = [Vendors sharedInstance]; //DHS 3/6 made property
     [_vv readFromParse];
     _cust = [Customers sharedInstance]; //DHS 3/13 new table
-
-    
+    [self getUserDefaults];
+    //_selectedCustomer         = @"KCH"; //Default to something!
+    //_selectedCustomerFullName = @"Kona Hospital";
     //Reachability...
     [self monitorReachability];
     
@@ -134,6 +136,56 @@
     [hostReach startNotifier];
 } //end monitorReachability
 
+//====(TestOCR AppDelegate)==========================================
+-(void) updateCustomerDefaults : (NSString *)customerString : (NSString *)customerFullString
+{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    _selectedCustomer            = customerString;
+    _selectedCustomerFullName    = customerFullString;
+    [userDefaults setObject:_selectedCustomer         forKey:@"customer"];
+    [userDefaults setObject:_selectedCustomerFullName forKey:@"customerFull"];
+
+} //end updateCustomerDefault
+
+//====(TestOCR AppDelegate)==========================================
+-(void) getUserDefaults
+{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    if ([userDefaults objectForKey:@"customer"] == nil  ) //No defaults yet?
+    {
+        NSLog(@" no defaults: reset");
+        [userDefaults setObject:@"KCH" forKey:@"customer"];
+        [userDefaults setObject:@"Kona Hospital" forKey:@"customerFull"];
+    }
+    else NSLog(@" found defaults...");
+    _selectedCustomer         = [userDefaults objectForKey:@"customer"];
+    _selectedCustomerFullName = [userDefaults objectForKey:@"customerFull"];
+
+}
+
+//====(TestOCR AppDelegate)==========================================
+// 3/20 new folder structure
+-(NSString *)getBatchFolderPath
+{
+    NSString *s = [NSString stringWithFormat:@"%@/%@",_selectedCustomer,_settings.batchFolder];
+    return s;
+}
+
+//====(TestOCR AppDelegate)==========================================
+// 3/20 new folder structure
+-(NSString *)getOutputFolderPath
+{
+    NSString *s = [NSString stringWithFormat:@"%@/%@",_selectedCustomer,_settings.outputFolder];
+    return s;
+}
+
+//====(TestOCR AppDelegate)==========================================
+// 3/20 new folder structure
+-(NSString *)getReportsFolderPath
+{
+    NSString *s = [NSString stringWithFormat:@"/%@/%@/reports",_selectedCustomer,_settings.outputFolder];
+    return s;
+}
 
 
 @end

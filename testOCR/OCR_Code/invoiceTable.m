@@ -18,6 +18,7 @@
 // 2/9  add parentUp flag to avoid delegate callback crashes on dismissed VC
 // 2/23 Fix array -> mutableArray conversion bug
 // 3/12 add page field
+// 3/22 add parentUp checks
 #import "invoiceTable.h"
 
 @implementation invoiceTable
@@ -123,7 +124,7 @@
                 self.iobj = [self packFromPFObject:pfo];
                 [self unpackInvoiceOids];
             }
-            [self->_delegate didReadInvoiceTable];
+             if (_parentUp) [self->_delegate didReadInvoiceTable];
         }
     }];
     
@@ -152,7 +153,7 @@
                 NSString*s = [NSString stringWithFormat:@"[%@](%@):%@",ds,pfo[PInv_InvoiceNumber_key],pfo[PInv_CustomerKey]];
                 [self->recordStrings addObject:s];
             }
-            [self->_delegate didReadInvoiceTableAsStrings:self->invoiceObjects];
+            if (_parentUp) [self->_delegate didReadInvoiceTableAsStrings:self->invoiceObjects];
         }
     }];
     

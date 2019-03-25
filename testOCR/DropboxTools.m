@@ -189,6 +189,8 @@
          }
          else
          {
+             NSString * message = [self getErrorMessage:error];
+             NSLog(@" dbt error: %@",message);
              [self->_delegate errorCreatingFolder : folderPath];
          }
      }];

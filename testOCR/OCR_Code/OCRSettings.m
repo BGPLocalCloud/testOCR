@@ -50,7 +50,7 @@ NSString *const PS_MoveProcessedFilesKey    = @"MoveProcessedFiles";
     if (self = [super init])
     {
         loaded = FALSE;
-        tableName = @"Settings";
+        tableName = @"Settings2"; // 3/20
         NSArray  *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         SettingsFileFullPath = [documentsDirectory stringByAppendingPathComponent:tableName];
@@ -218,6 +218,7 @@ NSString *const PS_MoveProcessedFilesKey    = @"MoveProcessedFiles";
     [data writeToFile:SettingsFileFullPath atomically:YES];
     //NSLog(@" ....save OK");
 } //end saveLocalSettings
+
 
 
 //=====<OCRSettings>======================================================================

@@ -69,6 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(void) clearFields;
 -(void) clearHeaders;
 -(void) clearTags : (int) index;
+-(void) checkVendorTemplate : (NSString *)vendorMatch;
 -(void) deleteBox : (int) index;
 -(NSString *) getAllTags :(int) index;
 -(int) getBoxCount;
@@ -102,6 +103,8 @@ NS_ASSUME_NONNULL_END
 @protocol OCRTemplateDelegate <NSObject>
 @required
 @optional
+- (void)didCheckTemplate : (int) count;
+- (void)errorCheckingTemplate : (NSString *)errmsg;
 - (void)didReadTemplate;
 - (void)errorReadingTemplate : (NSString *)errmsg;
 - (void)didReadTemplateTableAsStrings : (NSMutableArray*) a;

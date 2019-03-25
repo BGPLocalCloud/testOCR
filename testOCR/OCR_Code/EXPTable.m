@@ -16,7 +16,8 @@
 //  2/8 add invoiceNumber to readFromParseAsStrings
 //  2/9 add parentUp flag to avoid delegate callback crashes on dismissed VC
 //  2/12 add productname to fixPrices...
-
+//  3/20 add selectedCustomer support
+//  3/22 missed some tableName changes
 #import "EXPTable.h"
 
 @implementation EXPTable
@@ -34,7 +35,7 @@
         csvList       = [[NSMutableArray alloc] init]; //saved object ids, for matching invoice
         _sortBy = @"*";
         _selectBy = @"*";
-        tableName = @"EXPFullTable";
+        tableName = @"EXP_KCH"; //3/20
         _parentUp = TRUE;
 
         AppDelegate *eappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -370,7 +371,7 @@
     [self handleCSVInit:dumptoCSV:FALSE];
     NSMutableArray *a = [[NSMutableArray alloc] init];
     NSArray *sitems =  [soids componentsSeparatedByString:@","];
-    PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
+    PFQuery *query = [PFQuery queryWithClassName:tableName];
     for (NSString *s in sitems)  //incoming should look like X_OBJID,X_OBJID, etc
     {
         NSArray *s2 =  [s componentsSeparatedByString:@"_"];
@@ -390,7 +391,7 @@
 // 2/12 add productname
 -(void) fixPricesInObjectByID: (NSString *)oid  : (NSString *)productName : (NSString *)qt : (NSString *)pt : (NSString *)tt
 {
-    PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
+    PFQuery *query = [PFQuery queryWithClassName:tableName];
     PFObject *pfo = [query getObjectWithId:oid];  //Fetch by object ID,
     if (pfo != nil)
     {
@@ -416,7 +417,7 @@
 //=============OCR VC=====================================================
 -(void) fixFieldInObjectByID : (NSString *)oid : (NSString *)key : (NSString *)value
 {
-    PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
+    PFQuery *query = [PFQuery queryWithClassName:tableName];
     PFObject *pfo = [query getObjectWithId:oid];  //Fetch by object ID,
     if (pfo != nil)
     {
@@ -433,7 +434,7 @@
 {
     if (debugMode) NSLog(@" getObjectsByIDs %@",oids);
     if (oids == nil || oids.count < 1) return;
-    PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
+    PFQuery *query = [PFQuery queryWithClassName:tableName];
     [query whereKey:@"objectId" containedIn:oids];
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) { //Query came back...
@@ -457,7 +458,7 @@
 //=============OCR VC=====================================================
 -(void) getObjectByID : (NSString *)oid
 {
-    PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
+    PFQuery *query = [PFQuery queryWithClassName:tableName];
     //2/11 NOTE: this is done in the foreground, the UI is waiting and it's a remote call!
     //  produces this warning: Warning: A long-running operation is being executed on the main thread.
     //  Break on warnBlockingOperationOnMainThread() to debug.
@@ -473,7 +474,7 @@
 -(void) readFromParseAsStrings : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)batch : invoiceNumberstring
 {
     [self handleCSVInit:TRUE:FALSE];
-    PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
+    PFQuery *query = [PFQuery queryWithClassName:tableName]; //3/20
     
     //Wildcards means get everything...
     if (![vendor               isEqualToString:@"*"]) [query whereKey:PInv_Vendor_key  equalTo:vendor];
@@ -527,7 +528,7 @@
         if (addErrStatus) header = [header stringByAppendingString:@",ErrStatus"];
         [csvList addObject:header];
     }
-    PFQuery *query = [PFQuery queryWithClassName:@"EXPFullTable"];
+    PFQuery *query = [PFQuery queryWithClassName:tableName]; //3/20
     if (![batchID isEqualToString:@"*"]) [query whereKey:PInv_BatchID_key equalTo:batchID];
     if (debugMode) NSLog(@" read %d to %d",skip,skip+LIMIT_SIZE);
     query.skip = skip;
@@ -644,6 +645,15 @@
 -(void) setTableName : (NSString *)newName
 {
     tableName = newName;
+}
+
+//=============(EXPTable)=====================================================
+// 3/20 WARNING: overrides original table name!
+-(void) setTableNameForCurrentCustomer  
+{
+    AppDelegate *eappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    tableName = [NSString stringWithFormat:@"EXP_%@",eappDelegate.selectedCustomer];
+    NSLog(@"   set EXP Table: %@",tableName);
 }
 
 

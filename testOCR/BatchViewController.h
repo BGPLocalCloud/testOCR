@@ -29,6 +29,7 @@
     BOOL haltingBatchToExitVC;
     NSArray *fiscalMonths;
     NSString* batchMonth;
+    NSString* batchCustomer;
 }
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UIButton *runButton;

@@ -17,6 +17,9 @@
 @protocol GenParseDelegate;
 
 @interface GenParse : NSObject
+{
+    NSMutableArray *parseObjects;
+}
 
 @property (nonatomic, unsafe_unretained) id <GenParseDelegate> delegate; // receiver of completion messages
 

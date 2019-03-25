@@ -34,8 +34,9 @@ static Customers *sharedInstance = nil;
 {
     if (self = [super init])
     {
-        _customerNames  = [[NSMutableArray alloc] init]; // Customer names
-        _loaded         = FALSE;
+        _customerNames      = [[NSMutableArray alloc] init]; // Customer names
+        _fullNames          = [[NSMutableArray alloc] init]; // Customer names
+        _loaded             = FALSE;
         [self readFromParse];
     }
     return self;
@@ -56,9 +57,11 @@ static Customers *sharedInstance = nil;
                 return;
             }
             [self->_customerNames removeAllObjects];
+            [self->_fullNames removeAllObjects];
             for( PFObject *pfo in objects)  //Save all our customer names...
             {
                 [self->_customerNames addObject: [pfo objectForKey:PInv_CustomerName_key]];
+                [self->_fullNames     addObject: [pfo objectForKey:PInv_FullName_key]];
             }
             NSLog(@" ...loaded all customers");
             self->_loaded = TRUE;

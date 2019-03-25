@@ -41,6 +41,7 @@
     batchIDLookup   = @"*";
     invoiceLookup   = @"*";
     vendorLookup    = @"*";
+    _scustomer      = @"KCH"; // 3/20
     _detailMode     = FALSE;
 
     barnIcon    = [UIImage imageNamed:@"barnIcon"];
@@ -114,6 +115,8 @@
         batchIDLookup = _actData;
     }
     loadingData = FALSE; //DHS 2/22
+    //3/20 multi-customer support
+    [et setTableName : [NSString stringWithFormat:@"EXP_%@",_scustomer]];
     [self loadEXP];
     [self updateUI];
 } //end viewWillAppear

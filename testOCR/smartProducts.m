@@ -23,6 +23,8 @@
 //  3/15  add keywordsNo1stChar dictionary
 //        add even price/amount comparison check (bad math)
 //        made zero quantity a major error (not warning)
+//  3/22  add T default for intQuantity, assume zero quantity = 1
+//         also assume 3-digit prices are errors missing decimal point
 #import "smartProducts.h"
 
 @implementation smartProducts
@@ -43,6 +45,7 @@
         keywordsNo1stChar =  [[NSMutableDictionary alloc] init]; //3/15
 
         didInitAlready = FALSE;
+        _intQuantity   = TRUE; //DHS 3/22 assume int quantities
         NSLog(@" SmartProducts: Load typos from DISK");
         [self loadRulesTextFile : @"splits" : FALSE : splits : joined];
         [self loadRulesTextFile : @"typos"  : TRUE :  typos  : fixed];
@@ -146,6 +149,7 @@
                     @"discount",
                     @"dry items",
                     @"frozen items",
+                    @"other",
                     @"payment",
                     @"refrigerated",
                     @"subtotal",
@@ -635,7 +639,7 @@
     NSString *result = @"Bad Errcode";
     switch(aerr)
     {
-        case ANALYZER_BAD_PRICE_COLUMNS: result = @"Bad Price Columns";
+        case ANALYZER_BAD_PRICE_COLUMNS: result = @"Zero QPA Columns";
             break;
         case ANALYZER_MATH_ERROR:        result = @"Math Err";
             break;
@@ -862,31 +866,34 @@
         )
         local = TRUE;
     
+
     //Sanity Check: quantity * price = amount?
     int qint         = [quantity intValue];
     float qfloat     = [quantity floatValue];
     float pfloat     = [price floatValue];
     float afloat     = [amount floatValue];
+    //3/22 move from bad math area...
+    if (afloat < 0.0) afloat = -1.0 * afloat; //Just negate any negatives!
+    if (pfloat < 0.0) pfloat = -1.0 * pfloat;
+    NSLog(@" analyze: [%@] priceFix q p a %d %f %f",fullProductName,qint,pfloat,afloat);
     if (afloat > 10000.0) //Huge Amount? Assume decimal error
     {
         //NSLog(@" ERROR: amount over $10000!!");
         afloat = afloat / 1000.0;
     }
-    if (afloat > 1000.0) //Huge Amount? Assume decimal error
+    else if (afloat > 1000.0) //Huge Amount? Assume decimal error
     {
-        //NSLog(@" ERROR: amount over $1000!!");
         afloat = afloat / 100.0;
     }
     if (pfloat > 10000.0) //Huge Price? Assume decimal error
     {
-        //NSLog(@" ERROR: price over $10000!!");
         pfloat = pfloat / 1000.0;
     }
-    if (pfloat > 1000.0) //Huge Price? Assume decimal error
+    else if (pfloat > 1000.0) //Huge Price? Assume decimal error
     {
-        //NSLog(@" ERROR: price over $1000!!");
         pfloat = pfloat / 100.0;
     }
+
     //2/14 support float/int quantity
     BOOL zeroQuantity = ((_intQuantity && qint == 0) || (!_intQuantity && qfloat == 0.0));
     BOOL zeroPrice    = (pfloat == 0.0);
@@ -894,7 +901,7 @@
     BOOL evenPrice    = [self hasZeroCents:pfloat];
     BOOL evenAmount   = [self hasZeroCents:afloat];
     BOOL priceAmountClose = (ABS(pfloat-afloat) < 1.0);
-    //NSLog(@" above [%@] priceFix q p a %d %f %f",fullProductName,qint,pfloat,afloat);
+    
 
     if (priceAmountClose) //3/15 Price and amount are curiously close together?
     {
@@ -909,17 +916,20 @@
     {
         //NSLog(@" ... 2 out of 3 price columns are zero!");
         _majorError = ANALYZER_BAD_PRICE_COLUMNS;
+        NSLog(@" bad price columns %d %f %f",qint,pfloat,afloat);
+        qint   = 1;
+        qfloat = 1.0;
         if (!zeroPrice)  //Got a price, assume quantity is 1...
         {
-            qint   = 1;
-            qfloat = 1.0;
             afloat = pfloat;
         }
         else if (!zeroAmount)  //Got an amount, assume quantity is 1...
         {
-            qint   = 1;
-            qfloat = 1.0;
             pfloat = afloat;
+        }
+        else //3/22 wups forgot the 3rd case! valid price but zeroes elsewhere
+        {
+            afloat = pfloat;
         }
     }
     else //2/5 check for one zero field, fixable!
@@ -937,10 +947,10 @@
         else if (zeroQuantity)
         {
             //NSLog(@" ...ZERO QUANTITY: FIX");
-            if (_intQuantity) //2/14
+            if (_intQuantity) //3/22 usually means single quantity
             {
-                qint = (int)floor((afloat / pfloat) + 0.5); //DHS 2/10 account for roundup/down
-                if (qint == 0) qint = 1; //Handle roundoff errors...
+                qint   = 1;       //This is based on HFM invoices!
+                afloat = pfloat; //Price seems to come thru the best...
             }
             else{
                 qfloat = afloat / pfloat;      // 2/14
@@ -957,21 +967,23 @@
                 pfloat = afloat / qfloat;
             aerror = ANALYZER_ZERO_PRICE;
         }
-        else if ((_intQuantity  && (afloat != (float)qint * pfloat)) ||  //All fields present but still bad math?
-                 (!_intQuantity && (afloat != (qfloat * pfloat))))        // Assume quantity is wrong?
+        else if ((_intQuantity  && (afloat != (float)qint * pfloat)) ||    //All fields present but still bad math?
+                 (!_intQuantity && fabsf(afloat - (qfloat*pfloat)) > 0.01) ) //3/24 add 1cent tolerance for floats
         {
-            if (afloat < 0.0) afloat = -1.0 * afloat; //Just negate any negatives!
-            if (pfloat < 0.0) pfloat = -1.0 * pfloat;
+            if (!_intQuantity)
+            {
+                NSLog(@" ...badmath, diff off: %f",afloat - (qfloat * pfloat));
+            }
             //if (!_intQuantity) NSLog(@" ...bad math  q %4.2f p %4.2f a %4.2f q*p %4.2f",
             //  qfloat,pfloat,afloat,qfloat*pfloat);
-            if ((_intQuantity && (qint == 1)) || (!_intQuantity && (qfloat == 1.0)) ) //Mismatch price/amount, defer to amount
+            if ((_intQuantity && (qint == 1)) || (!_intQuantity && (qfloat == 1.0)) ) //Mismatch price/amount, defer to price!
             {
-                pfloat = afloat;
+                afloat = pfloat; //DHS 3/22 price is correct more often!
             }
             else //Bogus quantity? or price/amount read incompletely?
             {
                     if (_intQuantity)
-                        qint = (int)(afloat / pfloat);
+                        qint = MAX(1,(int)(afloat / pfloat)); //3/22 add zero check
                     else
                         qfloat = afloat/pfloat;
             }

@@ -204,6 +204,25 @@
 
 
 //=============(OCRTemplate)=====================================================
+// 3/17 See if we have vendors template asdf
+-(void) checkVendorTemplate : (NSString *)vendorMatch
+{
+    PFQuery *query = [PFQuery queryWithClassName:@"templates"];
+    [query whereKey:@"vendor" equalTo:vendorMatch];
+    [query countObjectsInBackgroundWithBlock:^(int count, NSError *error) {
+        //        NSLog(@" find puzzles matching %@",matchString);
+        if (!error) { //Query came back...
+            [self.delegate didCheckTemplate : count]; //Pass count back to delegate
+        }
+        else{
+            [self.delegate errorCheckingTemplate : error.localizedDescription];
+        }
+    }]; //end query
+} //end checkVendorTemplate
+
+
+
+//=============(OCRTemplate)=====================================================
 // which item in he
 -(CGRect) getColumnRect :(int) index
 {

@@ -12,6 +12,7 @@
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 //  2/23 Fix array -> mutableArray conversion bug
+//  3/20 new folder structure
 
 #import "BatchReportController.h"
 
@@ -47,8 +48,6 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    NSLog(@" pfo %@",_pfo);
-    
     int bcount = [self countCommas:_pfo[PInv_BatchErrors_key]];
     int fcount = [self countCommas:_pfo[PInv_BatchFixed_key]];;
     int errCount = bcount - fcount;  //# errs = total errs - fixed errs
@@ -72,8 +71,9 @@
         {
             ///outputFolder/reports/fname
             AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-            NSString *folderPath = [NSString stringWithFormat : @"/%@/reports",bappDelegate.settings.outputFolder];
-            NSString *reportPath = [NSString stringWithFormat:@"%@/%@_report.txt",folderPath,_pfo[PInv_BatchID_key]];
+            //NSString *folderPath = [NSString stringWithFormat : @"/%@/reports",bappDelegate.settings.outputFolder];
+            NSString *reportPath = [NSString stringWithFormat:@"%@/%@_report.txt",   //3/20
+                                    [bappDelegate getReportsFolderPath],_pfo[PInv_BatchID_key]];
             [dbt downloadTextFile:reportPath];
         }
     }
