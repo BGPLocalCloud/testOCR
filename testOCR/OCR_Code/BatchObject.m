@@ -1046,7 +1046,8 @@ static BatchObject *sharedInstance = nil;
 {
     //OK write to dropbox.
     AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSString *folderPath = [NSString stringWithFormat : @"/%@/reports",bappDelegate.settings.outputFolder];
+    //3/25 multi-user...
+    NSString *folderPath = [NSString stringWithFormat : @"/%@/reports", [bappDelegate getOutputFolderPath]];
     [dbt saveTextFile : [NSString stringWithFormat:@"%@/%@.csv",folderPath,_batchID] :s];
 }
 //===========<OCRTopObjectDelegate>================================================

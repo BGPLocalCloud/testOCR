@@ -151,12 +151,11 @@
     NSMutableArray *chunks = [[_pdfFile componentsSeparatedByString:@"/"] mutableCopy]; //DHS 2/23
     int ccount = (int)chunks.count;
     if (ccount > 3)
-    {
+    {//asdf
         AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        chunks[ccount-3] = bappDelegate.settings.outputFolder;
-        //Overwrite PDf filename? good idea?
+        //Overwrite PDf filename? good idea?  3/25 redo
         _pdfFile = [NSString stringWithFormat:@"/%@/%@/%@",
-                    bappDelegate.settings.outputFolder,chunks[ccount-2],chunks[ccount-1]];
+                    [bappDelegate getOutputFolderPath],chunks[ccount-2],chunks[ccount-1]]; //3/25
         triedOutputFolder = TRUE;
         [dbt downloadImages:_pdfFile];
     }

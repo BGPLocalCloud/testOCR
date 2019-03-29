@@ -325,7 +325,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self updateUI];
         self->_runButton.hidden = FALSE; //OK we can run batches now
-        self->_titleLabel.text = [NSString stringWithFormat:@"Batch Ready[%@]",batchCustomer]; // 3/20
+        self->_titleLabel.text = [NSString stringWithFormat:@"Batch Ready[%@]",self->batchCustomer]; // 3/20
         //self->_titleLabel.text = @"Batch Processor Ready";;
         [self->spv stop];
     });

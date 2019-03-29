@@ -516,8 +516,8 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->_table reloadData];
-        loadingData = FALSE;
-        [spv stop];
+        self->loadingData = FALSE;
+        [self->spv stop];
         [self setLoadedTitle : @"EXP"];
         self->_sortButton.hidden   = FALSE;
         self->_selectButton.hidden = FALSE;

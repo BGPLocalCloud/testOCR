@@ -71,14 +71,11 @@
         {
             ///outputFolder/reports/fname
             AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-            //NSString *folderPath = [NSString stringWithFormat : @"/%@/reports",bappDelegate.settings.outputFolder];
             NSString *reportPath = [NSString stringWithFormat:@"%@/%@_report.txt",   //3/20
                                     [bappDelegate getReportsFolderPath],_pfo[PInv_BatchID_key]];
             [dbt downloadTextFile:reportPath];
         }
     }
-
-    
 } //end viewWillAppear
 
 

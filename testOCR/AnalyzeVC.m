@@ -313,7 +313,6 @@
         folderPath = [bappDelegate getBatchFolderPath]; // 3/20
     }
     else{
-        //folderPath = [NSString stringWithFormat : @"/%@",bappDelegate.settings.outputFolder];
         folderPath = [bappDelegate getOutputFolderPath]; // 3/20
     }
     [spv start : @"Get Folder List"];

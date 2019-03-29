@@ -171,7 +171,7 @@ NSString * steps[] = {
                                                             //3/17 choose PDF from a staged file area...
                                                             if ([self->vendorMode isEqualToString:@"load"])
                                                             {
-                                                                NSString *folderPath = [NSString stringWithFormat : @"%@/latestBatch/%@/%@",self->customerSelect,_vendor,fname];
+                                                                NSString *folderPath = [NSString stringWithFormat : @"%@/latestBatch/%@/%@",self->customerSelect,self->_vendor,fname];
                                                                 [self->dbt downloadImages : folderPath];
                                                             }
                                                             else // 3/17  Is this still used?

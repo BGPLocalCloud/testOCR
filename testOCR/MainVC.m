@@ -274,7 +274,7 @@
         [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(nextCust,nil)
                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                       [mappDelegate updateCustomerDefaults:nextCust :cfull];
-                                                      _customerLabel.text = cfull;
+                                                      self->_customerLabel.text = cfull;
                                                   }]];
         i++;
     }
@@ -302,7 +302,7 @@
     [alert addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"EXP Table",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-                                                              scustomer = mappDelegate.selectedCustomer; //3/20
+                                                              self->scustomer = mappDelegate.selectedCustomer; //3/20
                                                               [self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
                                                           }]];
     for (int vindex = 0;vindex < vv.vcount;vindex++)
@@ -932,6 +932,10 @@ int currentYear = 2019;
 - (void)didReadFullTableToCSV : (NSString *)s
 {
     NSLog(@" got csv list %@",s);
+    //3/25 wups, stop spinner!
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self->spv stop];
+    });
     NSArray *testit = [s componentsSeparatedByString:@"\n"];
     if (testit.count < 3) //Nothin?
     {
@@ -947,6 +951,7 @@ int currentYear = 2019;
 - (void)errorReadingFullTableToCSV : (NSString *)err;
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self->spv stop]; //3/25
         [self errorMessage:@"Error exporting to Excel" : err];
     });
 

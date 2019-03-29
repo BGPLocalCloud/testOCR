@@ -124,7 +124,7 @@
                 self.iobj = [self packFromPFObject:pfo];
                 [self unpackInvoiceOids];
             }
-             if (_parentUp) [self->_delegate didReadInvoiceTable];
+            if (self->_parentUp) [self->_delegate didReadInvoiceTable];
         }
     }];
     
@@ -153,7 +153,7 @@
                 NSString*s = [NSString stringWithFormat:@"[%@](%@):%@",ds,pfo[PInv_InvoiceNumber_key],pfo[PInv_CustomerKey]];
                 [self->recordStrings addObject:s];
             }
-            if (_parentUp) [self->_delegate didReadInvoiceTableAsStrings:self->invoiceObjects];
+            if (self->_parentUp) [self->_delegate didReadInvoiceTableAsStrings:self->invoiceObjects];
         }
     }];
     

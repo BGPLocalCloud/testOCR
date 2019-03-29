@@ -186,6 +186,22 @@ a[href] {
 </head>
 
 <body>
+    <h1>Table of Contents</h1>
+<ul>
+    <li><a href="#menu">Main Menu</a></li>
+    <li><a href="#customer">Customer Menu</a></li>
+    <li><a href="#db">Database</a></li>
+    <li><a href="#output">Output</a></li>
+    <li><a href="#batch">Batch</a></li>
+    <li><a href="#batchpopup">Batch Popup Menu</a></li>
+    <li><a href="#dropbox">Dropbox</a></li>
+    <li><a href="#sashido">Sashido</a></li>
+    <li><a href="#typos">Fixing Typos and adding Keywords</a></li>
+</ul>
+    
+    
+    
+    
 <h1>Basic Theory:</h1>
 The app is designed to process sets of invoices, usually in PDF format, and output line item records to a cloud database (the DB).
 You can also feed in PNG or JPG scans as well as certain CSV text files.
@@ -261,21 +277,36 @@ At the bottom of the screen are four buttons which navigate you through the app.
 If you select items from the table, you can examine details for some activities. If the activity was related to a batch you can get DB records such as EXP items produced by the batch. You can also fix errors and warnings in EXP line items produced by the batch, or you can look at the Batch Report. See <b>Batch Popup Menu</b> below for more instructions.
 <br>
 
-<h4>Menu:</h4>
-The Menu navigates to other screens where you can create or edit templates, load Comparison Data from past months, or clear data storage from your phone. Most of the time you won`t need to use this control. More detailed instructions will be published later.  At the bottom of the Menu are the <b>Logout from Dropbox</b> and <b>Logout from Sashido</b> commands, which may be needed if you use more than one Dropbox account on your phone.
+<a name="menu"></a>
+<h4>Main Menu:</h4>
+The Main Menu navigates to other screens where you can create or edit templates, load Comparison Data from past months, or clear data storage from your phone. Most of the time you won`t need to use this control. More detailed instructions will be published later.  At the bottom of the Menu are the <b>Logout from Dropbox</b> and <b>Logout from Sashido</b> commands, which may be needed if you use more than one Dropbox account on your phone.
 <p>
 You can <i>change the customer</i> setting by selecting the top item in the Menu.  This will put up yet another set of choices containing all the current customers.  Make sure you have the correct customer selected before running a batch!
 <p>
+<a name="customer"></a>
+<h4>Customer Menu:</h4>
+To get here, select <i>Change Customer</i> from the Main Menu.
+Here you can select which customer to run batches on.
+<p>
+Remember that each customer has their own section on dropbox and
+also has their own EXP table for batch line item outputs.
+<p>
+The selected customer is shown at the top of the Home Screen and
+also at the top of the Batch Screen.
+<p>
+<a name="db"></a>
 <h4>DB:</h4>
 This puts up another menu which lets you look at all EXP table line items from the latest batch, or the latest invoices grouped by vendor. For instance the <i>HFM Invoices</i> option will show a table of HFM invoices produced in the last batch run.
 See below for more information on these options.
 <p>
+<a name="output"></a>
 <h4>Output:</h4>
 This switches apps to the BGP Charts app.  This app displays a set of canned FY data in a variety of formats,
 and it also can load the contents of the <b>EXP_Comparison</b> table, which is created from loading
 in CSV data from an Excel spreadsheet.  The same button position in the Chart App returns you
 to this app.
 <p>
+<a name="batch"></a>
 <h4>Batch:</h4>
 This takes you to the Batch Screen. At startup, the app takes up to 15 seconds to load important vendor settings from the DB and this button won`t work until the settings are present.
 <br>
@@ -364,6 +395,7 @@ If you want to rerun a batch after halting it or because of an internet error, o
     </div>
 </center>
 
+<a name="batchpopup"></a>
 <h1>Batch Popup Menu</h1>
 
 <ul>
@@ -409,6 +441,7 @@ To look at the all the batch details choose <b>Get Report</b>. This downloads th
     </div>
 </center>
 
+<a name="errors"></a>
 <h4>Fixing Errors or Warnings:</h4>
 This brings up the Error Screen.  It shows a list of all the errors that occurred in the batch. Errors are marked with a red X and a pinkish background color, while warnings are marked with a yellow exclamation point and a yellow background color.
 <br>
@@ -460,6 +493,145 @@ Once you are done fixing errors you can exit the Error Window by pressing the li
 
 
 <br>
+
+
+<a name="dropbox"></a>
+<h4>Dropbox setup:</h4>
+The BGPCloud Dropbox account has a special folder for this app,
+and that is where all the input PDF files are staged.
+<p>
+The top level folder is:
+<ul>
+    <b><li>/Apps/BGPCloud/...</li></b>
+</ul>
+<p>
+There you will see folders for each customer:
+
+    <ul><b>
+    <li>/Apps/BGPCloud/KCH/...</li>
+    <li>/Apps/BGPCloud/KVMH/...</li>
+    <li>/Apps/BGPCloud/Quest/...</li>
+    <li>/Apps/BGPCloud/SMMH/...</li>    </b>
+    <li>etc...</li>
+</ul>
+<p>
+Inside each customer folder it looks almost the same. There are 2 folders:
+<ul><b>
+    <li>/Apps/BGPCloud/(customer)/latestBatch/...</li>
+    <li>/Apps/BGPCloud/(customer)/processedBatch/...</li></b>
+</ul>
+<p>
+The <i>latestBatch</i> folder is where each vendor folder lives.
+For example, the KCH (Kona Hospital) folder looks like this:
+<ul><b>
+    <li>/Apps/BGPCloud/KCH/latestBatch/Hawaii_Beef_Producers/...</li>
+    <li>/Apps/BGPCloud/KCH/latestBatch/HFM/...</li></b>
+    <li>more vendors as needed...</li>
+</ul>
+<p>
+<p>
+At the bottom of it all, in each vendor folder, is where the individual PDF files are staged.
+They can have any names you like, but remember not to use the word <i>skip</i> in the name
+unless you want to omit that file from the batch.
+
+<hr>
+
+<br>
+
+
+<a name="sashido"></a>
+<h4>Sashido setup:</h4>
+The Database <i>DB</i> is hosted by sashido.io.  All batch outputs get stored there either
+temporarily (between batches) or permanently.  For the most part, users won't have
+to interact directly with the DB, but the overall structure will be covered here
+just in case.
+<p>
+To examine or change the DB, you must first log in.  See Heidi for login information.
+<p>
+When you log in, you will see the sashido main screen for the account:
+<br>
+<center>
+    <div class="outer" width:90%>
+        <center>
+            <img src=images/sash01.jpg>
+                <br>
+                <i>sashido main screen</i>
+                </center>
+    </div>
+</center>
+<br>
+There is only one app right now, so select the BGP Cloud Icon.  You will be taken to
+the navigation screen for the App.  On the left side is the navigation bar, which
+contains links to all the DB tables.  On the right side is the DB display area, which
+shows the contents of one table at a time.  The <i>Customer</i> table is shown in this example:
+<center>
+    <div class="outer" width:90%>
+        <center>
+            <img src=images/sash02.jpg>
+                <br>
+                <i>navigation screen</i>
+                </center>
+    </div>
+</center>
+<br>
+Look for the sub-section entitled <i>Core</i> on the left side. The icon looks like a rocket.
+Click the little arrow to the right of the title to show or hide the contents of the Core.
+Inside the Core is the <i>Browser</i>, which lets you look at all the DB tables.  There are
+several tables, one for EXP output data for each Customer, one for invoice outputs for each
+Vendor, and tables containing Batch output, latest activities, Customer and Vendor settings,
+invoice templates, and overall settings.
+<p>
+Most likely the only tables you would be changing would be the EXP_ tables for each customer,
+in case you want to fix OCR errors in the DB before exporting to Excel.  You may also need to
+add new Vendors or new Customers as things change over time.
+<p>
+<a name="typos"></a>
+<b>Typos, Splits, and Keywords</b>
+<p>
+There are three tables just for OCR errors and keyword recognition:
+<ul>
+    <li>Keywords : contains single-word keywords and corresponding categories</li>
+    <li>Splits   : contains OCR errors resulting in split words and their fixes</li>
+    <li>Typos    : contains OCR typos and their fixes</li>
+</ul>
+If a batch runs and you see a lot of <i>Bad Product Name</i> errors, this may mean that there
+are new products whose keywords the OCR needs to have added.  For instance, if the word
+<i>asparagus</i> is appearing as a Bad Product Name then it may have to be added as a keyword.
+<center>
+    <div class="outer" width:90%>
+        <center>
+            <img src=images/sash03.jpg>
+                <br>
+                <i>the keywords table</i>
+                </center>
+    </div>
+</center>
+To add a keyword, follow these steps:
+<ul>
+    <li>Make sure the Keywords table is selected in the navigation pane</li>
+    <li>Look for the little gear labeled <i>Edit</i> at the top right.  If there is a popup there, dismiss it.</li>
+    <li>A pulldown menu appears.  Select <i>Add a row</i></li>
+    <li>A new row gets created in the Keywords table, with empty columns.</li>
+    <li>Look for the column entitled <i>Name</i>.  Click 3x on the new row below this title</li>
+    <li>A small squarish edit box appears.</li>
+    <li>Enter the keyword you want to add and press the enter key.</li>
+    <li>Look for the <i>Category</i> column.  Click 3x below this title.</li>
+    <li>Enter the Category (produce, protein, etc) and press the enter key.</li>
+    <li>Make sure all entries are in lower case.</li>
+</ul>
+Once you have entered the new keywords the next batch you run will reload this information
+and the products with the new keywords should be recognized and added to the EXP output.
+<p>
+If you find strange misspellings, like <i>aspwrgus</i>, for example, you need to add this
+information to the <i>Typos</i> table.  Follow the instructions above for adding a keyword,
+but in this case add your new info to the <i>Typo</i> and <i>Fixed</i> columns.
+<p>
+If you find a misspelling like <i>asp ragus</i>, for example, you need to add this
+information to the <i>Splits</i> table.  Follow the instructions above for adding a keyword,
+but in this case add your new info to the <i>Split</i> and <i>Joined</i> columns.
+<p>
+After all this new info is entered, the next time you run the batch the typos and splits
+should be corrected on any future batches you may run.
 
 
 </body>

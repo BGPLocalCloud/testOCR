@@ -18,6 +18,7 @@
 //  2/12 add productname to fixPrices...
 //  3/20 add selectedCustomer support
 //  3/22 missed some tableName changes
+//  3/25 sort CSV output by PInv_BatchCounter_key
 #import "EXPTable.h"
 
 @implementation EXPTable
@@ -533,6 +534,8 @@
     if (debugMode) NSLog(@" read %d to %d",skip,skip+LIMIT_SIZE);
     query.skip = skip;
     query.limit = LIMIT_SIZE;
+    [query orderByDescending:PInv_BatchCounter_key]; //3/25
+
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
             for( PFObject *pfo in objects)

@@ -50,7 +50,7 @@ NSString *const PS_MoveProcessedFilesKey    = @"MoveProcessedFiles";
     if (self = [super init])
     {
         loaded = FALSE;
-        tableName = @"Settings2"; // 3/20
+        tableName = @"Settings"; 
         NSArray  *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         SettingsFileFullPath = [documentsDirectory stringByAppendingPathComponent:tableName];
