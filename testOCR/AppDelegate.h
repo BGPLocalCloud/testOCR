@@ -19,6 +19,7 @@
 #import "SessionManager.h"
 #import "Customers.h"
 #import "Vendors.h"
+#import "soundFX.h"
 
 #define VERBOSITY_DELIVERY 101
 #define VERBOSITY_DEBUG    102
@@ -41,6 +42,7 @@
 @property (strong, nonatomic) OCRSettings* settings;
 @property (nonatomic , assign) BOOL networkStatus;
 @property(nonatomic) BOOL debugMode;
+@property (nonatomic, strong) soundFX *sfx;
 
 -(NSString *)getBatchFolderPath;
 -(NSString *)getOutputFolderPath;

@@ -145,6 +145,7 @@
         vc.incomingOCRText = ocredText;
         vc.incomingImage   = _photo;
         vc.incomingVendor  = _vendor;
+        vc.incomingImageFilename = oto.imageFileName;
     }
 } //end prepareForSegue
 
@@ -202,13 +203,14 @@
 // 3/17
 - (void)didPerformOCR:(NSNotification *)notification
 {
-    NSLog(@" didPerformOCR");
+    NSLog(@" didPerformOCR...");
 //    od = (OCRDocument*)notification.object; //Note this ISN'T a copy! don't modify it!
 //    [od setupPage:page-1]; //NOTE must change on page +/-!!
 //    NSLog(@" annnd doc is %@",od);
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->spv stop];
         self->ocredText = [self->oto getRawResult];
+        NSLog(@"%@",self->ocredText);
         self->_outputTextView.text = self->ocredText;
     });
 } //end didReadBatchByIDs

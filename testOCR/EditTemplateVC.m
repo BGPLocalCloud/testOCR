@@ -51,7 +51,7 @@
     editing = adjusting = FALSE;
     
     docnum = 4;
-    OCR_mode = 1;  //1 = use stubbed OCR, 2 = fetch new OCR from server
+    OCR_mode = 2;  //1 = use stubbed OCR, 2 = fetch new OCR from server
 
     invoiceDate = [[NSDate alloc] init];
     rowItems    = [[NSMutableArray alloc] init];
@@ -134,10 +134,9 @@
         docRect = [od getDocRect]; //Get min/max limits of printed text
         [ot setOriginalRects : tlRect : trRect];
         ot.supplierName = vendor; //Pass along supplier name to template
-        ot.pdfFile      = selectFnameForTemplate;
-        
+        ot.pdfFile      = _incomingImageFilename;
         //Set unit scaling
-        [od computeScaling : tlRect : trRect];
+        [od setUnitScaling];
         [self clearFields]; //This clears vendor Parse entry too!
     }
         
@@ -204,6 +203,16 @@
 - (void)viewWillLayoutSubviews {
     //Make sure screen has settled before adding overlays!
     [self refreshOCRBoxes];
+    
+    //4/30 scale document vs viewport...
+    int iwid = _incomingImage.size.width;
+    int ihit = _incomingImage.size.height;
+    NSLog(@" iwid/hit %d %d",iwid,ihit);
+    CGRect screenRect = _inputImage.frame;
+    NSLog(@" swid/hit %f %f",screenRect.size.width,screenRect.size.height);
+    docXConv = (double)iwid / (double)screenRect.size.width ;
+    docYConv = (double)ihit / (double)screenRect.size.height ;
+
     if (selectBox == nil) //Add selection box...
     {
         selectDocRect = CGRectMake(0, 0, 100, 100); //
@@ -460,11 +469,15 @@
         [self alertMessage:@"Invoice Dump" :OCR_Results_Dump];
     }
     else{   //Better make sure template is set up here!!!
-        [self loadStubbedOCRDataLite]; //asdf
-        oto.imageFileName = selectFnameForTemplate;
+        //4/30 use incoming image...
+        NSArray *farray = [_incomingImageFilename componentsSeparatedByString:@"/"];
+        if (farray.count > 0) oto.imageFileName = farray[farray.count-1]; //Just get last component...
+        else oto.imageFileName = _incomingImageFilename;
         oto.ot = ot; //Hand template down to oto
-
-        [oto performOCROnImage : selectFnameForTemplate : [UIImage imageNamed:selectFnameForTemplate]];
+        [oto applyTemplate : ot : 0]; //4/30 MUST use page 0!
+        [oto writeEXPToParse : 0]; //Note 2nd arg is page!
+        NSString *OCR_Results_Dump = [oto dumpResults];
+        [self alertMessage:@"Invoice Dump" :OCR_Results_Dump];
     }
     
     //    [self callOCRSpace : @"hawaiiBeefInvoice.jpg"];
@@ -973,7 +986,7 @@
 -(void) moveOrResizeSelectBox : (int) xdel : (int) ydel : (int) xsdel : (int) ysdel
 {
     CGRect r = selectBox.frame;
-    NSLog(@" clugex %d clugey %d",clugex,clugey);
+    //NSLog(@" clugex %d clugey %d",clugex,clugey);
     int xi,yi,xs,ys;
     xi = r.origin.x;
     yi = r.origin.y;
@@ -989,15 +1002,15 @@
     int dh = pageRect.size.height;
     if (xs<arrowLHStepSize) xs = arrowLHStepSize;
     if (ys<arrowLHStepSize) ys = arrowLHStepSize;
-    if (xs>dw) xs = dw;
-    if (ys>dh) ys = dh;
+   //4/30 no upper limits... if (xs>dw) xs = dw;
+   //4/30 no upper limits... if (ys>dh) ys = dh;
     dy+=24; //NOTCH?
     if (xi < 0) xi = 0;
     if (yi < 0) yi = 0;
     //    if (xi < dx) xi = dx;
     //    if (yi < dy) yi = dy;
-    if (xi+xs > dx+dw) xi = (dx+dw) - xs;
-    if (yi+ys > dy+dh) yi = (dy+dh) - ys;
+   //4/30 no upper limits... if (xi+xs > dx+dw) xi = (dx+dw) - xs;
+   //4/30 no upper limits... if (yi+ys > dy+dh) yi = (dy+dh) - ys;
     selectBox.frame = CGRectMake(xi, yi, xs, ys);
     
     [self setupMagView : xi : yi];
@@ -1270,6 +1283,14 @@
 
     [self mailit: s];
 }
+
+
+//===========<OCRTopObjectDelegate>================================================
+// Called w/ bad product ID, or from errorInEXPRecord in EXP write
+- (void)errorInEXPRecord  : (NSString *) errMsg : (NSString*) objectID : (NSString*) productName
+{
+    NSLog(@" errorInEXPRecord %@ : %@: %@",errMsg,objectID,productName);
+} //end errorInEXPRecord
 
 #pragma mark - OCRTopObjectDelegate
 

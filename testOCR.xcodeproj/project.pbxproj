@@ -37,6 +37,15 @@
 		721C296621F56DD100631570 /* documentBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 721C296521F56DD100631570 /* documentBox.m */; };
 		721D9C2021CB122F00D1E78A /* OCRCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D9C1F21CB122F00D1E78A /* OCRCategories.m */; };
 		721D9C2421CB13E500D1E78A /* CatObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D9C2321CB13E500D1E78A /* CatObject.m */; };
+		72270D95224EEF3800151931 /* timer44k.wav in Resources */ = {isa = PBXBuildFile; fileRef = 72270D8F224EEF3800151931 /* timer44k.wav */; };
+		72270D96224EEF3800151931 /* lilglock.wav in Resources */ = {isa = PBXBuildFile; fileRef = 72270D90224EEF3800151931 /* lilglock.wav */; };
+		72270D97224EEF3800151931 /* blip.wav in Resources */ = {isa = PBXBuildFile; fileRef = 72270D91224EEF3800151931 /* blip.wav */; };
+		72270D98224EEF3800151931 /* congamid44k.wav in Resources */ = {isa = PBXBuildFile; fileRef = 72270D92224EEF3800151931 /* congamid44k.wav */; };
+		72270D99224EEF3800151931 /* bub1.wav in Resources */ = {isa = PBXBuildFile; fileRef = 72270D93224EEF3800151931 /* bub1.wav */; };
+		72270DA0224EEF9100151931 /* soundFX.m in Sources */ = {isa = PBXBuildFile; fileRef = 72270D9D224EEF9100151931 /* soundFX.m */; };
+		72270DA1224EEF9100151931 /* SynthDave.m in Sources */ = {isa = PBXBuildFile; fileRef = 72270D9F224EEF9100151931 /* SynthDave.m */; };
+		72270DA4224EEF9900151931 /* AudioBufferPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 72270DA2224EEF9900151931 /* AudioBufferPlayer.m */; };
+		72270DA8224EF0CB00151931 /* oogieMidiStubs.m in Sources */ = {isa = PBXBuildFile; fileRef = 72270DA7224EF0CB00151931 /* oogieMidiStubs.m */; };
 		722E08F321BF504700BBD88D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08F221BF504700BBD88D /* SystemConfiguration.framework */; };
 		722E08F521BF504E00BBD88D /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08F421BF504E00BBD88D /* NetworkExtension.framework */; };
 		722E08F721BF505500BBD88D /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08F621BF505500BBD88D /* AudioToolbox.framework */; };
@@ -118,6 +127,9 @@
 		72C90B9F21F450050032875D /* bgpspin.png in Resources */ = {isa = PBXBuildFile; fileRef = 72C90B9E21F450050032875D /* bgpspin.png */; };
 		72CA1A6A21CADE7200F908A0 /* SessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 72CA1A6921CADE7200F908A0 /* SessionManager.m */; };
 		72D6516D2204DA97009E2057 /* ComparisonVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D6516C2204DA97009E2057 /* ComparisonVC.m */; };
+		72DA6F97224EF51E0017287D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72DA6F95224EF51D0017287D /* AVFoundation.framework */; };
+		72DA6F98224EF51E0017287D /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72DA6F96224EF51D0017287D /* AVKit.framework */; };
+		72DA6F9A224EF70D0017287D /* clave.wav in Resources */ = {isa = PBXBuildFile; fileRef = 72DA6F99224EF70D0017287D /* clave.wav */; };
 		72DB332021CDC35F00AA44C0 /* DropboxTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DB331F21CDC35F00AA44C0 /* DropboxTools.m */; };
 		72E3FA89220BC1000073C84A /* PDFVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E3FA88220BC1000073C84A /* PDFVC.m */; };
 		72E5D31121B6DE4C005AF869 /* txt in Resources */ = {isa = PBXBuildFile; fileRef = 72E5D31021B6DE4C005AF869 /* txt */; };
@@ -180,6 +192,20 @@
 		721D9C2221CB13E500D1E78A /* CatObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CatObject.h; sourceTree = "<group>"; };
 		721D9C2321CB13E500D1E78A /* CatObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CatObject.m; sourceTree = "<group>"; };
 		722420F921C854F9002D02A4 /* DBKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DBKeys.h; sourceTree = "<group>"; };
+		72270D8F224EEF3800151931 /* timer44k.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = timer44k.wav; sourceTree = "<group>"; };
+		72270D90224EEF3800151931 /* lilglock.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = lilglock.wav; sourceTree = "<group>"; };
+		72270D91224EEF3800151931 /* blip.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = blip.wav; sourceTree = "<group>"; };
+		72270D92224EEF3800151931 /* congamid44k.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = congamid44k.wav; sourceTree = "<group>"; };
+		72270D93224EEF3800151931 /* bub1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = bub1.wav; sourceTree = "<group>"; };
+		72270D9C224EEF9100151931 /* soundFX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = soundFX.h; path = testOCR/soundFX.h; sourceTree = SOURCE_ROOT; };
+		72270D9D224EEF9100151931 /* soundFX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = soundFX.m; path = testOCR/soundFX.m; sourceTree = SOURCE_ROOT; };
+		72270D9E224EEF9100151931 /* SynthDave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SynthDave.h; path = testOCR/SynthDave.h; sourceTree = SOURCE_ROOT; };
+		72270D9F224EEF9100151931 /* SynthDave.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SynthDave.m; path = testOCR/SynthDave.m; sourceTree = SOURCE_ROOT; };
+		72270DA2224EEF9900151931 /* AudioBufferPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AudioBufferPlayer.m; path = testOCR/AudioBufferPlayer.m; sourceTree = SOURCE_ROOT; };
+		72270DA3224EEF9900151931 /* AudioBufferPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioBufferPlayer.h; path = testOCR/AudioBufferPlayer.h; sourceTree = SOURCE_ROOT; };
+		72270DA5224EEFC200151931 /* oogieMidiStubs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = oogieMidiStubs.h; path = testOCR/oogieMidiStubs.h; sourceTree = SOURCE_ROOT; };
+		72270DA6224EEFDE00151931 /* cheat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cheat.h; path = testOCR/cheat.h; sourceTree = SOURCE_ROOT; };
+		72270DA7224EF0CB00151931 /* oogieMidiStubs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = oogieMidiStubs.m; path = testOCR/oogieMidiStubs.m; sourceTree = SOURCE_ROOT; };
 		722E08F221BF504700BBD88D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		722E08F421BF504E00BBD88D /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		722E08F621BF505500BBD88D /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -292,6 +318,9 @@
 		72CA1A6921CADE7200F908A0 /* SessionManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SessionManager.m; sourceTree = "<group>"; };
 		72D6516B2204DA97009E2057 /* ComparisonVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ComparisonVC.h; sourceTree = "<group>"; };
 		72D6516C2204DA97009E2057 /* ComparisonVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ComparisonVC.m; sourceTree = "<group>"; };
+		72DA6F95224EF51D0017287D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		72DA6F96224EF51D0017287D /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
+		72DA6F99224EF70D0017287D /* clave.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = clave.wav; sourceTree = "<group>"; };
 		72DB331E21CDC35F00AA44C0 /* DropboxTools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DropboxTools.h; sourceTree = "<group>"; };
 		72DB331F21CDC35F00AA44C0 /* DropboxTools.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DropboxTools.m; sourceTree = "<group>"; };
 		72E3FA87220BC1000073C84A /* PDFVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PDFVC.h; sourceTree = "<group>"; };
@@ -315,6 +344,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72DA6F97224EF51E0017287D /* AVFoundation.framework in Frameworks */,
+				72DA6F98224EF51E0017287D /* AVKit.framework in Frameworks */,
 				72A9828921CCAC7400D5EAC6 /* WebKit.framework in Frameworks */,
 				729C592F21C1F62400F4C695 /* MessageUI.framework in Frameworks */,
 				722E090321BF50BF00BBD88D /* ParseUI.framework in Frameworks */,
@@ -335,6 +366,7 @@
 		7206007C21B64052000B26DC = {
 			isa = PBXGroup;
 			children = (
+				72270D8D224EEF3800151931 /* Samples */,
 				72693B2A2214DEF700EEB571 /* www */,
 				7209609021B81E4A00D49C63 /* Resources */,
 				72E5D31021B6DE4C005AF869 /* txt */,
@@ -356,6 +388,7 @@
 		7206008721B64052000B26DC /* testOCR */ = {
 			isa = PBXGroup;
 			children = (
+				72270D9B224EEF8300151931 /* SFX */,
 				7206008821B64052000B26DC /* AppDelegate.h */,
 				7206008921B64052000B26DC /* AppDelegate.m */,
 				7283813421C4A60000A2954B /* MainVC.h */,
@@ -467,9 +500,40 @@
 			path = "New Group";
 			sourceTree = "<group>";
 		};
+		72270D8D224EEF3800151931 /* Samples */ = {
+			isa = PBXGroup;
+			children = (
+				72DA6F99224EF70D0017287D /* clave.wav */,
+				72270D8F224EEF3800151931 /* timer44k.wav */,
+				72270D90224EEF3800151931 /* lilglock.wav */,
+				72270D91224EEF3800151931 /* blip.wav */,
+				72270D92224EEF3800151931 /* congamid44k.wav */,
+				72270D93224EEF3800151931 /* bub1.wav */,
+			);
+			path = Samples;
+			sourceTree = "<group>";
+		};
+		72270D9B224EEF8300151931 /* SFX */ = {
+			isa = PBXGroup;
+			children = (
+				72270DA6224EEFDE00151931 /* cheat.h */,
+				72270DA5224EEFC200151931 /* oogieMidiStubs.h */,
+				72270DA7224EF0CB00151931 /* oogieMidiStubs.m */,
+				72270DA3224EEF9900151931 /* AudioBufferPlayer.h */,
+				72270DA2224EEF9900151931 /* AudioBufferPlayer.m */,
+				72270D9C224EEF9100151931 /* soundFX.h */,
+				72270D9D224EEF9100151931 /* soundFX.m */,
+				72270D9E224EEF9100151931 /* SynthDave.h */,
+				72270D9F224EEF9100151931 /* SynthDave.m */,
+			);
+			path = SFX;
+			sourceTree = "<group>";
+		};
 		722E08F121BF504700BBD88D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				72DA6F95224EF51D0017287D /* AVFoundation.framework */,
+				72DA6F96224EF51D0017287D /* AVKit.framework */,
 				72A9828821CCAC7300D5EAC6 /* WebKit.framework */,
 				729C592E21C1F62400F4C695 /* MessageUI.framework */,
 				722E08FC21BF50BE00BBD88D /* Bolts.framework */,
@@ -644,13 +708,16 @@
 				72435AB721E697290048846A /* LICENCE.txt in Resources */,
 				7283812A21C4A36200A2954B /* dbNOT.png in Resources */,
 				7206009521B64055000B26DC /* LaunchScreen.storyboard in Resources */,
+				72270D97224EEF3800151931 /* blip.wav in Resources */,
 				7206009221B64055000B26DC /* Assets.xcassets in Resources */,
 				7209609721B81E6B00D49C63 /* arrUp.png in Resources */,
 				724B4BB521E74BE50086B933 /* multiNOT.png in Resources */,
 				72F6DC2A21E5C0D900EDF9A4 /* bluecheck.png in Resources */,
 				72B787B921ED310B00459AD4 /* emptyDoc.png in Resources */,
+				72270D95224EEF3800151931 /* timer44k.wav in Resources */,
 				7283813021C4A3FD00A2954B /* gearHOT.png in Resources */,
 				72435AB821E697290048846A /* README.md in Resources */,
+				72270D96224EEF3800151931 /* lilglock.wav in Resources */,
 				72B8DEC021C46459004ADD79 /* magtarg.png in Resources */,
 				729E92BF21DBE3A000048DAF /* hiIcon.png in Resources */,
 				7209609521B81E6B00D49C63 /* arrRight.png in Resources */,
@@ -670,6 +737,7 @@
 				726F0A4921DF092F007656FD /* dbGrey.png in Resources */,
 				729E92C521DC1CCC00048DAF /* globeIcon.png in Resources */,
 				7283813121C4A3FD00A2954B /* gearNOT.png in Resources */,
+				72270D98224EEF3800151931 /* congamid44k.wav in Resources */,
 				7283812D21C4A36200A2954B /* HamburgerHOT.png in Resources */,
 				7209609621B81E6B00D49C63 /* arrDown.png in Resources */,
 				7283812B21C4A36200A2954B /* HamburgerNOT.png in Resources */,
@@ -690,11 +758,13 @@
 				72A4FDCB21F2633E00203A50 /* grecoShrunk3.png in Resources */,
 				729E92BB21DBE3A000048DAF /* centIcon.png in Resources */,
 				724B4BB321E74BDE0086B933 /* multiHOT.png in Resources */,
+				72DA6F9A224EF70D0017287D /* clave.wav in Resources */,
 				72990756221524990021804F /* dbug.png in Resources */,
 				725145ED220037E40074EDBF /* lildbGrey.png in Resources */,
 				729E92C121DC1CC100048DAF /* barnIcon.png in Resources */,
 				72990754221523D40021804F /* empty64x64.png in Resources */,
 				72B787B521ED30DA00459AD4 /* redX.png in Resources */,
+				72270D99224EEF3800151931 /* bub1.wav in Resources */,
 				72435B3B21C96E8E00620F4B /* loves.jpg in Resources */,
 				720FB49D21EC4F5800C0F320 /* yellowWarningIcon.png in Resources */,
 			);
@@ -791,8 +861,11 @@
 				7209159321E0908C00F94258 /* ErrorViewController.m in Sources */,
 				7206009821B64055000B26DC /* main.m in Sources */,
 				72ACEA3222398D5A00AB973E /* Customers.m in Sources */,
+				72270DA0224EEF9100151931 /* soundFX.m in Sources */,
+				72270DA1224EEF9100151931 /* SynthDave.m in Sources */,
 				7290229C21D58FF900885EF9 /* activityCell.m in Sources */,
 				7206008A21B64052000B26DC /* AppDelegate.m in Sources */,
+				72270DA4224EEF9900151931 /* AudioBufferPlayer.m in Sources */,
 				72BA4D2B21CF52B600F432E9 /* BatchObject.m in Sources */,
 				72BA4D2521CE175000F432E9 /* BatchViewController.m in Sources */,
 				72990759221632430021804F /* LoginVC.m in Sources */,
@@ -803,6 +876,7 @@
 				729C592C21C1D08900F4C695 /* smartProducts.m in Sources */,
 				721D9C2421CB13E500D1E78A /* CatObject.m in Sources */,
 				721C296621F56DD100631570 /* documentBox.m in Sources */,
+				72270DA8224EF0CB00151931 /* oogieMidiStubs.m in Sources */,
 				725145F02200B9860074EDBF /* GenParse.m in Sources */,
 				728EECC821ED1DDB00F83129 /* invoiceCell.m in Sources */,
 				7260676A22210E6E00FF24A5 /* AnalyzeVC.m in Sources */,

@@ -158,6 +158,7 @@
 @property (nonatomic , strong) NSString* incomingOCRText;
 @property (nonatomic , strong) UIImage* incomingImage;
 @property (nonatomic , strong) NSString* incomingVendor;
+@property (nonatomic , strong) NSString* incomingImageFilename;
 
 
 

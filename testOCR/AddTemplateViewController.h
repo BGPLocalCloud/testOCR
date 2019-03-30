@@ -76,6 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // sharable properties...
 @property (nonatomic , strong) UIImage *photo;
+@property (nonatomic , assign) CGRect photoRect;
 @property (nonatomic , strong) UIImage *rphoto;
 @property (nonatomic , strong) UIImage *prphoto;
 @property (nonatomic , assign) int step;

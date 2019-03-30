@@ -184,9 +184,10 @@ a[href] {
 /* end */
   </style>
 </head>
+<a name="tod"></a>
 
 <body>
-    <h1>Table of Contents</h1>
+    <h1>BGP Cloud Help: Contents</h1>
 <ul>
     <li><a href="#menu">Main Menu</a></li>
     <li><a href="#customer">Customer Menu</a></li>
@@ -194,9 +195,11 @@ a[href] {
     <li><a href="#output">Output</a></li>
     <li><a href="#batch">Batch</a></li>
     <li><a href="#batchpopup">Batch Popup Menu</a></li>
-    <li><a href="#dropbox">Dropbox</a></li>
-    <li><a href="#sashido">Sashido</a></li>
+    <li><a href="#dropbox">Dropbox Setup</a></li>
+    <li><a href="#sashido">Sashido Setup</a></li>
     <li><a href="#typos">Fixing Typos and adding Keywords</a></li>
+    <li><a href="#settings">Settings</a></li>
+    <li><a href="#flowchart">Batch Flowchart</a></li>
 </ul>
     
     
@@ -207,27 +210,30 @@ The app is designed to process sets of invoices, usually in PDF format, and outp
 You can also feed in PNG or JPG scans as well as certain CSV text files.
 <p>
 Uses Dropbox:<br>
-The invoices are assumed to be stored by vendor in a preset folder on Dropbox.
-<br>
-For instance, HFM invoices are stored in
-<br>
-<b>/latestBatch/HFM/...</b>
-<br>
-As more customers are added this structure will change a little.
-<br>
-For Quest the folder for Gordon Foodservice will be
-<br>
-<b>/Quest/latestBatch/Gordon/</b>
+The invoices are assumed to be stored by vendor in preset folders on Dropbox.
+Dropbox provides a folder for this app, called "Apps/BGPCLoud/...".
+Each customer has a folder in this area.
+See
+<a href="#dropbox">
+    <b>Dropbox Setup</b>
+</a>
+for more info...
 <p>
-These files are referred to as <i>staged files</i>.
+PDF files prepped for batch runs are referred to as <i>staged files</i>.
 <br>
-Staged files can be skipped over if you don`t want to process them. Just add the word <i>skip</i> to the filename right before the dot like this: octoberInvoice<i>skip</i>.pdf
-<p>
-Once a batch is run, files that were processed ok get moved to a different folder. There is one processed folder per vendor. For the Gordon files above the folder is
 <br>
-<b>/Quest/processedBatch/Gordon/</b>
+<b>Staged files can be skipped over if you don`t want to process them. Just add the word <i>skip</i> to the filename right before the dot like this: octoberInvoice<i>skip</i>.pdf</b>
 <p>
-These staging and processed folders can be reconfigured by changing the app settings which are stored in the DB. See <i>settings</i> below.
+Once a batch is run, files that were processed ok get moved to a different folder.
+these files are referred to as <i>processed files</i>.
+<br>
+These staging and processed folders can be reconfigured by changing the app settings which are stored in the DB.
+See
+<a href="#settings">
+    <b>Settings</b>
+</a>
+below for more instructions.
+
 <p>
 <h4>OCR Server:</h4>
 An OCR (Optical Character Recognition)  server is used to convert scanned images to readable text that can be organized and sorted.  The server also can be used from a website for free:
@@ -274,7 +280,14 @@ At the bottom of the screen are four buttons which navigate you through the app.
     <li>Batch: Processes Invoices</li>
 </ul>
 
-If you select items from the table, you can examine details for some activities. If the activity was related to a batch you can get DB records such as EXP items produced by the batch. You can also fix errors and warnings in EXP line items produced by the batch, or you can look at the Batch Report. See <b>Batch Popup Menu</b> below for more instructions.
+If you select items from the table, you can examine details for some activities. If the activity was related to a batch you can get DB records such as EXP items produced by the batch. You can also fix errors and warnings in EXP line items produced by the batch, or you can look at the Batch Report.
+    See
+    <a href="#batchpopup">
+    <b>Batch Popup Menu</b>
+    </a>
+    below for more instructions.
+
+
 <br>
 
 <a name="menu"></a>
@@ -283,7 +296,11 @@ The Main Menu navigates to other screens where you can create or edit templates,
 <p>
 You can <i>change the customer</i> setting by selecting the top item in the Menu.  This will put up yet another set of choices containing all the current customers.  Make sure you have the correct customer selected before running a batch!
 <p>
+<hr>
 <a name="customer"></a>
+<a href="#tod">
+    <img align=right width=64 height = 64 src=images/topHot.jpg>
+</a>
 <h4>Customer Menu:</h4>
 To get here, select <i>Change Customer</i> from the Main Menu.
 Here you can select which customer to run batches on.
@@ -294,11 +311,19 @@ also has their own EXP table for batch line item outputs.
 The selected customer is shown at the top of the Home Screen and
 also at the top of the Batch Screen.
 <p>
+<hr>
 <a name="db"></a>
-<h4>DB:</h4>
+<a href="#tod">
+    <img align=right width=64 height = 64 src=images/topHot.jpg>
+</a>
+<h4>Database:</h4>
 This puts up another menu which lets you look at all EXP table line items from the latest batch, or the latest invoices grouped by vendor. For instance the <i>HFM Invoices</i> option will show a table of HFM invoices produced in the last batch run.
 See below for more information on these options.
 <p>
+<hr>
+<a href="#tod">
+    <img align=right width=64 height = 64 src=images/topHot.jpg>
+</a>
 <a name="output"></a>
 <h4>Output:</h4>
 This switches apps to the BGP Charts app.  This app displays a set of canned FY data in a variety of formats,
@@ -306,7 +331,11 @@ and it also can load the contents of the <b>EXP_Comparison</b> table, which is c
 in CSV data from an Excel spreadsheet.  The same button position in the Chart App returns you
 to this app.
 <p>
+<hr>
 <a name="batch"></a>
+<a href="#tod">
+    <img align=right width=64 height = 64 src=images/topHot.jpg>
+</a>
 <h4>Batch:</h4>
 This takes you to the Batch Screen. At startup, the app takes up to 15 seconds to load important vendor settings from the DB and this button won`t work until the settings are present.
 <br>
@@ -321,6 +350,10 @@ This takes you to the Batch Screen. At startup, the app takes up to 15 seconds t
 </center>
 
 
+<hr>
+<a href="#tod">
+    <img align=right width=64 height = 64 src=images/topHot.jpg>
+</a>
 <h1>Batch Screen:</h1>
 This is where batches are run. The first thing done is a query of Dropbox, to see if there are any staged files for processing. Then it displays a list of vendors with a filecount by each name.
 <br>Vendors with zero files staged are not available for batch processing. Also note that staged files with <i>skip</i> in their name <b>are</b> included in these filecounts.
@@ -396,6 +429,9 @@ If you want to rerun a batch after halting it or because of an internet error, o
 </center>
 
 <a name="batchpopup"></a>
+<a href="#tod">
+    <img align=right width=64 height = 64 src=images/topHot.jpg>
+</a>
 <h1>Batch Popup Menu</h1>
 
 <ul>
@@ -423,7 +459,10 @@ If you select a batch a popup menu appears which lets you view and sometimes alt
 There are two ways to fix errors
 
 <ul>
-    <li>Change the database directly (see Sashido Instructions)</li>
+    <li>Change the database directly (see
+        <a href="#sashido">
+            <b>Sashido Setup</b>
+        </a>)
     <li>Use the BGPCloud <b>Fix Errors</b> option to change the errors in the database</li>
 </ul>
 <br>
@@ -496,6 +535,9 @@ Once you are done fixing errors you can exit the Error Window by pressing the li
 
 
 <a name="dropbox"></a>
+<a href="#tod">
+    <img align=right width=64 height = 64 src=images/topHot.jpg>
+</a>
 <h4>Dropbox setup:</h4>
 The BGPCloud Dropbox account has a special folder for this app,
 and that is where all the input PDF files are staged.
@@ -537,9 +579,10 @@ unless you want to omit that file from the batch.
 <hr>
 
 <br>
-
-
 <a name="sashido"></a>
+<a href="#tod">
+    <img align=right width=64 height = 64 src=images/topHot.jpg>
+</a>
 <h4>Sashido setup:</h4>
 The Database <i>DB</i> is hosted by sashido.io.  All batch outputs get stored there either
 temporarily (between batches) or permanently.  For the most part, users won't have
@@ -585,7 +628,12 @@ Most likely the only tables you would be changing would be the EXP_ tables for e
 in case you want to fix OCR errors in the DB before exporting to Excel.  You may also need to
 add new Vendors or new Customers as things change over time.
 <p>
+
+<hr>
 <a name="typos"></a>
+<a href="#tod">
+    <img align=right width=64 height = 64 src=images/topHot.jpg>
+</a>
 <b>Typos, Splits, and Keywords</b>
 <p>
 There are three tables just for OCR errors and keyword recognition:
@@ -632,7 +680,32 @@ but in this case add your new info to the <i>Split</i> and <i>Joined</i> columns
 <p>
 After all this new info is entered, the next time you run the batch the typos and splits
 should be corrected on any future batches you may run.
+<hr>
+<a name="settings"></a>
+<a href="#tod">
+    <img align=right width=64 height = 64 src=images/topHot.jpg>
+</a>
+<h4>Settings:</h4>
+The app Settings are stored in a table named <i>Settings<i> on Parse.
+This table contains only one row, and mostly consists of preset folder names.
+<p>
+<ul>
+    <li>BatchFolder : Determines where <i>staged files</i> are kept. (*)</li>
+    <li>OutputFolder : Determines where <i>processed files</i> are kept. (*)</li>
+    <li>TemplateFolder : Determines where <i>templates</li> are kept.
+    <li>ComparisonFolder : used to load CSV files into the DB from Excel</li>
+    <li>MoveProcessedFiles : Boolean: YES / NO : moves PDFs from Batch to Output Folder upon success</li>
+    <li>ErrorFolder : unused</li>
+    <li>RejectFolder : unused</li>
+    <li>JPEGQuality : unused</li>
 
-
+</ul>
+<hr>
+<a name="flowchart"></a>
+<a href="#tod">
+    <img align=right width=64 height = 64 src=images/topHot.jpg>
+</a>
+<h4>Batch Flowchart:</h4>
+<img width=100% src=images/flochart.jpg>
 </body>
 </html>

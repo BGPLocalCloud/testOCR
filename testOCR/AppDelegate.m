@@ -19,6 +19,19 @@
 
 @implementation AppDelegate
 
+#define NUM_SFX_SAMPLES 8
+NSString *hdkSoundFiles[NUM_SFX_SAMPLES] =
+{
+    @"clave",          //00:click sound
+    @"clave",                //01:Opening sound
+    @"blip",                //02:tile sound
+    @"bub1",            //03:win sound
+    @"lilglock",         //04:glockinspiel trimmed
+    @"congamid44k",         //05
+    @"congamid44k",         //06 secret sound
+    @"congamid44k",         //07 Squirrel Sound
+};
+
 
 //====(TestOCR AppDelegate)==========================================
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -46,7 +59,7 @@
         exit(1);
     }
     [DBClientsManager setupWithAppKey:appKey];
-    NSLog(@" ...logged into dropbox...");
+    //NSLog(@" ...logged into dropbox...");
 
     //Crashlytics / Fabric
     [Fabric with:@[[Crashlytics class]]];
@@ -61,6 +74,21 @@
     //_selectedCustomerFullName = @"Kona Hospital";
     //Reachability...
     [self monitorReachability];
+#define USE_SFX
+#ifdef USE_SFX
+    //Load Audio Sample files...
+    _sfx = [soundFX sharedInstance];
+    for (int i=0;i<NUM_SFX_SAMPLES;i++)
+    {
+        [_sfx setSoundFileName:i :hdkSoundFiles[i]];
+    }
+    //For now, load ALL audio in background: mixed foreground/background audio loading was
+    //  causing data corruption in the sound buffers. We will have to accept no "bong" sound
+    //STill getting audio weirdness: Load in bkgd 99 seems to load up every sample but 1,
+    //  while loadAudio (foreground) produces all null audio or static!
+    [_sfx loadAudioBKGD:0]; ///6]; //Load all samples except 6 in bkgd, 6 loads immediately...
+#endif
+
     
     _debugMode = FALSE;
     

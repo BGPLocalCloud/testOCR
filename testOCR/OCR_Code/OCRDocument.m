@@ -23,6 +23,7 @@
 
 @implementation OCRDocument
 
+double drand(double lo_range,double hi_range ); //External...
 
 //=============(OCRDocument)=====================================================
 -(instancetype) init
@@ -1663,7 +1664,13 @@
     postOCRMinorErrors[row] = merror;
 }
 
-
+//=============(OCRDocument)=====================================================
+// 4/30 For template edit: template and document are the same...
+-(void) setUnitScaling
+{
+    hScale = vScale = 1.0;
+    unitScale = TRUE;
+}
 
 
 //=============(OCRDocument)=====================================================
@@ -1810,7 +1817,7 @@
 } //end template2DocRect
 
 
-
+#ifdef NEED_DRAND_HERE
 
 /*-----------------------------------------------------------*/
 /*-----------------------------------------------------------*/
@@ -1825,6 +1832,8 @@ double drand(double lo_range,double hi_range )
     outd = (double)(lo_range + (hi_range-lo_range)*tempd);
     return(outd);
 }   //end drand
+
+#endif
 
 
 

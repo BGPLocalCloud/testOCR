@@ -38,6 +38,7 @@
 #import "spinnerView.h"
 #import "smartProducts.h"
 #import "Vendors.h"
+#import "soundFX.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MainVC : UIViewController <NavButtonsDelegate,ActivityTableDelegate,
@@ -81,6 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) IBOutlet UILabel *versionLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *logoView;
+@property (nonatomic, strong) soundFX *sfx;
 
 
 - (IBAction)eSelect:(id)sender;

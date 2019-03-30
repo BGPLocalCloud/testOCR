@@ -374,9 +374,9 @@ NSString * steps[] = {
     if([[segue identifier] isEqualToString:@"checkTemplateSegue"])
     {
         CheckTemplateVC *vc = (CheckTemplateVC*)[segue destinationViewController];
-        vc.photo    = _templateImage.image;
-        vc.fileName = imagePath;
-        vc.vendor   = _vendor;
+        vc.photo     = _templateImage.image;
+        vc.fileName  = imagePath;
+        vc.vendor    = _vendor;
     }
 }
 
@@ -638,9 +638,11 @@ NSString * steps[] = {
 - (void)didDownloadImages
 {
     NSLog(@" ...got image");
-    _photo   = dbt.batchImages[0];
-    gotPhoto = TRUE;
-    _step    = 1; //Set UI state...
+    _photo     = dbt.batchImages[0];
+    NSValue *rectObj = dbt.batchImageRects[0]; //PDF size (hopefully!)
+    _photoRect = [rectObj CGRectValue];
+    gotPhoto   = TRUE;
+    _step      = 1; //Set UI state...
 
 
     dispatch_async(dispatch_get_main_queue(), ^{

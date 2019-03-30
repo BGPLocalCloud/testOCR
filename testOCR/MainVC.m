@@ -51,6 +51,9 @@
     et = [[EXPTable alloc] init];
     et.delegate = self;
 
+    // 3/29 sfx
+    _sfx         = [soundFX sharedInstance];
+
     ecount = 0;
     
     vv = [Vendors sharedInstance];
@@ -169,7 +172,7 @@
         loginMode = @"login";
         [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
     }
-    else NSLog(@" ...logged into Parse");
+    //else NSLog(@" ...logged into Parse");
     _versionLabel.text = [NSString stringWithFormat:@"V %@",versionNumber];
     [self testit];
 }
@@ -231,6 +234,7 @@
                                               }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Logout From Dropbox",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self makeCancelSound];
                                                   [DBClientsManager unlinkAndResetClients];
                                               }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Logout From Sashido",nil)
@@ -245,6 +249,7 @@
                                               }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self makeCancelSound];
                                               }]];
     [self presentViewController:alert animated:YES completion:nil];
 
@@ -280,6 +285,7 @@
     }
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self makeCancelSound];
                                               }]];
     [self presentViewController:alert animated:YES completion:nil];
     
@@ -317,6 +323,7 @@
     }
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                               [self makeCancelSound];
                                                            }];
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
@@ -398,6 +405,7 @@
     } //end isbatch
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                               [self makeCancelSound];
                                                            }]];
     [self presentViewController:alert animated:YES completion:nil];
     
@@ -421,6 +429,7 @@
                                                         }];
     UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"NO",nil)
                                                        style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                           [self makeCancelSound];
                                                        }];
     //DHS 3/13: Add owner's ability to delete puzzle
     [alert addAction:yesAction];
@@ -443,9 +452,11 @@
                                                         style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                             [self->spv start:@"Clear Activities..."];
                                                             [self->gp deleteAllByTableAndKey:@"activity" :@"*" :@"*"];
+
                                                         }];
     UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"NO",nil)
                                                        style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                           [self makeCancelSound];
                                                        }];
     //DHS 3/13: Add owner's ability to delete puzzle
     [alert addAction:yesAction];
@@ -507,10 +518,34 @@
 
 
 //=============OCR MainVC=====================================================
+-(void) makeCancelSound
+{
+    [self->_sfx makeTicSoundWithPitch : 5 : 82];
+}
+
+
+//=============OCR MainVC=====================================================
+-(void) makeSegueSound
+{
+    [self->_sfx makeTicSoundWithPitch : 4 : 84];
+    [self->_sfx makeTicSoundWithPitch : 4 : 89];
+    [self->_sfx makeTicSoundWithPitch : 4 : 96];
+}
+
+//=============OCR MainVC=====================================================
+-(void) makeSelectSound
+{
+    [self->_sfx makeTicSoundWithPitch : 5 : 70];
+}
+
+
+
+//=============OCR MainVC=====================================================
 // Handles last minute VC property setups prior to segues
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     //NSLog(@" prepareForSegue: %@ sender %@",[segue identifier], sender);
+    [self makeSegueSound];
     if([[segue identifier] isEqualToString:@"loginSegue"])
     {
         LoginVC *vc = (LoginVC*)[segue destinationViewController];
@@ -755,14 +790,15 @@
 {
     //NSLog(@"   didselectNavButton %d",which);
     // [_sfx makeTicSoundWithPitch : 8 : 50 + which];
-    
     if (which == 0) //THis is now a multi-function popup...
     {
+        [self makeSelectSound];
         [self menu];
         //[self performSegueWithIdentifier:@"cloudSegue" sender:@"feedCell"];
     }
     else if (which == 1) //THis is now a multi-function popup...
     {
+        [self makeSelectSound];
         [self dbmenu];
     }
     else if (which == 2) //Templates / settings?

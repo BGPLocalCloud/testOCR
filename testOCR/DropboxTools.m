@@ -350,7 +350,7 @@
                  NSLog(@" ...found jpg/png file data");
                  nextImage = [UIImage imageWithData:fileData];
                  if (nextImage != nil)
-                 {
+                 { 
                      [self->_batchImages     addObject:nextImage];
                      [self->_batchImagePaths addObject:imagePath];
                      [self->_batchImageData  addObject:fileData];

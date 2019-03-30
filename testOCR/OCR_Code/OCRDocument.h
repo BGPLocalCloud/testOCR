@@ -93,6 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(NSString*) cleanUpNumberString : (NSString *)nstr;
 -(NSString *)cleanupPrice : (NSString *)s;
 -(NSMutableArray *) cleanUpRawColumns : (int) index : (NSString *)ctype : (NSMutableArray*) a;
+-(void) setUnitScaling;
 -(void) computeScaling: (CGRect )tlr : (CGRect )trr;
 -(void) dumpArrayFull : (NSArray*)a;
 -(void) dumpArray : (NSArray*)a;
