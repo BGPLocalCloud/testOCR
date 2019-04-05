@@ -19,6 +19,7 @@
 // 2/23 Fix array -> mutableArray conversion bug
 // 3/12 add page field
 // 3/22 add parentUp checks
+// 4/5  add sfx, fix packFromPFObject
 #import "invoiceTable.h"
 
 @implementation invoiceTable
@@ -91,21 +92,23 @@
 } //end packInvoiceOids
 
 //=============(invoiceTable)=====================================================
+//DHS 4/5 DUH: need to create new object every time!
 -(invoiceObject*) packFromPFObject : (PFObject *)pfo
 {
-    _iobj.objectID       = pfo.objectId;
-    _iobj.date           = [pfo objectForKey:PInv_Date_key];
-    _iobj.packedEXPIDs   = [pfo objectForKey:PInv_EXPObjectID_key];
-    _iobj.invoiceNumber  = [pfo objectForKey:PInv_InvoiceNumber_key];
-    _iobj.itotal         = [pfo objectForKey:PInv_ITotal_Key];
-    _iobj.customer       = [pfo objectForKey:PInv_CustomerKey];
-    _iobj.batchID        = [pfo objectForKey:PInv_BatchID_key];
-    _iobj.PDFFile        = [pfo objectForKey:PInv_PDFFile_key];
-    _iobj.pageCount      = [pfo objectForKey:PInv_PageCount_key];
-    _iobj.page           = [pfo objectForKey:PInv_Page_key];
-    _iobj.vendor         = [pfo objectForKey:PInv_Vendor_key];
-    [self unpackInvoiceOids]; //asdf
-    return _iobj;
+    invoiceObject* tempiobj = [[invoiceObject alloc] init];
+    tempiobj.objectID       = pfo.objectId;
+    tempiobj.date           = [pfo objectForKey:PInv_Date_key];
+    tempiobj.packedEXPIDs   = [pfo objectForKey:PInv_EXPObjectID_key];
+    tempiobj.invoiceNumber  = [pfo objectForKey:PInv_InvoiceNumber_key];
+    tempiobj.itotal         = [pfo objectForKey:PInv_ITotal_Key];
+    tempiobj.customer       = [pfo objectForKey:PInv_CustomerKey];
+    tempiobj.batchID        = [pfo objectForKey:PInv_BatchID_key];
+    tempiobj.PDFFile        = [pfo objectForKey:PInv_PDFFile_key];
+    tempiobj.pageCount      = [pfo objectForKey:PInv_PageCount_key];
+    tempiobj.page           = [pfo objectForKey:PInv_Page_key];
+    tempiobj.vendor         = [pfo objectForKey:PInv_Vendor_key];
+    [self unpackInvoiceOids];
+    return tempiobj;
 } //end packFromPFObject
 
 

@@ -48,6 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
     NavButtons *nav;
     int viewWid,viewHit,viewW2,viewH2;
     ActivityTable *act;
+    AppDelegate *mappDelegate; //4/5 used often enough...
     NSString *versionNumber;
     UIImage *emptyIcon;
     UIImage *dbIcon;
@@ -55,6 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
     UIImage *errIcon;
     int selectedRow;
     NSString* stype;
+    NSString* sInvoiceNumber;
     NSString* sdata;
     NSString* scustomer;
     UIRefreshControl *refreshControl;
@@ -66,7 +68,6 @@ NS_ASSUME_NONNULL_BEGIN
     spinnerView *spv;
     DropboxTools *dbt;
     GenParse *gp;
-    Vendors *vv;
     EXPTable *et;
     NSString *selVendor;
     BOOL fatalErrorSelect; //2/11 Better way to do this? Maybe type select?
@@ -86,6 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (IBAction)eSelect:(id)sender;
+- (IBAction)customerSelect:(id)sender;
 
 
 @end

@@ -12,6 +12,7 @@
 //  Created by Dave Scruton on 12/5/18.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  4/1 add loadTemplateFromPFObject
 
 #import "OCRTemplate.h"
 
@@ -518,6 +519,18 @@
     NSLog(@" ...saved templates to %@ [%@]",fileLocation,fileWorkString);
 }
 
+//=============(OCRTemplate)=====================================================
+// DHS 4/1 for loading a template from DB or from full table of PFObjects...
+-(void) loadTemplateFromPFObject : (NSArray *) objects : (int) index
+{
+    if (index < 0 || index >= objects.count) return;
+    [self->ocrBoxes removeAllObjects];
+    PFObject *pfo = objects[index];
+    NSString *ps = [pfo objectForKey:@"packedString"];
+    [self unpackFromString:ps];
+    ps = [pfo objectForKey:PInv_PDFFile_key];
+    if (ps != nil) self->_pdfFile = ps;
+} //end loadTemplateFromPFObject
 
 //=============(OCRTemplate)=====================================================
 // Use vendor name to find record, loads associated template...
@@ -525,21 +538,16 @@
 {
     if (vendorName == nil) return;
     PFQuery *query = [PFQuery queryWithClassName:@"templates"];
-    [query whereKey:@"vendor" equalTo:vendorName];
+    if (![vendorName isEqualToString:@"*"]) //DHS 5/1 add wildcard support
+        [query whereKey:@"vendor" equalTo:vendorName];
     [query orderByDescending:@"createdAt"]; //Get latest saved template (there may be many edits)...
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) { //Query came back...
-            [self->ocrBoxes removeAllObjects];
-            for( PFObject *pfo in objects) //Should only be one?
-            {
-                NSString *ps = [pfo objectForKey:@"packedString"];
-                [self unpackFromString:ps];
-                ps = [pfo objectForKey:PInv_PDFFile_key];
-                if (ps != nil) self->_pdfFile = ps;
-                break;
-            }
             if (objects.count > 0)
-                [self.delegate didReadTemplate];
+            {
+                [self loadTemplateFromPFObject : objects : 0]; //4/1
+                [self.delegate didReadTemplate : objects];
+            }
             else
                 [self.delegate errorReadingTemplate : @"Empty table"];
         }

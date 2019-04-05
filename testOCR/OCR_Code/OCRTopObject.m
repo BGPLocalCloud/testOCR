@@ -60,7 +60,6 @@ static OCRTopObject *sharedInstance = nil;
         it.delegate = self;
         et = [[EXPTable alloc] init];   // Parse DB: EXP line item storage
         et.delegate = self;
-        [et setTableNameForCurrentCustomer]; //3/20 multi-customer support
         act = [[ActivityTable alloc] init];
 
         _batchMonth = @"01-JUL"; //DHS this needs to be INPUT? from DB?ß
@@ -793,6 +792,8 @@ static OCRTopObject *sharedInstance = nil;
 //  also smartCount must be set!
 -(void) writeEXPToParse : (int) page
 {
+    
+    [et setTableNameForCurrentCustomer]; //4/5  multi-customer support moved here!@
     smartCount  = 0;
     //Set up EXP for new entries...
     [et clear];

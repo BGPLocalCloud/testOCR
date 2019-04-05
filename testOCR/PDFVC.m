@@ -13,7 +13,7 @@
 //
 //  2/10 add download for PDF's not in cache, note retry of output folder too
 //  2/23 Fix array -> mutableArray conversion bug
-
+//  4/5  add sfx, rotate image, page input
 #import "PDFVC.h"
 
 
@@ -28,8 +28,10 @@
     dbt.delegate = self;
     [dbt setParent:self];
     triedOutputFolder = FALSE;
-
-
+    pageInt = 1; //4/5
+    // 4/5 sfx
+    _sfx         = [soundFX sharedInstance];
+    rotatedCount = 0;
     pc    = [PDFCache sharedInstance];      //For looking at images of ivoices
     vv    = [Vendors sharedInstance];
     return self;
@@ -43,17 +45,15 @@
     _pdfImage.image = photo;
     _scrollView.delegate=self;
     vindex = [vv getVendorIndex:_vendor];
-    page = 1;
     pastEnd =  FALSE;
     
     //2/10 load spinner view in case we need to download PDF...
     CGSize csz   = [UIScreen mainScreen].bounds.size;
     spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, csz.width, csz.height)];
     [self.view addSubview:spv];
-
-    
+    pageInt = 1 + _page.intValue; //DHS 4/5 page passed in as string
+    //NSLog(@" incoming page %@ -> %d",_page,pageInt);
     [self loadPhoto];
-
 }
 
 //=============PDF VC=====================================================
@@ -90,7 +90,7 @@
 //=============PDF VC=====================================================
 -(void) dismiss
 {
-    //[_sfx makeTicSoundWithPitch : 8 : 52];
+    [self->_sfx makeTicSoundWithPitch : 5 : 82];
     [self dismissViewControllerAnimated : YES completion:nil];
     
 }
@@ -106,7 +106,8 @@
 {
     if (!pastEnd)
     {
-        page++;
+        [self makeSelectSound];
+        pageInt++;
         [self loadPhoto];
     }
 }
@@ -114,9 +115,26 @@
 //=============PDF VC=====================================================
 - (IBAction)prevPageSelect:(id)sender
 {
-    page--;
-    if (page < 1) page = 1;
+    pageInt--;
+    if (pageInt < 1) pageInt = 1;
+    [self makeSelectSound];
     [self loadPhoto];
+}
+
+//=============PDF VC=====================================================
+-(void) makeSelectSound
+{
+    [self->_sfx makeTicSoundWithPitch : 5 : 70];
+}
+
+//=============PDF VC=====================================================
+//  4/5 add rotate 90 degrees
+- (IBAction)rotSelect:(id)sender {
+    [self makeSelectSound];
+    UIImage *ii = _pdfImage.image;
+    ii = [itools rotate90CCW : ii];
+    _pdfImage.image = ii;
+    rotatedCount++;
 }
 
 
@@ -124,7 +142,7 @@
 //What about going past end page?
 -(void) loadPhoto
 {
-    UIImage *testPhoto =  [pc getImageByID:_pdfFile : page];
+    UIImage *testPhoto =  [pc getImageByID:_pdfFile : pageInt];
     if (testPhoto == nil) //Cache miss!
     {
         [spv start:@"Download PDF..."];
@@ -141,8 +159,10 @@
         if ([vrstr isEqualToString:@"-90"])  //Rotate to make readable
             photo = [itools rotate90CCW:photo];
     }
+    //DHS 4/5 user wants more rotation?
+    for (int i=0;i<rotatedCount;i++) photo = [itools rotate90CCW : photo];
     _pdfImage.image = photo;
-    _titleLabel.text = [NSString stringWithFormat:@"Invoice:%@,Page %d",_invoiceNumber,page];
+    _titleLabel.text = [NSString stringWithFormat:@"Invoice: Page %d",pageInt];
 }
 
 //=============PDF VC=====================================================

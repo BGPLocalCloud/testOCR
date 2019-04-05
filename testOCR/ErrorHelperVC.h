@@ -55,6 +55,7 @@
     NSString *errorStatus;
     
     int iwid,ihit;
+    int rotatedCount;
 
 }
 

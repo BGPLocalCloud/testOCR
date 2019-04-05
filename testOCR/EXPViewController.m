@@ -14,6 +14,7 @@
 //  1/9 add pull to refresh
 //  2/22 add loadingData flag
 //  2/22 moved CSV export to mainVC
+//  4/5  add sfx
 
 #import "EXPViewController.h"
 
@@ -28,9 +29,10 @@
 -(id)initWithCoder:(NSCoder *)aDecoder {
     if ( !(self = [super initWithCoder:aDecoder]) ) return nil;
     
-//    od = [[OCRDocument alloc] init];
     ot = [[OCRTemplate alloc] init];
     ot.delegate = self;
+    // 4/5 sfx
+    _sfx         = [soundFX sharedInstance];
     
     et = [[EXPTable alloc] init];
     et.delegate     = self;
@@ -77,6 +79,7 @@
     [self.view addSubview:spv];
     
     // Do any additional setup after loading the view.
+    _customerLabel.text = _scustomer;
     _titleLabel.text = @"Touch Menu to perform query...";
     _sortButton.hidden   = TRUE;
     _selectButton.hidden = TRUE;
@@ -175,6 +178,7 @@
                                               }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                               [self makeCancelSound];
                                                            }]];
     [self presentViewController:alert animated:YES completion:nil];
     
@@ -204,6 +208,7 @@
     }
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                               [self makeCancelSound];
                                                            }];
     [alert addAction:cancelAction];
     
@@ -268,6 +273,7 @@
                                                   }]];
     [alert addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                      [self makeCancelSound];
                                                   }]];
     [self presentViewController:alert animated:YES completion:nil];
     
@@ -283,6 +289,28 @@
     [self loadEXP];
 
 }
+
+//=============EXP VC=====================================================
+-(void) makeCancelSound
+{
+    [self->_sfx makeTicSoundWithPitch : 5 : 82];
+}
+
+
+//=============EXP VC=====================================================
+-(void) makeSegueSound
+{
+    [self->_sfx makeTicSoundWithPitch : 4 : 84];
+    [self->_sfx makeTicSoundWithPitch : 4 : 89];
+    [self->_sfx makeTicSoundWithPitch : 4 : 96];
+}
+
+//=============EXP VC=====================================================
+-(void) makeSelectSound
+{
+    [self->_sfx makeTicSoundWithPitch : 5 : 70];
+}
+
 
 
 //=============EXP VC=====================================================
@@ -319,6 +347,7 @@
     }
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                               [self makeCancelSound];
                                                            }];
 
     for (int i = 0;i<nvends;i++)  [alert addAction:actions[i]];
@@ -334,7 +363,7 @@
 //=============OCR VC=====================================================
 -(void) dismiss
 {
-    //[_sfx makeTicSoundWithPitch : 8 : 52];
+    [self makeCancelSound];
     et.parentUp = FALSE; // 2/9 Tell expTable we are outta here
     [self dismissViewControllerAnimated : YES completion:nil];
 }
@@ -344,6 +373,7 @@
 -(void) loadEXP
 {
     if (loadingData) return; //DHS 2/22
+    [self makeSelectSound]; //4/5 almost always invoked by button click...
     [spv start : @"Loading EXP..."];
     loadingData = TRUE;
     _titleLabel.text = @"Loading EXP table...";
@@ -369,6 +399,7 @@
 //=============EXP VC=====================================================
 -(void) loadEXPByVendor : (NSString *)v
 {
+    [self makeSelectSound];
     [spv start : @"Loading Vendor EXP"];
     loadingData = TRUE;
     _titleLabel.text = @"Loading EXP table...";
@@ -499,12 +530,14 @@
 //=============EXP VC=====================================================
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
+    [self makeSegueSound];
     if([[segue identifier] isEqualToString:@"expDetailSegue"])
     {
         //Just hand all our PFObjects to the detailVC...
         EXPDetailVC *vc = (EXPDetailVC*)[segue destinationViewController];
         vc.allObjects  = [[NSArray alloc]initWithArray:et.expos];
         vc.detailIndex = selectedRow;
+        vc.scustomer   = _scustomer;
     }
 } //end prepareForSegue
 

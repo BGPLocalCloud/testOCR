@@ -22,6 +22,7 @@
 #import "Vendors.h"
 #import "smartProducts.h"
 #import "spinnerView.h"
+#import "soundFX.h"
 
 @interface ErrorViewController : UIViewController <batchObjectDelegate,
                                 UITableViewDelegate,UITableViewDataSource,EXPTableDelegate,
@@ -69,6 +70,7 @@
     NSString *batchID;
     PFObject *pfoWork;
     BOOL isNumeric;
+    int rotatedCount;
 }
 
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
@@ -83,11 +85,14 @@
 @property (weak, nonatomic) IBOutlet UITextField *field3Value;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UIButton *backButton;
+@property (weak, nonatomic) IBOutlet UIButton *rotButton;
+@property (nonatomic, strong) soundFX *sfx;
 
 @property (nonatomic , assign) BOOL fixingErrors;
 
 - (IBAction)fieldCancelSelect:(id)sender;
 - (IBAction)fieldFixSelect:(id)sender;
+- (IBAction)rotSelect:(id)sender;
 
 - (IBAction)textChanged:(id)sender;
 

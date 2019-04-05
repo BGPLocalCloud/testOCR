@@ -1,16 +1,17 @@
 //
-//  __     ___                ____            _             _ _
-//  \ \   / (_) _____      __/ ___|___  _ __ | |_ _ __ ___ | | | ___ _ __
-//   \ \ / /| |/ _ \ \ /\ / / |   / _ \| '_ \| __| '__/ _ \| | |/ _ \ '__|
-//    \ V / | |  __/\ V  V /| |__| (_) | | | | |_| | | (_) | | |  __/ |
-//     \_/  |_|\___| \_/\_/  \____\___/|_| |_|\__|_|  \___/|_|_|\___|_|
+//   _____    _ _ _  _____                    _       _     __     ______
+//  | ____|__| (_) ||_   _|__ _ __ ___  _ __ | | __ _| |_ __\ \   / / ___|
+//  |  _| / _` | | __|| |/ _ \ '_ ` _ \| '_ \| |/ _` | __/ _ \ \ / / |
+//  | |__| (_| | | |_ | |  __/ | | | | | |_) | | (_| | ||  __/\ V /| |___
+//  |_____\__,_|_|\__||_|\___|_| |_| |_| .__/|_|\__,_|\__\___| \_/  \____|
+//                                     |_|
 //
-//  ViewController.h
+//  EditTemplateVC.h
 //  testOCR
 //
 //  Created by Dave Scruton on 12/3/18.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
-//
+//  March/April: Redo to link in w/ addTemplate/CheckTemplateVC
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
@@ -18,13 +19,16 @@
 #import "AppDelegate.h"
 #import "ActivityTable.h"
 #import "DBKeys.h"
+#import "DropboxTools.h"
 #import "OCRWord.h"
 #import "OCRDocument.h"
 #import "OCRTemplate.h"
 #import "OCRTopObject.h"
+#import "PDFCache.h"
 #import "imageTools.h"
 #import "MagnifierView.h"
 #import "smartProducts.h"
+#import "spinnerView.h"
 #import "invoiceTable.h"
 #import "EXPTable.h"
 
@@ -58,9 +62,9 @@
 
 
 
-@interface EditTemplateVC : UIViewController <MFMailComposeViewControllerDelegate,OCRTemplateDelegate,
+@interface EditTemplateVC : UIViewController <OCRTemplateDelegate,
                                             invoiceTableDelegate,EXPTableDelegate,OCRTopObjectDelegate,
-                                            ActivityTableDelegate>
+                                            ActivityTableDelegate, DropboxToolsDelegate>
 {
     
     UIActivityIndicatorView *spinner;
@@ -71,9 +75,12 @@
     OCRDocument *od;
     OCRTemplate *ot;
     OCRTopObject *oto; //Performs OCR using template and document...
+    PDFCache *pc;
 
     ActivityTable *act;
-    
+    DropboxTools *dbt;
+    spinnerView *spv;
+
     UIView *selectBox;
     CGRect selectDocRect;
     CGRect pageRect;
@@ -89,8 +96,6 @@
     BOOL docFlipped90;
     NSString *rawOCRResult;
 
-    int OCR_mode;  //1 = need OCR from server 2 = load canned pre-OCR'ed data
-    
     //OCR'ed results...
     NSString *supplierName;
     NSString *vendor;
@@ -121,7 +126,6 @@
     int adjustSelect;
     
     CGRect tlRect,trRect;  //Absolute document boundary rects for text
-    CGRect blRect,brRect;
 
     //Move to a processor object?
     smartProducts *smartp;

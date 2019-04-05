@@ -14,6 +14,7 @@
 
 #import <UIKit/UIKit.h>
 #import "EXPObject.h"
+#import "soundFX.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -46,6 +47,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic , strong) EXPObject* eobj;
 @property (nonatomic , strong) NSArray* allObjects;
 @property (nonatomic , assign) int detailIndex;
+@property (nonatomic, strong) soundFX *sfx;
+@property (weak, nonatomic) IBOutlet NSString *scustomer;
+
 
 - (IBAction)backSelect:(id)sender;
 

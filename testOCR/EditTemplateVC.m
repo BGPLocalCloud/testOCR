@@ -1,11 +1,12 @@
 //
-//  __     ___                ____            _             _ _
-//  \ \   / (_) _____      __/ ___|___  _ __ | |_ _ __ ___ | | | ___ _ __
-//   \ \ / /| |/ _ \ \ /\ / / |   / _ \| '_ \| __| '__/ _ \| | |/ _ \ '__|
-//    \ V / | |  __/\ V  V /| |__| (_) | | | | |_| | | (_) | | |  __/ |
-//     \_/  |_|\___| \_/\_/  \____\___/|_| |_|\__|_|  \___/|_|_|\___|_|
+//   _____    _ _ _  _____                    _       _     __     ______
+//  | ____|__| (_) ||_   _|__ _ __ ___  _ __ | | __ _| |_ __\ \   / / ___|
+//  |  _| / _` | | __|| |/ _ \ '_ ` _ \| '_ \| |/ _` | __/ _ \ \ / / |
+//  | |__| (_| | | |_ | |  __/ | | | | | |_) | | (_| | ||  __/\ V /| |___
+//  |_____\__,_|_|\__||_|\___|_| |_| |_| .__/|_|\__,_|\__\___| \_/  \____|
+//                                     |_|
 //
-//  ViewController.m
+//  EditTemplateVC.m
 //  testOCR
 //
 //  Created by Dave Scruton on 12/3/18.
@@ -26,13 +27,15 @@
 //  In Adjust mode, zoom in??
 //  1/13 Added more detail to activity outputs...
 //  3/17 Added hookups for checkVC passed image/OCRtext
+//  4/1  Looks good for template create / edit
+//  4/5  remove ocr_mode, nextDoc, email, all stubbed stuff
 #import "EditTemplateVC.h"
 
  
 
 @implementation EditTemplateVC
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(id)initWithCoder:(NSCoder *)aDecoder {
     if ( !(self = [super initWithCoder:aDecoder]) ) return nil;
 
@@ -45,13 +48,17 @@
 
     act = [[ActivityTable alloc] init];
     act.delegate = self;
-    
+    dbt = [[DropboxTools alloc] init];
+    dbt.delegate = self;
+    [dbt setParent:self];
+
+    pc = [PDFCache sharedInstance];
+
     arrowLHStepSize = 10;
     arrowRHStepSize = 10;
     editing = adjusting = FALSE;
     
     docnum = 4;
-    OCR_mode = 2;  //1 = use stubbed OCR, 2 = fetch new OCR from server
 
     invoiceDate = [[NSDate alloc] init];
     rowItems    = [[NSMutableArray alloc] init];
@@ -80,7 +87,7 @@
 
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(void) loadView
 {
     [super loadView];
@@ -97,22 +104,18 @@
 }
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
-    //parse test
     
+    // 4/1 Add spinner busy indicator...
+    spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, viewWid, viewHit)];
+    [self.view addSubview:spv];
     if (_incomingOCRText.length < 1) //Not being invoked by AddTemplateVC->CheckTemplateVC?
     {
-        if (OCR_mode == 1) //Stubbed mode vs live OCR
-        {
-            [self loadStubbedOCRData];
-            [ot readFromParse:vendor]; //Unpacks template and loads it from DB
-            //XMAS STUB [ot loadTemplatesFromDisk:vendor];
-        }
-        
-
+        //Normal mode ( GET RID OF MODE 1)
+        [spv start : @"find templates..."];
+        [ot readFromParse:@"*"]; //read all templates
     }
     else // 3/17 coming in from checkTemplateVC...load up our incoming image...
     {
@@ -128,9 +131,6 @@
         [od setupDocumentAndParseJDON : selectFnameForTemplate : jdict : docFlipped90]; //Last arg is flip: true for HFM
         tlRect = [od getTLRect];
         trRect = [od getTRRect];
-        //NOTE: BL rect may be same as TLrect because it looks for leftmost AND bottommost!
-        blRect = [od getBLRect];
-        brRect = [od getBRRect];
         docRect = [od getDocRect]; //Get min/max limits of printed text
         [ot setOriginalRects : tlRect : trRect];
         ot.supplierName = vendor; //Pass along supplier name to template
@@ -153,25 +153,20 @@
     magView.viewToMagnify = _inputImage;
     magView.hidden        = TRUE;
     
-    spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    int xs,ys,xi,yi;
-    xs = ys = 64;
-    xi = viewW2 - xs/2;
-    yi = viewH2 - ys/2;
-    spinner.frame = CGRectMake(xi, yi, xs, ys);
-    [self.view addSubview:spinner];
-    spinner.hidden = TRUE;
-    
-    //Canned starting stuff...
-    //    vendor = @"HFM";
-    //    selectFnameForTemplate  = @"hfm90.jpg";
-    //    selectFname  = @"hfm.jpg";
-    //    [_inputImage setImage:[UIImage imageNamed:selectFnameForTemplate]];
     [self scaleImageViewToFitDocument];
     
-}
+    //4/1 notifications from OCRTopObject singleton...
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didPerformOCR:)
+                                                 name:@"didPerformOCR" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(errorPerformingOCR:)
+                                                 name:@"errorPerformingOCR" object:nil];
 
-//=============OCR VC=====================================================
+    
+} //end viewDidLoad
+
+//=============EditTemplateVC=====================================================
 -(void) dismiss
 {
     //[_sfx makeTicSoundWithPitch : 8 : 52];
@@ -181,7 +176,7 @@
 }
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(void) scaleImageViewToFitDocument
 {
     int iwid = _inputImage.image.size.width;
@@ -197,13 +192,9 @@
     _overlayView.frame = rr;
 }
 
-
-//=============OCR VC=====================================================
-// NOTE this gets called WHENEVER select box moves!!!
-- (void)viewWillLayoutSubviews {
-    //Make sure screen has settled before adding overlays!
-    [self refreshOCRBoxes];
-    
+//=============EditTemplateVC=====================================================
+-(void) computeDocumentConversion
+{
     //4/30 scale document vs viewport...
     int iwid = _incomingImage.size.width;
     int ihit = _incomingImage.size.height;
@@ -212,6 +203,16 @@
     NSLog(@" swid/hit %f %f",screenRect.size.width,screenRect.size.height);
     docXConv = (double)iwid / (double)screenRect.size.width ;
     docYConv = (double)ihit / (double)screenRect.size.height ;
+
+}
+
+//=============EditTemplateVC=====================================================
+// NOTE this gets called WHENEVER select box moves!!!
+- (void)viewWillLayoutSubviews {
+    //Make sure screen has settled before adding overlays!
+    [self refreshOCRBoxes];
+    [self computeDocumentConversion];
+    
 
     if (selectBox == nil) //Add selection box...
     {
@@ -226,13 +227,13 @@
     
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(void) stopMagView
 {
     magView.hidden = TRUE;
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(void) setupMagView : (int) x : (int) y
 {
     //WHY DO I NEED the xy cluge!??
@@ -252,7 +253,7 @@
     [magView setNeedsDisplay];
 } //end setupMagView
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     dragging = YES;
@@ -274,7 +275,7 @@
     }
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 - (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
     UITouch *touch = [[event allTouches] anyObject];
@@ -298,7 +299,76 @@
     //NSLog(@" touchEnded");
 } //end touchesEnded
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
+// 4/1 passed in list of template objects, choose one by vendor
+-(void) templateVendorMenu : (NSArray *)a
+{
+    NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:
+                                            @"Select Template by Vendor"];
+    [tatString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:25] range:NSMakeRange(0, tatString.length)];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Select Template by Vendor"
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    [alert setValue:tatString forKey:@"attributedTitle"];
+    for (int i=0;i<a.count;i++)
+    {
+        PFObject *pfo = a[i];
+        NSString *v = pfo[@"vendor"];
+        [alert addAction : [UIAlertAction actionWithTitle:v
+                                                    style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                        [self setupImageForVendor : a : v : i];
+                                                    }]] ;
+    }
+    [alert addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
+                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                   [self dismiss];
+                                               }]];
+    [self presentViewController:alert animated:YES completion:nil];
+    
+} //end templateVendorMenu
+
+
+//=============EditTemplateVC=====================================================
+-(void) setupImageForVendor : (NSArray *)a : (NSString *) v : (int) i
+{
+    [ot loadTemplateFromPFObject:a :i]; //Loadit!
+    vendor = v;
+    _incomingImageFilename = self->ot.pdfFile;
+
+    //Cache hit?
+    UIImage *ii = [pc getImageByID:_incomingImageFilename : 1];
+    if (ii == nil)
+    {
+        [spv start : @"Download image..."];
+        [dbt downloadImages:self->_incomingImageFilename];
+    }
+    else
+    {
+        NSLog(@" PDF Cache hit..."); //asdf
+        _incomingImage = ii;
+        [self finishWithDownloadedImage];
+    }
+} //end setupImageForVendor
+
+
+//=============EditTemplateVC=====================================================
+//  Called after PDF cache hit, or on return from dbt download...
+-(void) finishWithDownloadedImage
+{
+    _inputImage.image = _incomingImage;
+    [self scaleImageViewToFitDocument];
+    [self computeDocumentConversion]; //Just got image, need to do conversion!
+    [self refreshOCRBoxes];
+    //OK now its OCR time...
+    oto.imageFileName = _incomingImageFilename;
+    oto.ot = nil; //Hand template down to oto
+    [spv start:@"Perform OCR..."];
+    [oto performOCROnImage : _incomingImageFilename : _incomingImage ];
+
+}
+
+
+//=============EditTemplateVC=====================================================
 -(void) clearOverlay
 {
     NSArray *viewsToRemove = [_overlayView subviews];
@@ -306,7 +376,7 @@
     
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 // Clears and adds OCR boxes as defined in the OCRTemplate
 -(void) refreshOCRBoxes
 {
@@ -347,151 +417,19 @@
 } //end refreshOCRBoxes
 
 
-
-//=============OCR VC=====================================================
--(void) loadStubbedOCRDataLite
-{
-    [self getStubbedStrings];
-    [_inputImage setImage:[UIImage imageNamed:selectFnameForTemplate]];
-    [self scaleImageViewToFitDocument];
-
-} //end loadStubbedOCRDataLite
-
-//=============OCR VC=====================================================
-//DHS 1/17
--(void) getStubbedStrings
-{
-    if (docnum == 1)
-    {
-        stubbedDocName = @"hfm";
-        vendor   = @"HFM";
-        selectFname    = @"hfm.jpg";
-        selectFnameForTemplate = @"hfm90.jpg"; //This should be rotated for user
-        docFlipped90 = TRUE;
-    }
-    if (docnum == 2)
-    {
-        stubbedDocName = @"beef";
-        vendor   = @"Hawaii Beef Producers";
-        selectFname    = @"hawaiiBeefInvoice.jpg";
-        selectFnameForTemplate = @"hawaiiBeefInvoice.jpg";  //This should be rotated for user
-        docFlipped90 = FALSE;
-    }
-    if (docnum == 3)
-    {
-        stubbedDocName = @"gordon";
-        vendor   = @"Gordon";
-        selectFname    = @"gordon";
-        selectFnameForTemplate = @"gordon.png";  //This should be rotated for user
-        docFlipped90 = FALSE;
-    }
-    if (docnum == 4)
-    {
-        stubbedDocName = @"greco";
-        vendor   = @"Greco";
-        selectFname    = @"greco";
-        selectFnameForTemplate = @"grecoShrunk3.png";  //This should be rotated for user
-        docFlipped90 = FALSE;
-    }
-
-}
-
-//=============OCR VC=====================================================
--(void) loadStubbedOCRData
-{
-    NSLog(@" Load stubbed OCR data...");
-    [self getStubbedStrings];
-    [_inputImage setImage:[UIImage imageNamed:selectFnameForTemplate]];
-    [self scaleImageViewToFitDocument];
-
-    NSDictionary *d = [self readTxtToJSON:stubbedDocName];
-    if (d != nil)
-    {
-        [od setupDocumentAndParseJDON : selectFnameForTemplate : d : docFlipped90];
-        
-        tlRect = [od getTLRect];
-        trRect = [od getTRRect];
-        //NOTE: BL rect may be same as TLrect because it looks for leftmost AND bottommost!
-        blRect = [od getBLRect];
-        brRect = [od getBRRect];
-        docRect = [od getDocRect]; //Get min/max limits of printed text
-        [ot setOriginalRects : tlRect : trRect];
-        ot.supplierName = vendor; //Pass along supplier name to template
-        ot.pdfFile      = selectFnameForTemplate;
-        
-        //Set unit scaling
-        [od computeScaling : tlRect : trRect];
-        
-        CGRect r = _inputImage.frame;
-        //Screen -> Document conversion
-        //MUST HAVE image loaded correctly at this point!
-        docXConv = (double)_inputImage.image.size.width  / (double)r.size.width;
-        docYConv = (double)_inputImage.image.size.height / (double)r.size.height;
-
-    }
-} //End loadStubbedOCRData
-
-
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
+// Apply template to document, output basic fields
 - (IBAction)testSelect:(id)sender {
-    //[self testEmail:sender];
-    //return;
-    
-    //NSDate *date = [od isItADate:@"duhhhhhhhh"];
-    //NSDate *date2 = [od isItADate:@"12/24/18"];
-    
-    
-    //imageTools *it = [[imageTools alloc] init];
-    //[it findCorners:_inputImage.image];
-    //[it deskew:[UIImage imageNamed:@"cocacola.jpg"]];
-    // [it deskew:[UIImage imageNamed:@"hawaiiBeefInvoice.jpg"]];
-    //NSLog(@" duh just deskewed");
-    //OCR_mode = 1;
-    if (OCR_mode == 1)
-    {
-        //CLUGE: myst have a batch ID for EXP records now!
-        AppDelegate *eappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        eappDelegate.batchID = @"STUBBED";
-        oto.batchID = @"STUBBED";
-        [self loadStubbedOCRData]; //asdf
-        oto.imageFileName = selectFname; //selectFnameForTemplate;
-        oto.vendor        = vendor; //TEST
-        NSDictionary *d = [self readTxtToJSON:stubbedDocName]; //TEST: only works for beef invoice!
-        [oto setupTestDocumentJSON:d];
-        UIImage *imageToOCR = [UIImage imageNamed:selectFnameForTemplate];
-        CGRect r = CGRectMake(0, 0, imageToOCR.size.width, imageToOCR.size.height);
-        //We only need the frame now!
-        [oto setupDocumentFrameAndParseJSON : r];
-        oto.totalLines = 0; //Stubbed call... this is for keeping track of multiple page
-        [oto applyTemplate : ot : 1];
-        [oto writeEXPToParse : 0]; //Note 2nd arg is page!
-        NSString *OCR_Results_Dump = [oto dumpResults];
-        [self alertMessage:@"Invoice Dump" :OCR_Results_Dump];
-    }
-    else{   //Better make sure template is set up here!!!
-        //4/30 use incoming image...
-        NSArray *farray = [_incomingImageFilename componentsSeparatedByString:@"/"];
-        if (farray.count > 0) oto.imageFileName = farray[farray.count-1]; //Just get last component...
-        else oto.imageFileName = _incomingImageFilename;
-        oto.ot = ot; //Hand template down to oto
-        [oto applyTemplate : ot : 0]; //4/30 MUST use page 0!
-        [oto writeEXPToParse : 0]; //Note 2nd arg is page!
-        NSString *OCR_Results_Dump = [oto dumpResults];
-        [self alertMessage:@"Invoice Dump" :OCR_Results_Dump];
-    }
-    
-    //    [self callOCRSpace : @"hawaiiBeefInvoice.jpg"];
-    //[self callOCRSpace : @"hfm.jpg"];
-}
-
-//======(Hue-Do-Ku allColorPacks)==========================================
-- (IBAction)testEmail:(id)sender
-{
-    spinner.hidden = FALSE;
-    [spinner startAnimating];
-    [et readFromParseAsStrings : TRUE : @"HFM" : @"*" : @"*"]; //2/8
-    
-}
+    //4/30 use incoming image...
+    NSArray *farray = [_incomingImageFilename componentsSeparatedByString:@"/"];
+    if (farray.count > 0) oto.imageFileName = farray[farray.count-1]; //Just get last component...
+    else oto.imageFileName = _incomingImageFilename;
+    oto.ot = ot; //Hand template down to oto
+    [oto applyTemplate : ot : 0]; //4/30 MUST use page 0!
+    [oto writeEXPToParse : 0]; //Note 2nd arg is page!
+    NSString *OCR_Results_Dump = [oto dumpResults];
+    [self alertMessage:@"Invoice Dump" :OCR_Results_Dump];
+} //end testSelect
 
 
 
@@ -516,7 +454,7 @@
     return jdict;
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(NSDictionary*) getJSON : (NSString *)s
 {
     NSData *jsonData = [s dataUsingEncoding:NSUTF8StringEncoding];
@@ -525,7 +463,7 @@
     return dict;
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(void) clearFields
 {
     [ot clearFields];
@@ -540,7 +478,7 @@
 
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 // setups field for moving around and positioning:
 //   finishAndAddBox does actual creation of new template box
 -(void) addNewField : (NSString*) ftype
@@ -571,7 +509,7 @@
     
 } //end addNewField
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(void) adjustField
 {
     _LHArrowView.hidden = FALSE;
@@ -605,7 +543,7 @@
     
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 // Internal stuff...
 -(void) getShortFieldName
 {
@@ -619,7 +557,7 @@
     if ([fieldName isEqualToString:INVOICE_TOTAL_FIELD])      fieldNameShort = @"Total";
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(void) resetSelectBox
 {
     int xs = od.width/4;
@@ -633,7 +571,7 @@
 
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 - (IBAction)clearSelect:(id)sender {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:
                                 NSLocalizedString(@"Clear All Fields: Are you sure?",nil)
@@ -650,7 +588,7 @@
     [self presentViewController:alert animated:YES completion:nil];
 } //end clearSelect
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 // Handles add field OR cancel adding field
 - (IBAction)addFieldSelect:(id)sender {
     
@@ -723,7 +661,7 @@
     [self presentViewController:alert animated:YES completion:nil];
 } //end addFieldSelect
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 - (IBAction)promptForAdjust:(id)sender {
     
     NSString *fn    = [ot getBoxFieldName:adjustSelect];
@@ -744,10 +682,8 @@
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                                [self->ot deleteBox:self->adjustSelect];
                                                                [self->ot saveTemplatesToDisk:self->vendor];
-                                                               self->spinner.hidden = FALSE;
-                                                               [self->spinner startAnimating];
+                                                               [self->spv start : @"delete Box..."];
                                                                [self->act saveActivityToParse:@"...template:deleteBox" : fn];
-
                                                                [self->ot saveToParse:self->vendor];
                                                                [self refreshOCRBoxes];
                                                            }];
@@ -762,8 +698,7 @@
                                                 style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                     [self->ot clearTags:self->adjustSelect];
                                                     [self->ot saveTemplatesToDisk:self->vendor];
-                                                    self->spinner.hidden = FALSE;
-                                                    [self->spinner startAnimating];
+                                                    [spv start : @"clear Tags..."];
                                                     [self->act saveActivityToParse:@"...template:clearTags" : fn];
                                                     [self->ot saveToParse:self->vendor];
                                                 }];
@@ -781,7 +716,7 @@
     
 } //end promptForAdjust
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 - (IBAction)promptForNewTagToAdd:(id)sender {
     NSArray*actions = [[NSArray alloc] initWithObjects:
                        TOP_TAG_TYPE,BOTTOM_TAG_TYPE,LEFT_TAG_TYPE,RIGHT_TAG_TYPE,
@@ -814,21 +749,20 @@
     
 } //end promptForInvoiceNumberFormat
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(void) addTag : (NSString*)tag
 {
     NSLog(@" addTag %@",tag);
     [ot addTag:adjustSelect:tag];  //passed down to OCRBox:addTag
     [ot saveTemplatesToDisk:vendor];
-    spinner.hidden = FALSE;
-    [spinner startAnimating];
+    [spv start : @"add Tag..."];
     [act saveActivityToParse:@"...template:addTag" : tag];
     [ot saveToParse:vendor];
 } //end addTag
 
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 - (IBAction)doneSelect:(id)sender {
     if (editing || adjusting)
     {
@@ -843,7 +777,7 @@
     }
 } //end doneSelect
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(void) finishAndAddBox
 {
     //NOTE: this rect has to be scaled and offset for varying page sizes
@@ -855,15 +789,14 @@
     editing = adjusting = FALSE;
     [ot dump];
     [ot saveTemplatesToDisk:vendor];
-    spinner.hidden = FALSE;
-    [spinner startAnimating];
+    [spv start : @"add Box..."];
     [act saveActivityToParse:@"...template:addBox" : fieldName];
     [ot saveToParse:vendor];
     [self clearScreenAfterEdit];
     [self stopMagView];
 } //end finishAndAddBox
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(void) clearScreenAfterEdit
 {
     _LHArrowView.hidden     = TRUE;
@@ -877,7 +810,7 @@
     
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(int) screenToDocumentX : (int) xin
 {
     double dx = (double)xin * docXConv;
@@ -885,7 +818,7 @@
     return (int)floor(dx + 0.5);  //This is needed to get NEAREST INT!
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(int) screenToDocumentY : (int) yin
 {
     double dy = (double)yin * docYConv;
@@ -893,47 +826,47 @@
     return (int)floor(dy + 0.5);  //This is needed to get NEAREST INT!
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(int) screenToDocumentW : (int) win
 {
     return (int)floor((double)(win  * docXConv) + 0.5);
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(int) screenToDocumentH : (int) hin
 {
     return (int)floor((double)(hin  * docYConv) + 0.5);
 }
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(int) documentToScreenX : (int) xin
 {
     double dx = ((double)xin / docXConv + (double)_inputImage.frame.origin.x);
     return (int)floor(dx + 0.5);  //This is needed to get NEAREST INT!
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(int) documentToScreenY : (int) yin
 {
     double dy = ((double)yin / docYConv + (double)_inputImage.frame.origin.y);
     return (int)floor(dy + 0.5);  //This is needed to get NEAREST INT!
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(int) documentToScreenW : (int) win
 {
     return (int)floor((double)(win  / docXConv) + 0.5);
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(int) documentToScreenH : (int) hin
 {
     return (int)floor((double)(hin  / docYConv) + 0.5);
 }
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(CGRect) documentToScreenRect : (CGRect) docRect
 {
     int xi,yi,xs,ys;
@@ -946,7 +879,7 @@
 
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(CGRect) getDocumentFrameFromSelectBox
 {
     CGRect r = _inputImage.frame;
@@ -968,7 +901,7 @@
 } //end getDocumentFrameFromSelectBox
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 // Handles touch dragging
 -(void) dragSelectBox : (int) xt : (int) yt
 {
@@ -981,7 +914,7 @@
 } //end dragSelectBox
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 // Handles arrow up/down/etc
 -(void) moveOrResizeSelectBox : (int) xdel : (int) ydel : (int) xsdel : (int) ysdel
 {
@@ -1019,7 +952,7 @@
     [self getDocumentFrameFromSelectBox]; //Just updates screen/ toss return val
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(void) getWordsInBox
 {
     CGRect r = selectBox.frame;
@@ -1045,28 +978,9 @@
     //NSLog(@" annnd array %@",wstr);
 }
 
-//=============OCR VC=====================================================
-- (IBAction)nextDocSelect:(id)sender
-{
-    docnum++;
-    if (docnum > 4) docnum = 1;
-    [self clearOverlay];
-    if (OCR_mode == 1) //Get stubbed data...
-    {
-        NSLog(@" ocrmode 1:  nextdoc[%d] %@",docnum,vendor);
-        [self loadStubbedOCRData];
-        spinner.hidden = FALSE;
-        [spinner startAnimating];
-        [ot readFromParse:vendor]; //Unpacks template and loads it from DB
-    }
-    else{ //Do Full OCR
-        NSLog(@" ocrmode 2: nextdoc[%d] %@",docnum,vendor);
-
-    }
-}
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 - (IBAction)arrowDownSelect:(id)sender {
     UIButton *b = (UIButton *)sender;
     if (b.tag > 100) //LH arrows
@@ -1078,7 +992,7 @@
 }
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 - (IBAction)arrowUpSelect:(id)sender {
     UIButton *b = (UIButton *)sender;
     if (b.tag > 100) //LH arrows
@@ -1091,7 +1005,7 @@
 }
 
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 - (IBAction)arrowLeftSelect:(id)sender {
     UIButton *b = (UIButton *)sender;
     if (b.tag > 100) //LH arrows
@@ -1103,7 +1017,7 @@
     }
 }
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 - (IBAction)arrowRightSelect:(id)sender {
     UIButton *b = (UIButton *)sender;
     if (b.tag > 100) //LH arrows
@@ -1133,59 +1047,9 @@
     [self presentViewController:alert animated:YES completion:nil];
 } //end alertMessage
 
-//=============OCR VC=====================================================
-//Doesn't work in simulator??? huh??
--(void) mailit : (NSString *)s
-{
-    if ([MFMailComposeViewController canSendMail])
-    {
-        MFMailComposeViewController *mail = [[MFMailComposeViewController alloc] init];
-        mail.mailComposeDelegate = self;
-        [mail setSubject:@"Test CSV output"];
-        [mail setMessageBody:s isHTML:NO];
-        [mail setToRecipients:@[@"fraktalmaui@gmail.com"]];
-        
-        [self presentViewController:mail animated:YES completion:NULL];
-    }
-    else
-    {
-        NSLog(@"This device cannot send email");
-    }
-}
-
-#pragma mark - MFMailComposeViewControllerDelegate
 
 
-//==========FeedVC=========================================================================
-- (void) mailComposeController:(MFMailComposeViewController *)controller    didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
-{
-    NSLog(@" mailit: didFinishWithResult...");
-    switch (result)
-    {
-        case MFMailComposeResultSent:
-            NSLog(@" mail sent OK");
-            break;
-        case MFMailComposeResultFailed:
-            NSLog(@"Mail sent failure: %@", [error localizedDescription]);
-            break;
-        default:
-            break;
-    }
-    [controller dismissViewControllerAnimated:YES completion:NULL];
-}
-
-
-
-//=============OCR VC=====================================================
-//- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
-//                 didFinishWithResult:(MessageComposeResult)result
-//{
-//    [self dismissViewControllerAnimated:YES completion:NULL];
-//}
-
-
-
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 - (IBAction)arrowCenterSelect:(id)sender
 {
     UIButton *b = (UIButton *)sender;
@@ -1205,7 +1069,7 @@
     [self updateCenterArrowButtons];
 } //end arrowCenterSelect
 
-//=============OCR VC=====================================================
+//=============EditTemplateVC=====================================================
 -(void) updateCenterArrowButtons
 {
     if (lhArrowsFast)
@@ -1220,37 +1084,104 @@
     
 }
 
+
+
+//=============<OCRTopObject notification>=====================================================
+- (void)errorPerformingOCR:(NSNotification *)notification
+{
+    NSString *errmsg = (NSString*)notification.object;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@" error on OCR... %@",errmsg);
+        [self->spv stop];
+    });
+}
+
+//=============<OCRTopObject notification>=====================================================
+// Called by OCR notification...
+-(void) finishWithOCR
+{
+    _incomingOCRText = [oto getRawResult];
+    NSData *jsonData  = [_incomingOCRText dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *e;
+    NSDictionary *jdict = [NSJSONSerialization JSONObjectWithData:jsonData
+                                                          options:NSJSONReadingMutableContainers error:&e];
+    docFlipped90 = ([vendor isEqualToString:@"HFM"]);
+    selectFnameForTemplate = @"dog.png"; //DO I need this?
+    [od setupDocumentAndParseJDON : selectFnameForTemplate : jdict : docFlipped90]; //Last arg is flip: true for HFM
+    tlRect = [od getTLRect];
+    trRect = [od getTRRect];
+    docRect = [od getDocRect]; //Get min/max limits of printed text
+    [ot setOriginalRects : tlRect : trRect];
+    ot.supplierName = vendor; //Pass along supplier name to template
+    ot.pdfFile      = _incomingImageFilename;
+    //Is this OK?
+    od.width        = _incomingImage.size.width;
+    od.height       = _incomingImage.size.height;
+    //Set unit scaling
+    [od setUnitScaling];
+    
+} //end finishWithOCR
+
+//=============<OCRTopObject notification>=====================================================
+// 3/17
+- (void)didPerformOCR:(NSNotification *)notification
+{
+    NSLog(@" didPerformOCR...");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self->spv stop];
+        [self finishWithOCR];
+    });
+} //end didPerformOCR
+
+
+
+
+
+#pragma mark - DropboxToolsDelegate
+
+//===========<DropboxToolDelegate>================================================
+- (void)didDownloadImages
+{
+    [spv stop];
+    NSLog(@" dloaded dbox image... %@",_incomingImageFilename);
+    _incomingImage = dbt.batchImages[0];
+    [self finishWithDownloadedImage];
+}
+
 #pragma mark - OCRTemplateDelegate
 
 //===========<OCRTemplateDelegate>===============================================
-- (void)didReadTemplate
+// Returns with the array of PFObjects read from template table
+- (void)didReadTemplate  : (NSArray*) a
 {
     NSLog(@" didReadTemplate...");
-    [self refreshOCRBoxes];
-    
-    //look at our image, is it portrait or landscape?
-    [ot setTemplateOrientation:(int)_inputImage.image.size.width :(int)_inputImage.image.size.height ];
-    CGRect tlDocumentRect = [od getTLRect];
-    CGRect trDocumentRect = [od getTRRect];
-    //Force scaling to 1:1, since the template document IS the same as the scanned document
-    [od computeScaling : tlDocumentRect : trDocumentRect];
-
-    spinner.hidden = TRUE;
-    [spinner stopAnimating];
+    if (a.count > 1) //Read a list of templates? Means go to menu next
+    {
+        [self templateVendorMenu : a];
+    }
+    else{ //Single template read? Load up fields, etc
+        [self refreshOCRBoxes];
+        //look at our image, is it portrait or landscape?
+        [ot setTemplateOrientation:(int)_inputImage.image.size.width :(int)_inputImage.image.size.height ];
+        CGRect tlDocumentRect = [od getTLRect];
+        CGRect trDocumentRect = [od getTRRect];
+        //Force scaling to 1:1, since the template document IS the same as the scanned document
+        [od computeScaling : tlDocumentRect : trDocumentRect];
+    }
+    [spv stop];
 }
 
 
-//=============OCR VC=====================================================
+//===========<OCRTemplateDelegate>===============================================
 - (void)didSaveTemplate
 {
     NSLog(@" didSaveTemplate...");
-    spinner.hidden = TRUE;
-    [spinner stopAnimating];
+    [spv stop];
 }
 
 
 #pragma mark - invoiceTableDelegate
-//=============OCR VC=====================================================
+//===========<invoiceTableDelegate>===============================================
 - (void)didSaveInvoiceTable:(NSString *) s
 {
     NSLog(@" Invoice TABLE SAVED (OCR VC)");
@@ -1258,9 +1189,17 @@
 }
 
 
+//===========<invoiceTableDelegate>===============================================
+#pragma mark - activityTableDelegate
+- (void)didSaveActivity
+{
+    
+}
+
+
 #pragma mark - EXPTableDelegate
 
-//=============OCR VC=====================================================
+//===========<EXPTableDelegate>===============================================
 - (void)didSaveEXPTable  : (NSArray *)a
 {
     NSLog(@" EXP TABLE SAVED (OCR VC)");
@@ -1275,17 +1214,8 @@
 } //end didSaveEXPTable
 
 
-//=============OCR VC=====================================================
-- (void)didReadEXPTableAsStrings : (NSString *)s
-{
-    spinner.hidden = TRUE;
-    [spinner stopAnimating];
 
-    [self mailit: s];
-}
-
-
-//===========<OCRTopObjectDelegate>================================================
+//===========<EXPTableDelegate>===============================================
 // Called w/ bad product ID, or from errorInEXPRecord in EXP write
 - (void)errorInEXPRecord  : (NSString *) errMsg : (NSString*) objectID : (NSString*) productName
 {
@@ -1294,17 +1224,10 @@
 
 #pragma mark - OCRTopObjectDelegate
 
-//=============<OCRTopObjectDelegate>=====================================================
+//===========<OCRTopObjectDelegate>===============================================
 - (void)didSaveOCRDataToParse : (NSString *) s
 {
     NSLog(@" OK: full OCR -> DB done, invoice %@",s);
-}
-
-
-//=============<OCRTopObjectDelegate>=====================================================
-- (void)errorPerformingOCR : (NSString *) errMsg
-{
-     NSLog(@" errorPerformingOCR %@",errMsg);
 }
 
 //=============<OCRTopObjectDelegate>=====================================================

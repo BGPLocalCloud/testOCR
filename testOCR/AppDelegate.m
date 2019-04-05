@@ -23,12 +23,12 @@
 NSString *hdkSoundFiles[NUM_SFX_SAMPLES] =
 {
     @"clave",          //00:click sound
-    @"clave",                //01:Opening sound
+    @"rivloopie44k",                //01:Opening sound
     @"blip",                //02:tile sound
     @"bub1",            //03:win sound
     @"lilglock",         //04:glockinspiel trimmed
     @"congamid44k",         //05
-    @"congamid44k",         //06 secret sound
+    @"vwhorn44k",         //06 secret sound
     @"congamid44k",         //07 Squirrel Sound
 };
 

@@ -15,12 +15,11 @@
 //  2/9 add parentUp to invoiceTable
 //  2/22 add loadingData flag
 //  3/22 debug pass multi-customers
+//  4/5  add sfx, only support ONE vendor at a time
 
 #import "InvoiceViewController.h"
 
-@interface InvoiceViewController ()
 
-@end
 
 @implementation InvoiceViewController
 
@@ -28,12 +27,15 @@
 -(id)initWithCoder:(NSCoder *)aDecoder {
     if ( !(self = [super initWithCoder:aDecoder]) ) return nil;
     
-    it = [[invoiceTable alloc] init];
+    it    = [[invoiceTable alloc] init];
     it.delegate = self;
     iobj  = [[invoiceObject alloc] init];   //For selecting single invoices
     iobjs = [[NSMutableArray alloc] init];  // ...all invoices loaded into VC
     pc    = [PDFCache sharedInstance];      //For looking at images of ivoices
     vv    = [Vendors sharedInstance];
+    // 4/5 sfx
+    _sfx         = [soundFX sharedInstance];
+
     return self;
 }
 
@@ -48,23 +50,15 @@
     spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, csz.width, csz.height)];
     [self.view addSubview:spv];
 
-    if (_vendor == nil) //SHOULD NEVER HAPPEN
+    if (_vendor == nil) //Default to HFM on err
     {
         NSLog(@" ERROR:InvoiceVC: Nil Vendor! ");
-        _vendor = @"*";
+        _vendor = @"HFM";
     }
     _titleLabel.text  = @"Loading Invoices...";
     loadingData = TRUE;
     [spv start : @"Loading Invoices"];
-    if ([_vendor isEqualToString:@"*"]) //Get all vendors
-    {
-        vptr = 0;
-        [self loadNextVendorInvoice];
-    }
-    else
-    {
-        [it readFromParseAsStrings : _vendor  : @"*" : _invoiceNumber];
-    }
+    [it readFromParseAsStrings : _vendor  : @"*" : _invoiceNumber];
 
 } //end viewDidLoad
 
@@ -83,29 +77,53 @@
     
 } //end viewDidLayoutSubviews
 
+//=============Invoice VC=====================================================
+-(void) makeCancelSound
+{
+    [self->_sfx makeTicSoundWithPitch : 5 : 82];
+}
+
 
 //=============Invoice VC=====================================================
+-(void) makeSegueSound
+{
+    [self->_sfx makeTicSoundWithPitch : 4 : 84];
+    [self->_sfx makeTicSoundWithPitch : 4 : 89];
+    [self->_sfx makeTicSoundWithPitch : 4 : 96];
+}
+
+//=============Invoice VC=====================================================
+-(void) makeSelectSound
+{
+    [self->_sfx makeTicSoundWithPitch : 5 : 70];
+}
+
+//=============Invoice VC=====================================================
+-(void) finishedLoadingVendorInvoices
+{
+    loadingData = FALSE;
+    [spv stop];
+    [_table reloadData];
+    NSString *s;
+    //4/5 redid yet again!
+    if (![_vendor isEqualToString:@"*"])
+        s = [NSString stringWithFormat:@"Invoices: %@",_vendor];
+    else if (![_batchID isEqualToString:@"*"]) //Specific batch?
+        s = [NSString stringWithFormat:@"Invoices:Batch %@",_batchID];
+    else if (![_invoiceNumber isEqualToString:@"*"]) //Specific invoice #?
+        s = [NSString stringWithFormat:@"Invoice:%@",_invoiceNumber];
+    _titleLabel.text  = s;
+
+} //end finishedLoadingVendorInvoices
+
+//=============Invoice VC=====================================================
+// 4/5 obsolete?
 -(void) loadNextVendorInvoice
 {
     if (vptr >= vv.vcount) //All done??
     {
-        loadingData = FALSE;
-        [spv stop];
-        [_table reloadData];
-        NSString *s;
-        //2/8 redid
-        if (![_batchID isEqualToString:@"*"]) //Specific batch?
-            s = [NSString stringWithFormat:@"Invoices:Batch %@",_batchID];
-        else if (![_vendor isEqualToString:@"*"])   //Specific vendor?
-            s = [NSString stringWithFormat:@"Invoices:Vendor %@",_vendor];
-        else if (![_invoiceNumber isEqualToString:@"*"]) //Specific invoice #?
-            s = [NSString stringWithFormat:@"Invoice:%@",_invoiceNumber];
-        else
-        {
-            s =  @"All Invoices";
-        }
-        _titleLabel.text  = s;
-
+        [self finishedLoadingVendorInvoices];
+ 
         return;
     }
     NSString* vname = [vv getNameByIndex:vptr];  //DHS 3/6
@@ -119,7 +137,7 @@
 //=============Invoice VC=====================================================
 -(void) dismiss
 {
-    //[_sfx makeTicSoundWithPitch : 8 : 52];
+    [self makeCancelSound];
     it.parentUp = FALSE; // 2/9 Tell invoiceTable we are outta here
     [self dismissViewControllerAnimated : YES completion:nil];
 }
@@ -150,16 +168,18 @@
                                                }]];
     [alert addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"Load PDF Images",nil)
                                                style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                   NSString *pf = self->iobj.PDFFile;
+                                                   [self makeSelectSound];
+                                                   NSString *pf  = self->iobj.PDFFile;
+                                                   self->selPage = self->iobj.page;
                                                   //2/10 test if ([self->pc imageExistsByID:pf : 1])
                                                    {
                                                        self->selFname = pf;
-                                                       NSLog(@" got image...");
                                                        [self performSegueWithIdentifier:@"pdfSegue" sender:@"invoiceVC"];
                                                    }
                                                }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                               [self makeCancelSound];
                                                            }]];
     [self presentViewController:alert animated:YES completion:nil];
 } //end funcmenu
@@ -179,10 +199,7 @@
         cell = [[invoiceCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     iobj = iobjs[row];
-    if ([_vendor isEqualToString:@"*"]) //This isn't set up yet!
-        cell.label1.text = [NSString stringWithFormat:@"Vendor:%@:Batch:%@",iobj.vendor,iobj.batchID] ;
-    else //2/6
-        cell.label1.text = [NSString stringWithFormat:@"Vendor:%@:Batch:%@",_vendor,iobj.batchID] ;
+    cell.label1.text = [NSString stringWithFormat:@"Vendor:%@:Batch:%@",_vendor,iobj.batchID] ;
     NSDateFormatter * formatter =  [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"MM/dd/yyyy"];
     NSString *sfd = [formatter stringFromDate:iobj.date];
@@ -206,6 +223,7 @@
 
 //=============Invoice VC=====================================================
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [self makeSelectSound];
     selectedRow = (int)indexPath.row;
     iobj = iobjs[selectedRow];
     [self funcmenu];
@@ -217,6 +235,7 @@
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     //NSLog(@" prepareForSegue: %@ sender %@",[segue identifier], sender);
+    [self makeSegueSound];
     if([[segue identifier] isEqualToString:@"invoiceDetailSegue"])
     {
         EXPViewController *vc = (EXPViewController *)[segue destinationViewController];
@@ -230,6 +249,7 @@
         PDFVC *vc = (PDFVC *)[segue destinationViewController];
         vc.pdfFile = selFname;
         vc.vendor  = _vendor;
+        vc.page    = selPage;
         vc.invoiceNumber = iobj.invoiceNumber;
     }
 
@@ -244,7 +264,8 @@
 - (void)didReadInvoiceTableAsStrings : (NSMutableArray*)a
 {
     [iobjs addObjectsFromArray:(NSArray*)a];
-    [self loadNextVendorInvoice];
+    [self finishedLoadingVendorInvoices]; //DHS 4/5
+    //DHS 4/5 [self loadNextVendorInvoice];
 }
 
 

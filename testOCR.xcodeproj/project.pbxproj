@@ -37,6 +37,8 @@
 		721C296621F56DD100631570 /* documentBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 721C296521F56DD100631570 /* documentBox.m */; };
 		721D9C2021CB122F00D1E78A /* OCRCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D9C1F21CB122F00D1E78A /* OCRCategories.m */; };
 		721D9C2421CB13E500D1E78A /* CatObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D9C2321CB13E500D1E78A /* CatObject.m */; };
+		7225FE46224FEB15003ECE6B /* rivloopie44k.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7225FE45224FEB14003ECE6B /* rivloopie44k.wav */; };
+		7225FE48224FEB63003ECE6B /* vwhorn44k.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7225FE47224FEB63003ECE6B /* vwhorn44k.wav */; };
 		72270D95224EEF3800151931 /* timer44k.wav in Resources */ = {isa = PBXBuildFile; fileRef = 72270D8F224EEF3800151931 /* timer44k.wav */; };
 		72270D96224EEF3800151931 /* lilglock.wav in Resources */ = {isa = PBXBuildFile; fileRef = 72270D90224EEF3800151931 /* lilglock.wav */; };
 		72270D97224EEF3800151931 /* blip.wav in Resources */ = {isa = PBXBuildFile; fileRef = 72270D91224EEF3800151931 /* blip.wav */; };
@@ -48,7 +50,6 @@
 		72270DA8224EF0CB00151931 /* oogieMidiStubs.m in Sources */ = {isa = PBXBuildFile; fileRef = 72270DA7224EF0CB00151931 /* oogieMidiStubs.m */; };
 		722E08F321BF504700BBD88D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08F221BF504700BBD88D /* SystemConfiguration.framework */; };
 		722E08F521BF504E00BBD88D /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08F421BF504E00BBD88D /* NetworkExtension.framework */; };
-		722E08F721BF505500BBD88D /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08F621BF505500BBD88D /* AudioToolbox.framework */; };
 		722E08F921BF505B00BBD88D /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08F821BF505B00BBD88D /* CoreAudio.framework */; };
 		722E08FB21BF506200BBD88D /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08FA21BF506200BBD88D /* libsqlite3.tbd */; };
 		722E090021BF50BF00BBD88D /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08FC21BF50BE00BBD88D /* Bolts.framework */; };
@@ -128,7 +129,6 @@
 		72CA1A6A21CADE7200F908A0 /* SessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 72CA1A6921CADE7200F908A0 /* SessionManager.m */; };
 		72D6516D2204DA97009E2057 /* ComparisonVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D6516C2204DA97009E2057 /* ComparisonVC.m */; };
 		72DA6F97224EF51E0017287D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72DA6F95224EF51D0017287D /* AVFoundation.framework */; };
-		72DA6F98224EF51E0017287D /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72DA6F96224EF51D0017287D /* AVKit.framework */; };
 		72DA6F9A224EF70D0017287D /* clave.wav in Resources */ = {isa = PBXBuildFile; fileRef = 72DA6F99224EF70D0017287D /* clave.wav */; };
 		72DB332021CDC35F00AA44C0 /* DropboxTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DB331F21CDC35F00AA44C0 /* DropboxTools.m */; };
 		72E3FA89220BC1000073C84A /* PDFVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E3FA88220BC1000073C84A /* PDFVC.m */; };
@@ -192,6 +192,8 @@
 		721D9C2221CB13E500D1E78A /* CatObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CatObject.h; sourceTree = "<group>"; };
 		721D9C2321CB13E500D1E78A /* CatObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CatObject.m; sourceTree = "<group>"; };
 		722420F921C854F9002D02A4 /* DBKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DBKeys.h; sourceTree = "<group>"; };
+		7225FE45224FEB14003ECE6B /* rivloopie44k.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rivloopie44k.wav; sourceTree = "<group>"; };
+		7225FE47224FEB63003ECE6B /* vwhorn44k.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = vwhorn44k.wav; sourceTree = "<group>"; };
 		72270D8F224EEF3800151931 /* timer44k.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = timer44k.wav; sourceTree = "<group>"; };
 		72270D90224EEF3800151931 /* lilglock.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = lilglock.wav; sourceTree = "<group>"; };
 		72270D91224EEF3800151931 /* blip.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = blip.wav; sourceTree = "<group>"; };
@@ -208,7 +210,6 @@
 		72270DA7224EF0CB00151931 /* oogieMidiStubs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = oogieMidiStubs.m; path = testOCR/oogieMidiStubs.m; sourceTree = SOURCE_ROOT; };
 		722E08F221BF504700BBD88D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		722E08F421BF504E00BBD88D /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
-		722E08F621BF505500BBD88D /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		722E08F821BF505B00BBD88D /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		722E08FA21BF506200BBD88D /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		722E08FC21BF50BE00BBD88D /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Bolts.framework; path = 3rdparty/Bolts.framework; sourceTree = "<group>"; };
@@ -319,7 +320,6 @@
 		72D6516B2204DA97009E2057 /* ComparisonVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ComparisonVC.h; sourceTree = "<group>"; };
 		72D6516C2204DA97009E2057 /* ComparisonVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ComparisonVC.m; sourceTree = "<group>"; };
 		72DA6F95224EF51D0017287D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		72DA6F96224EF51D0017287D /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		72DA6F99224EF70D0017287D /* clave.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = clave.wav; sourceTree = "<group>"; };
 		72DB331E21CDC35F00AA44C0 /* DropboxTools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DropboxTools.h; sourceTree = "<group>"; };
 		72DB331F21CDC35F00AA44C0 /* DropboxTools.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DropboxTools.m; sourceTree = "<group>"; };
@@ -345,13 +345,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				72DA6F97224EF51E0017287D /* AVFoundation.framework in Frameworks */,
-				72DA6F98224EF51E0017287D /* AVKit.framework in Frameworks */,
 				72A9828921CCAC7400D5EAC6 /* WebKit.framework in Frameworks */,
 				729C592F21C1F62400F4C695 /* MessageUI.framework in Frameworks */,
 				722E090321BF50BF00BBD88D /* ParseUI.framework in Frameworks */,
 				722E08FB21BF506200BBD88D /* libsqlite3.tbd in Frameworks */,
 				722E08F921BF505B00BBD88D /* CoreAudio.framework in Frameworks */,
-				722E08F721BF505500BBD88D /* AudioToolbox.framework in Frameworks */,
 				722E090021BF50BF00BBD88D /* Bolts.framework in Frameworks */,
 				722E08F521BF504E00BBD88D /* NetworkExtension.framework in Frameworks */,
 				722E090221BF50BF00BBD88D /* Parse.framework in Frameworks */,
@@ -415,14 +413,14 @@
 				7299F76A2213B43A00FC0814 /* ErrorHelperVC.m */,
 				725DA97B21CB53BC0024ECF7 /* EXPViewController.h */,
 				725DA97C21CB53BC0024ECF7 /* EXPViewController.m */,
+				729E9A6221E02E0400F3FB5B /* EXPDetailVC.h */,
+				729E9A6321E02E0400F3FB5B /* EXPDetailVC.m */,
 				728EECC321ED1B5B00F83129 /* InvoiceViewController.h */,
 				728EECC421ED1B5B00F83129 /* InvoiceViewController.m */,
 				72693B2C2214DFDB00EEB571 /* helpVC.h */,
 				72693B2D2214DFDB00EEB571 /* helpVC.m */,
 				72E3FA87220BC1000073C84A /* PDFVC.h */,
 				72E3FA88220BC1000073C84A /* PDFVC.m */,
-				729E9A6221E02E0400F3FB5B /* EXPDetailVC.h */,
-				729E9A6321E02E0400F3FB5B /* EXPDetailVC.m */,
 				7206008E21B64052000B26DC /* Main.storyboard */,
 				7206009121B64055000B26DC /* Assets.xcassets */,
 				7206009321B64055000B26DC /* LaunchScreen.storyboard */,
@@ -503,6 +501,8 @@
 		72270D8D224EEF3800151931 /* Samples */ = {
 			isa = PBXGroup;
 			children = (
+				7225FE47224FEB63003ECE6B /* vwhorn44k.wav */,
+				7225FE45224FEB14003ECE6B /* rivloopie44k.wav */,
 				72DA6F99224EF70D0017287D /* clave.wav */,
 				72270D8F224EEF3800151931 /* timer44k.wav */,
 				72270D90224EEF3800151931 /* lilglock.wav */,
@@ -533,7 +533,6 @@
 			isa = PBXGroup;
 			children = (
 				72DA6F95224EF51D0017287D /* AVFoundation.framework */,
-				72DA6F96224EF51D0017287D /* AVKit.framework */,
 				72A9828821CCAC7300D5EAC6 /* WebKit.framework */,
 				729C592E21C1F62400F4C695 /* MessageUI.framework */,
 				722E08FC21BF50BE00BBD88D /* Bolts.framework */,
@@ -541,7 +540,6 @@
 				722E08FF21BF50BF00BBD88D /* ParseUI.framework */,
 				722E08FA21BF506200BBD88D /* libsqlite3.tbd */,
 				722E08F821BF505B00BBD88D /* CoreAudio.framework */,
-				722E08F621BF505500BBD88D /* AudioToolbox.framework */,
 				722E08F421BF504E00BBD88D /* NetworkExtension.framework */,
 				722E08F221BF504700BBD88D /* SystemConfiguration.framework */,
 				10023EDCB985E127D3A90CB2 /* Pods_testOCR.framework */,
@@ -747,6 +745,7 @@
 				72B8DEC121C46459004ADD79 /* loupe-mask@2x.png in Resources */,
 				729E92C421DC1CCC00048DAF /* factoryIcon.png in Resources */,
 				7257C0DC22149E8B0034A627 /* rotbut.png in Resources */,
+				7225FE48224FEB63003ECE6B /* vwhorn44k.wav in Resources */,
 				72693B312214E7C800EEB571 /* grafNOT.png in Resources */,
 				72C90B9F21F450050032875D /* bgpspin.png in Resources */,
 				7206009F21B640E2000B26DC /* hawaiiBeefInvoice.jpg in Resources */,
@@ -760,6 +759,7 @@
 				724B4BB321E74BDE0086B933 /* multiHOT.png in Resources */,
 				72DA6F9A224EF70D0017287D /* clave.wav in Resources */,
 				72990756221524990021804F /* dbug.png in Resources */,
+				7225FE46224FEB15003ECE6B /* rivloopie44k.wav in Resources */,
 				725145ED220037E40074EDBF /* lildbGrey.png in Resources */,
 				729E92C121DC1CC100048DAF /* barnIcon.png in Resources */,
 				72990754221523D40021804F /* empty64x64.png in Resources */,

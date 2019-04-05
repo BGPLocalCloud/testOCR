@@ -119,6 +119,7 @@
 -(void) runOneOrMoreBatches  : (int) vindex;
 -(void) setParent : (UIViewController*) p;
 -(void) setVisualDebug : (UIViewController*) p : (NSString*)dbs;
+-(void) setupCustomerFolders;
 
 -(void) updateParse;
 -(void) writeBatchReport;

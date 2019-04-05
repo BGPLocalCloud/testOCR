@@ -32,6 +32,11 @@
 
 @implementation MainVC
 
+#define NAV_HOME_BUTTON 0
+#define NAV_DB_BUTTON 1
+#define NAV_SETTINGS_BUTTON 2
+#define NAV_BATCH_BUTTON 3
+
 //=============OCR MainVC=====================================================
 -(id)initWithCoder:(NSCoder *)aDecoder {
     if ( !(self = [super initWithCoder:aDecoder]) ) return nil;
@@ -55,9 +60,6 @@
     _sfx         = [soundFX sharedInstance];
 
     ecount = 0;
-    
-    vv = [Vendors sharedInstance];
-    
     refreshControl = [[UIRefreshControl alloc] init];
     batchPFObjects = nil;
     
@@ -81,6 +83,9 @@
 //=============OCR MainVC=====================================================
 - (void)viewDidLoad {
     [super viewDidLoad];
+    //4/5
+    mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+
     // Do any additional setup after loading the view.
     int xi,yi,xs,ys;
     
@@ -155,7 +160,6 @@
 {
     [super viewWillAppear:animated];
     [act readActivitiesFromParse:nil :nil];
-    AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     _customerLabel.text = mappDelegate.selectedCustomerFullName;
     //[self testit];
 }
@@ -183,6 +187,12 @@
 {
     ecount++;
     if (ecount % 1 == 0) [self admin];
+}
+
+//=============OCR MainVC=====================================================
+- (IBAction)customerSelect:(id)sender
+{
+    [self customerMenu];
 }
 
 //=============OCR MainVC=====================================================
@@ -262,7 +272,6 @@
 // 3/20 New: multi-customer support
 -(void) customerMenu
 {
-    AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSString *cstr = [NSString stringWithFormat:@"Current Customer [%@]",mappDelegate.selectedCustomer];
     NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:cstr];
     [tatString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:30] range:NSMakeRange(0, tatString.length)];
@@ -278,7 +287,7 @@
         NSString *cfull = mappDelegate.cust.fullNames[i];
         [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(nextCust,nil)
                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                      [mappDelegate updateCustomerDefaults:nextCust :cfull];
+                                                      [self->mappDelegate updateCustomerDefaults:nextCust :cfull];
                                                       self->_customerLabel.text = cfull;
                                                   }]];
         i++;
@@ -304,20 +313,26 @@
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
 
     [alert setValue:tatString forKey:@"attributedTitle"];
-
-    [alert addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"EXP Table",nil)
-                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-                                                              self->scustomer = mappDelegate.selectedCustomer; //3/20
-                                                              [self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
-                                                          }]];
-    for (int vindex = 0;vindex < vv.vcount;vindex++)
+    //4/5 add EXP for all customers!
+    for (int cindex = 0;cindex < mappDelegate.cust.ccount;cindex++)
     {
-        NSString *s = [vv getNameByIndex:vindex]; //DHS 3/6
+        NSString *s = [mappDelegate.cust getNameByIndex:cindex];
+        NSString *nextChoice = [NSString stringWithFormat:@"%@ EXP",s];
+        [alert addAction: [UIAlertAction actionWithTitle:nextChoice
+                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                       self->scustomer = s;
+                                                       [self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
+                                                   }]];
+    }
+
+    for (int vindex = 0;vindex < mappDelegate.vv.vcount;vindex++)
+    {
+        NSString *s = [mappDelegate.vv getNameByIndex:vindex]; //DHS 3/6
         NSString *nextChoice = [NSString stringWithFormat:@"%@ Invoices",s];
             [alert addAction: [UIAlertAction actionWithTitle:nextChoice
                                                        style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                            self->selVendor = s;
+                                                           self->sInvoiceNumber = @"*";
                                                            [self performSegueWithIdentifier:@"invoiceSegue" sender:@"mainVC"];
                                                        }]];
     }
@@ -332,7 +347,6 @@
 //=============OCR MainVC=====================================================
 -(void) dumpSettings
 {
-    AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSString *s = [mappDelegate.settings getDumpString];
     UIAlertController *alertController =
     [UIAlertController alertControllerWithTitle:@"Settings Dump"
@@ -357,7 +371,8 @@
 -(void) batchListChoiceMenu
 {
     NSArray  *sItems  = [sdata componentsSeparatedByString:@":"]; //Look at the data for this item...
-    BOOL isBatch = (sItems.count > 1); //Is this a batch started / completed item?
+    BOOL isBatch   = (sItems.count > 1); //Is this a batch started / completed item?
+    BOOL isInvoice = (sItems.count == 1); //DHS 4/5
     if (sItems.count > 2) scustomer = sItems[2];  //3/20
     NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:@"Batch Retreival"];
     [tatString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:25] range:NSMakeRange(0, tatString.length)];
@@ -367,15 +382,15 @@
                                                             preferredStyle:UIAlertControllerStyleAlert];
     
     [alert setValue:tatString forKey:@"attributedTitle"];
-    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Get EXP records",nil)
+    if (!isInvoice) [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Get EXP records",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                   if (isBatch) self->stype = @"E"; //Lookup by batch
                                                   else         self->stype = @"I"; //Lookup by invoice
                                                   [self performSegueWithIdentifier:@"expSegue" sender:@"mainVC"];
                                               }]];
-    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Get Invoices",nil)
+    if (isInvoice) [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Get Invoices",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                  self->stype = @"I";
+                                                  self->sInvoiceNumber = sItems[0];
                                                   [self performSegueWithIdentifier:@"invoiceSegue" sender:@"mainVC"];
                                               }]];
     if (isBatch) //2/8 batch has extra choices...
@@ -467,10 +482,6 @@
 
 
 
-#define NAV_HOME_BUTTON 0
-#define NAV_DB_BUTTON 1
-#define NAV_SETTINGS_BUTTON 2
-#define NAV_BATCH_BUTTON 3
 
 //=============OCR MainVC=====================================================
 -(void) setupNavBar
@@ -557,6 +568,14 @@
         vc.step = 0;
         vc.needPicker = TRUE;
     }
+    else if([[segue identifier] isEqualToString:@"templateSegue"])
+    {
+        EditTemplateVC *vc = (EditTemplateVC*)[segue destinationViewController];
+        vc.incomingOCRText = @""; //5/1 clear all fields
+        vc.incomingImage   = nil;
+        vc.incomingVendor  = @"";
+        vc.incomingImageFilename = @"";
+    }
     else if([[segue identifier] isEqualToString:@"expSegue"])
     {
         EXPViewController *vc = (EXPViewController*)[segue destinationViewController];
@@ -568,9 +587,9 @@
     else if([[segue identifier] isEqualToString:@"invoiceSegue"])
     {
         InvoiceViewController *vc = (InvoiceViewController*)[segue destinationViewController];
-        vc.vendor        = @"*"; //2/9 Default to all vendors, batches and invoices
+        vc.vendor        = selVendor;  //4/5 must select vendor!
         vc.batchID       = @"*";
-        vc.invoiceNumber = @"*";
+        vc.invoiceNumber = sInvoiceNumber; //4/5 invoice# from batch maybe?
         if (sdata != nil) // Called from batch popup -> invoices? get batch#
         {
             //Get batch ID for invoice lookup...
@@ -796,28 +815,20 @@
         [self menu];
         //[self performSegueWithIdentifier:@"cloudSegue" sender:@"feedCell"];
     }
-    else if (which == 1) //THis is now a multi-function popup...
+    else if (which == 1 && mappDelegate.vv.loaded && mappDelegate.cust.loaded) //DB needs vendors AND customers
     {
         [self makeSelectSound];
         [self dbmenu];
     }
-    else if (which == 2) //Templates / settings?
+    else if (which == 2) //Chartit? Switch to app
     {
-        
+        [self->_sfx makeTicSoundWithPitch : 6 : 70];
+        //4/30 test
         NSString *chartitAppURL = @"Chartit://";
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:chartitAppURL]];
 
-//        if ( canOpenUrl ) [[UIApplication sharedApplication]
-//                           openURL:[NSURL URLWithString:url]];
-        
-//        To find all the url, go to this page: http://handleopenurl.com/
-        //        [self performSegueWithIdentifier:@"helpSegue" sender:@"mainVC"];
-
-       // [self testit];
-       // return;
-       // [self performSegueWithIdentifier:@"templateSegue" sender:@"mainVC"];
-    }
-    if (which == 3 && vv.loaded) //batch? (2/5 make sure vendors are there first!)
+   }
+    if (which == 3 && mappDelegate.vv.loaded) //batch? (2/5 make sure vendors are there first!)
     {
         [self performSegueWithIdentifier:@"batchSegue" sender:@"mainVC"];
     }
@@ -871,34 +882,6 @@ int currentYear = 2019;
     
 //    [self performSegueWithIdentifier:@"addTemplateSegue" sender:@"mainVC"];
     return;
-//    smartProducts *smartp = [[smartProducts alloc] init];
-//    [smartp saveKeywordsAndTyposToParse];
-//    return;
-
-    
-//    [self performSegueWithIdentifier:@"errorSegue" sender:@"mainVC"];
-//    return;
-    //[et readFullTableToCSV:0];
-    
-//    GenParse *gp = [[GenParse alloc] init];
-//    [gp deleteAllByTableAndKey:@"activity" :@"*" :@"*"];
-//    NSLog(@" deletit?");
-   // smartProducts *smartp = [[smartProducts alloc] init];
-    
-//    AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-//    DropboxTools *dbt = [[DropboxTools alloc] init];
-//    [dbt getFolderList : mappDelegate.settings.templateFolder];
-
-    return;
-    
-//    NSDictionary *d    = [self readTxtToJSON:@"hfmpages"];
-//    OCRDocument *od = [[OCRDocument alloc] init];
-//
-//    NSString *p = @"I. 64";
-//    [od cleanupPrice:p];
-//
-//    [od setupDocumentAndParseJDON : @"hfmpages" :d :FALSE];
-//    return;
 
 }
 

@@ -13,7 +13,7 @@
 //
 //  2/23 Fix array -> mutableArray conversion bug
 //  3/20 new folder structure
-
+//  4/5  add dbt textfile error handler
 #import "BatchReportController.h"
 
 @interface BatchReportController ()
@@ -123,6 +123,14 @@
     _contents.text   = reportText;
     _titleLabel.text = _pfo[PInv_BatchID_key];
 }
+
+//===========<DropboxToolDelegate>================================================
+// 4/5
+- (void)errorDownloadingTextFile : (NSString *)s
+{
+    NSLog(@" DBT error %@",s);
+}
+
 
 
 @end

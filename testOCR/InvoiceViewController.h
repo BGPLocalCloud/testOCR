@@ -23,6 +23,7 @@
 #import "PDFCache.h"
 #import "PDFVC.h"
 #import "Vendors.h"
+#import "soundFX.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -41,13 +42,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     NSString *selFname;
     NSString *selNumber;
-
+    NSString *selPage; //4/5
 }
 
 - (IBAction)backSelect:(id)sender;
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UITableView *table;
 @property (weak, nonatomic) IBOutlet UIView *headerView;
+@property (nonatomic, strong) soundFX *sfx;
 
 @property (nonatomic , strong) NSString* vendor;
 @property (nonatomic , strong) NSString* batchID;

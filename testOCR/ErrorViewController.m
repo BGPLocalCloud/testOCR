@@ -17,6 +17,7 @@
 //  here is a link about adding a minus and enter key:
 //  https://stackoverflow.com/questions/9613109/uikeyboardtypedecimalpad-with-negative-numbers
 //  2/12 added field0Value for productname, renamed fieldValue
+//  4/5 add rotate 90 degrees
 #import "ErrorViewController.h"
 
 @interface ErrorViewController ()
@@ -63,6 +64,9 @@
     kbUp = FALSE;
     _fixingErrors = TRUE;
 
+    // 4/5 sfx
+    _sfx         = [soundFX sharedInstance];
+
     return self;
 } //end initWithCoder
 
@@ -105,6 +109,8 @@
     [expList removeAllObjects];
     _fixNumberView.hidden = TRUE;
     _scrollView.hidden    = TRUE;
+    _rotButton.hidden     = TRUE;
+    rotatedCount          = 0;
     [self zoomPDFView : 1];
     
     // Top field: product Name : DO NOT CLEAR!
@@ -170,6 +176,18 @@
 
 
 //=============Error VC=====================================================
+-(void) makeCancelSound
+{
+    [self->_sfx makeTicSoundWithPitch : 5 : 82];
+}
+
+//=============Error VC=====================================================
+-(void) makeSelectSound
+{
+    [self->_sfx makeTicSoundWithPitch : 5 : 70];
+}
+
+//=============Error VC=====================================================
 -(void) initErrorKeys
 {
     errKeysToCheck= @[   //CANNED
@@ -217,6 +235,7 @@
 
 //=============Error VC=====================================================
 - (IBAction)fieldCancelSelect:(id)sender {
+    [self makeCancelSound];
     BOOL needToSwap = !kbUp; //2/11
     [self dismissKBIfNeeded];
     [self animateTextField: _field1Value up: NO];
@@ -227,7 +246,8 @@
 //=============Error VC=====================================================
 - (IBAction)fieldFixSelect:(id)sender
 {
-    NSLog(@" fix: new value %@ SAVE TO PARSE...",qText);
+    //NSLog(@" fix: new value %@ SAVE TO PARSE...",qText);
+    [self makeSelectSound];
     [self dismissKBIfNeeded]; //2/11
     [self textFieldDidEndEditing:_field1Value];
     // save new field to parse...
@@ -272,9 +292,22 @@
 
 
 //=============Error VC=====================================================
+//  4/5 add rotate 90 degrees
+- (IBAction)rotSelect:(id)sender {
+    [self makeSelectSound];
+    UIImage *ii = _pdfView.image;
+    ii = [it rotate90CCW : ii];
+    _pdfView.image = ii;
+    rotatedCount++;
+
+}
+
+
+//=============Error VC=====================================================
 // 2/11 for cancel/fix button presses
 -(void) dismissKBIfNeeded
 {
+    [self makeCancelSound];
     if (!kbUp) return;
     [_field0Value resignFirstResponder];  //One of these is up, resign all dismisses any keyboard
     [_field1Value resignFirstResponder];
@@ -291,6 +324,8 @@
     _backButton.hidden      = fixingErrors;
     _fixNumberView.hidden   = !fixingErrors;
     _scrollView.hidden      = !fixingErrors;
+    _rotButton.hidden       = !fixingErrors;
+
 } //end swapViews
 
 //=============Error VC=====================================================
@@ -305,7 +340,7 @@
 //=============Error VC=====================================================
 -(void) dismiss
 {
-    //[_sfx makeTicSoundWithPitch : 8 : 52];
+    [self makeCancelSound];
     et.parentUp = FALSE; // 2/9 Tell expTable we are outta here
     [self dismissViewControllerAnimated : YES completion:nil];
 }
@@ -424,6 +459,7 @@
 
 //=============Error VC=====================================================
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [self makeSelectSound];
     selectedRow        = (int)indexPath.row;
     NSString *allErrs  = [errorList objectAtIndex:selectedRow];
     NSArray *sItems    = [allErrs componentsSeparatedByString:@":"];
@@ -493,10 +529,11 @@
     NSLog(@"show fixit view...");
     [self swapViews : TRUE];
     //Show error fixing view...
-    _table.hidden = TRUE;
-    _backButton.hidden = TRUE;
+    _table.hidden         = TRUE;
+    _backButton.hidden    = TRUE;
     _fixNumberView.hidden = FALSE;
-    _pdfView.hidden = FALSE;
+    _pdfView.hidden       = FALSE;
+    _rotButton.hidden     = FALSE;
 
     fixingObjectKey = key;
     isNumeric = [errKeysNumeric containsObject:key];
@@ -551,6 +588,8 @@
     //Does this vendor usually have XY flipped scans?
     NSString *rot = [vv getRotationByVendorName:vendorName];
     if ([rot isEqualToString:@"-90"]) ii = [it rotate90CCW : ii];
+    // If user has rotated image earlier, rotate image to match their preference
+    for (int i=0;i<rotatedCount;i++) ii = [it rotate90CCW : ii];
     _pdfView.image = ii;
     [self zoomPDFView : 3];
 
@@ -584,11 +623,10 @@
 - (void)didGetObjectsByIds : (NSMutableDictionary *)d
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@" setop");
         [self->spv stop];
     });
 
-    NSLog(@" OK exp objectsBYid %@",d);
+    //NSLog(@" OK exp objectsBYid %@",d);
     expRecordsByID = d;
     [_table reloadData];
 }
@@ -728,7 +766,6 @@
     int tag = (int)textField.tag;
     [self loadFields:tag:textField];
 } //end textFieldDidEndEditing
-
 
 
 

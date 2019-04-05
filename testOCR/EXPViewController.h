@@ -24,6 +24,7 @@
 #import "EXPCell.h"
 #import "EXPDetailVC.h"
 #import "spinnerView.h"
+#import "soundFX.h"
 
 #define DB_MODE_NONE 200
 #define DB_MODE_EXP 201
@@ -65,12 +66,14 @@
 @property (weak, nonatomic) IBOutlet UITableView *table;
 @property (weak, nonatomic) IBOutlet UIButton *selectButton;
 @property (weak, nonatomic) IBOutlet UIView *headerView;
+@property (weak, nonatomic) IBOutlet UILabel *customerLabel;
 
 @property (weak, nonatomic) IBOutlet NSString *actData;
 @property (weak, nonatomic) IBOutlet NSString *searchType;
 @property (weak, nonatomic) IBOutlet UIButton *sortButton;
 @property (weak, nonatomic) IBOutlet UIButton *sortDirButton;
 @property (weak, nonatomic) IBOutlet NSString *scustomer;
+@property (nonatomic, strong) soundFX *sfx;
 
 @property (weak, nonatomic) IBOutlet NSString *invoiceNumber;
 

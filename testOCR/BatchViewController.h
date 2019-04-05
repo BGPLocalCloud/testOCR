@@ -17,6 +17,7 @@
 #import "BatchObject.h"
 #import "spinnerView.h"
 #import "Vendors.h"
+#import "soundFX.h"
 
 @interface BatchViewController : UIViewController <batchObjectDelegate,OCRTemplateDelegate>
 {
@@ -35,6 +36,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *runButton;
 @property (weak, nonatomic) IBOutlet UITextView *outputText;
 @property (weak, nonatomic) IBOutlet UIButton *monthButton;
+@property (nonatomic, strong) soundFX *sfx;
 
 - (IBAction)cancelSelect:(id)sender;
 - (IBAction)runSelect:(id)sender;

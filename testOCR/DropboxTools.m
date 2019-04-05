@@ -319,6 +319,25 @@
              NSString *str = [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
              [self->_delegate didDownloadTextFile : str];
          }
+         else {
+             NSString *title = @"";
+             NSString *message = @"";
+             if (routeError) {
+                 // Route-specific request error
+                 title = @"Route-specific error";
+                 if ([routeError isPath]) {
+                     message = [NSString stringWithFormat:@"Invalid path: %@", routeError.path];
+                 }
+             } else {
+                 // Generic request error
+                 title = @"Generic request error";
+                 message = [self getErrorMessage:error];
+             }
+             [self errMsg:@"Dropbox read error" :message];
+             [self->_delegate errorDownloadingTextFile : message];
+             
+             //  [self setFinished];
+         }
      }];
     
 } //end downloadTextFile

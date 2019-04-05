@@ -11,6 +11,7 @@
 //  Created by Dave Scruton on 1/4/19.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  4/5 add sfx, multi-customer label
 
 #import "EXPDetailVC.h"
 
@@ -19,6 +20,15 @@
 @end
 
 @implementation EXPDetailVC
+
+//=============EXPDetail VC=====================================================
+-(id)initWithCoder:(NSCoder *)aDecoder {
+    if ( !(self = [super initWithCoder:aDecoder]) ) return nil;
+    // 4/5 sfx
+    _sfx         = [soundFX sharedInstance];
+    return self;
+}
+
 
 //=============EXPDetail VC=====================================================
 - (void)viewDidLoad {
@@ -40,6 +50,7 @@
     ssOverlay.image = nil;
     [self.view addSubview:ssOverlay];
     ssOverlay.hidden = TRUE;
+    
 }
 
 //=============EXPDetail VC=====================================================
@@ -62,7 +73,9 @@
 //=============EXPDetail VC=====================================================
 -(void) updateUI
 {
-    _titleLabel.text = [NSString stringWithFormat:@"EXP[%@](%d/100)",_eobj.objectId,_detailIndex+1];
+    //4/5 multi customers!
+    _titleLabel.text = [NSString stringWithFormat:@"EXP_%@(%d/100)",_scustomer,_detailIndex+1];
+//    _titleLabel.text = [NSString stringWithFormat:@"EXP[%@](%d/100)",_eobj.objectId,_detailIndex+1];
     NSDateFormatter * formatter =  [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"MM/dd/yyyy  HH:mmv:SS"];
     NSString *sfd = [formatter stringFromDate:_eobj.expdate];
@@ -119,6 +132,7 @@
         _detailIndex--;
     _eobj = [_allObjects objectAtIndex:_detailIndex];
     [self animSwipe : 1];
+    [self->_sfx makeTicSoundWithPitch : 5 : 69];
     [self updateUI];
 }
 
@@ -131,6 +145,7 @@
         _detailIndex++;  // you'll need to check bounds
     _eobj = [_allObjects objectAtIndex:_detailIndex];
     [self animSwipe : 0];
+    [self->_sfx makeTicSoundWithPitch : 5 : 70];
     [self updateUI];
 }
 
@@ -144,7 +159,7 @@
 //=============EXPDetail VC=====================================================
 -(void) dismiss
 {
-    //[_sfx makeTicSoundWithPitch : 8 : 52];
+    [self->_sfx makeTicSoundWithPitch : 5 : 82];
     [self dismissViewControllerAnimated : YES completion:nil];
     
 }

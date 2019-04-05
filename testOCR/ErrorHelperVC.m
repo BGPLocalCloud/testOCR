@@ -14,6 +14,11 @@
 //  This looks up errors and displays them as text on top of a
 //   fullscreen-scrollable view of the matching invoice.
 //  Designed for use when correcting EXP data on another platform
+//  gets batch ID, looks up batch, then has to go get EXP records
+//   once that is done, has to fetch PDF ! may miss cache!
+
+//  4/5 add rotatedcount to keep track of rotations across invoice pages
+//      exp multi-customer support
 
 #import "ErrorHelperVC.h"
 
@@ -50,6 +55,8 @@
     oldName = @"";
     oldPage = 0;
     iwid = ihit = 128;
+    
+    rotatedCount = 0;
     return self;
 } //end initWithCoder
 
@@ -63,11 +70,15 @@
     {
         [spv start : @"Get Batch Errors"];
         batchID = bItems[0];
+        //DHS 4/5 need to setup customer too!
+        if (bItems.count > 2) [et setTableName:[NSString stringWithFormat:@"EXP_%@",bItems[2]]]; //Customer name: 3rd item
         [bbb readFromParseByID : batchID];
     }
     [expList removeAllObjects];
     [self zoomPDFView : 1.0];
-    
+    productName = @"...";
+    errorStatus = @"...";
+    [self setLabels];
 } //end viewWillAppear
 
 
@@ -114,6 +125,8 @@
     UIImage *ii = _pdfImage.image;
     ii = [it rotate90CCW : ii];
     _pdfImage.image = ii;
+    rotatedCount++;
+
 }
 
 //=============ErrorHelperVC=====================================================
@@ -138,15 +151,31 @@
 }
 
 
+//=============ErrorHelperVC=====================================================
+-(void) errorMessage : (NSString *) title :(NSString *) msg
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:
+                                NSLocalizedString(title,nil)  message:msg
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                              }]];
+    [self presentViewController:alert animated:YES completion:nil];
+    
+} //end errorMessage
+
+
 //=============Error VC=====================================================
 -(void) finishSettingPDFImage : (UIImage *)ii
 {
     //Does this vendor usually have XY flipped scans?
-    NSString *rot = [vv getRotationByVendorName:vendorName];
+    NSString *rot = [vv getRotationByVendorName:vendorName]; //asdf
     if ([rot isEqualToString:@"-90"]) ii = [it rotate90CCW : ii];
+    for (int i=0;i<rotatedCount;i++)  ii = [it rotate90CCW : ii]; //handle xtra rotations
     _pdfImage.image = ii;
     iwid = ii.size.width;
     ihit = ii.size.height;
+    [spv stop]; //DHS 4/5 just in case...
     [self zoomPDFView : 1.8];
     [self setLabels];
 } //end finishSettingPDFImage
@@ -260,6 +289,7 @@
             {
                 [spv start: @"Download PDF..."];
                 NSLog(@" ...cache MISS: downloading %@",pdfName);
+                rotatedCount = 0;
                 [dbt downloadImages:pdfName];
             }
         }
@@ -305,8 +335,8 @@
 - (void)didGetObjectsByIds : (NSMutableDictionary *)d
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@" getEXPObjects...");
-        [self->spv stop];
+        NSLog(@" getEXPObjects...[%d recs found]",(int)d.count);
+       //DHS 4/5 comes in late! [self->spv stop];
     });
     
     NSLog(@" OK exp objectsBYid %@",d);
@@ -331,7 +361,11 @@
 {
     [spv stop];
     NSLog(@" ERROR! %@",s); //2/8 MAKE THIS AN ERROR POPUP?
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self errorMessage : @"Dropbox Error" : s];
+    });
+
 }
 
-
+//asdf
 @end

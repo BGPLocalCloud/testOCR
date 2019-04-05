@@ -88,6 +88,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(void) dumpBox : (int) index;
 -(BOOL) isSupplierAMatch : (NSString *)stest;
 -(void) loadTemplatesFromDisk : (NSString *)vendorName;
+-(void) loadTemplateFromPFObject : (NSArray *) objects : (int) index;
 -(void) setOriginalRects : (CGRect) tlr : (CGRect) trr;
 -(void) setTemplateOrientation : (int)w : (int) h;
 -(void) saveTemplatesToDisk : (NSString *)vendorName;
@@ -105,7 +106,7 @@ NS_ASSUME_NONNULL_END
 @optional
 - (void)didCheckTemplate : (int) count;
 - (void)errorCheckingTemplate : (NSString *)errmsg;
-- (void)didReadTemplate;
+- (void)didReadTemplate: (NSArray*) a;
 - (void)errorReadingTemplate : (NSString *)errmsg;
 - (void)didReadTemplateTableAsStrings : (NSMutableArray*) a;
 - (void)didSaveTemplate;

@@ -71,12 +71,8 @@ static BatchObject *sharedInstance = nil;
         
         ot  = [[OCRTemplate alloc] init];
         ot.delegate = self;
-        AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        // 3/20 multi-customer support
-        customerName = bappDelegate.selectedCustomer;
-        expTableName = [NSString stringWithFormat:@"EXP_%@",customerName];
-        //batchFolder = bappDelegate.settings.batchFolder;        //@"latestBatch";
-        batchFolder = [bappDelegate getBatchFolderPath]; // 3/20
+
+
         oto = [OCRTopObject sharedInstance];
         oto.delegate = self;
 
@@ -101,6 +97,17 @@ static BatchObject *sharedInstance = nil;
     return self;
 }
 
+//=============(BatchObject)=====================================================
+// 4/5 wups this was not getting called at the right time!
+-(void) setupCustomerFolders
+{
+    AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    // 3/20 multi-customer support
+    customerName = bappDelegate.selectedCustomer;
+    expTableName = [NSString stringWithFormat:@"EXP_%@",customerName];
+    //batchFolder = bappDelegate.settings.batchFolder;        //@"latestBatch";
+    batchFolder = [bappDelegate getBatchFolderPath]; // 3/20
+}
 
 //=============(BatchObject)=====================================================
 -(void) addError : (NSString *) errDesc : (NSString *) objectID : (NSString*) productName
@@ -933,7 +940,7 @@ static BatchObject *sharedInstance = nil;
 #pragma mark - OCRTemplateDelegate
 
 //===========<OCRTemplateDelegate>================================================
-- (void)didReadTemplate
+- (void)didReadTemplate : (NSArray*) a
 {
     if (debugMode) NSLog(@" got template...");
     gotTemplate = TRUE;

@@ -65,7 +65,12 @@
     AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSLog(@"Verbose Debug Output %d",mappDelegate.debugMode);
     batchCustomer = mappDelegate.selectedCustomer;
+    [bbb setupCustomerFolders]; //DHS 4/5
     [bbb getBatchCounts];
+    
+    // 3/29 sfx
+    _sfx         = [soundFX sharedInstance];
+
 }
 
 //=============Batch VC=====================================================
@@ -101,6 +106,21 @@
     [self dismissViewControllerAnimated : YES completion:nil];
     
 }
+
+//=============OCR MainVC=====================================================
+-(void) makeCancelSound
+{
+    [self->_sfx makeTicSoundWithPitch : 5 : 82];
+}
+
+
+//=============OCR MainVC=====================================================
+-(void) makeSelectSound
+{
+    [self->_sfx makeTicSoundWithPitch : 5 : 70];
+}
+
+
 
 //=============AddTemplate VC=====================================================
 -(void) updateUI
@@ -176,6 +196,7 @@
                                                       self->vendorName = s;
                                                       self->_outputText.text = @"";
                                                       [self->spv start : @"Run Batch..."];
+                                                      [self->_sfx makeTicSoundWithPitch : 1 : 60];
                                                       [self->bbb clearAndRunBatches : vindex];
                                                   }]];
         }
@@ -183,11 +204,13 @@
     UIAlertAction *allAction    = [UIAlertAction actionWithTitle:NSLocalizedString(@"Run All",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                                self->_outputText.text = @"";
+                                                               [self->_sfx makeTicSoundWithPitch : 6 : 60];
                                                                [self->spv start : @"Run Batch..."];
                                                                [self->bbb clearAndRunBatches : -1];
                                                            }];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                               [self makeCancelSound];
                                                            }];
     [alert addAction:allAction];
     [alert addAction:cancelAction];
@@ -234,10 +257,12 @@
         [alert addAction:[UIAlertAction actionWithTitle:[NSString stringWithFormat:@"Dump %@",dbs]
                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                       [self setVisualDebug : dbs];
+                                                      [self makeSelectSound];
                                                   }]];
     }
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self makeCancelSound];
                                               }]];
     [self presentViewController:alert animated:YES completion:nil];
     
@@ -286,12 +311,14 @@
         [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(month,nil)
                                  style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                      self->batchMonth = month;
+                                     [self makeSelectSound];
                                      [self->_monthButton setTitle:month forState:UIControlStateNormal];
                                  }]];
     }
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                               [self makeCancelSound];
                                                            }];
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
@@ -342,6 +369,7 @@
         int wcount   = (int)www.count;
         [self addToOutputText : [NSString stringWithFormat:@"Batch Complete, Errors:%d Warnings:%d",ecount,wcount]];
         [self->spv stop];
+        [self->_sfx makeTicSoundWithPitchandLevel : 6 : 70 : 90];
         if (self->haltingBatchToExitVC) [self dismiss];
 
     });

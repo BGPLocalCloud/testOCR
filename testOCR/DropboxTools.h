@@ -67,6 +67,7 @@
 - (void)errorCreatingFolder : (NSString *)folderPath;
 - (void)didDownloadImages;
 - (void)didDownloadTextFile : (NSString *)result;
+- (void)errorDownloadingTextFile : (NSString *)s;
 - (void)didDownloadCSVFile : (NSString *)vendor : (NSString *)result;
 - (void)errorDownloadingCSV : (NSString *)s;
 - (void)didGetFolderList : (NSArray *)entries;

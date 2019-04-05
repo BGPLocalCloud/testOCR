@@ -36,11 +36,19 @@ static Customers *sharedInstance = nil;
     {
         _customerNames      = [[NSMutableArray alloc] init]; // Customer names
         _fullNames          = [[NSMutableArray alloc] init]; // Customer names
+        _ccount             = 0;
         _loaded             = FALSE;
         [self readFromParse];
     }
     return self;
 }
+
+//=============(Customers)=====================================================
+-(NSString *) getNameByIndex : (int)index
+{
+    if (index < 0 || index >= _customerNames.count) return @"";
+    return _customerNames[index];
+} //end getNameByIndex
 
 
 //=============(Customers)=====================================================
@@ -57,13 +65,15 @@ static Customers *sharedInstance = nil;
                 return;
             }
             [self->_customerNames removeAllObjects];
+            self->_ccount = 0;
             [self->_fullNames removeAllObjects];
             for( PFObject *pfo in objects)  //Save all our customer names...
             {
                 [self->_customerNames addObject: [pfo objectForKey:PInv_CustomerName_key]];
                 [self->_fullNames     addObject: [pfo objectForKey:PInv_FullName_key]];
+                self->_ccount++;
             }
-            NSLog(@" ...loaded all customers");
+            //NSLog(@" ...loaded all customers");
             self->_loaded = TRUE;
             [self.delegate didReadCustomersFromParse];
         }
