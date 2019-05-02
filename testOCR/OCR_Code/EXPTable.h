@@ -39,6 +39,10 @@
 
     int batchCounter;
 
+   //5/1 for csv input
+    NSArray *pamHeaders;
+    NSArray *pamKeywords;
+
     BOOL debugMode;   //2/7 For verbose logging...
 }
 
@@ -64,6 +68,7 @@
 -(void) fixFieldInObjectByID : (NSString *)oid : (NSString *)key : (NSString *)value;
 -(void) saveEXPOs;
 -(void) saveToParse : (int) page : (BOOL) lastPage;
+-(void) processCSV : (NSString *)s;
 -(void) readFromParse : (NSString *) invoiceNumberstring;
 -(void) readFromParseByObjIDs : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)soids;
 -(void) readFromParseAsStrings : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)batch : invoiceNumberstring;

@@ -23,7 +23,7 @@
 //  2/23 Fix array -> mutableArray conversion bug
 //  3/12 Add help option
 //  3/20 New: multi-customer support, new folder structure
-
+//  4/30 Add dropbox tools again, add csv -> db loader for graph
 #import "MainVC.h"
 
 @interface MainVC ()
@@ -55,7 +55,7 @@
     gp.delegate = self;
     et = [[EXPTable alloc] init];
     et.delegate = self;
-
+    dbt = nil; //DHS 4/30
     // 3/29 sfx
     _sfx         = [soundFX sharedInstance];
 
@@ -226,10 +226,10 @@
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self performSegueWithIdentifier:@"templateSegue" sender:@"mainVC"];
                                                           }]];
-//    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Load Comparison EXP File...",nil)
-//                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-//                                                              [self performSegueWithIdentifier:@"comparisonSegue" sender:@"mainVC"];
-//                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Load EXP->CSV for graph...",nil)
+                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                              [self selectCustomerCSVFile];
+                                                          }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Clear Local Caches",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self clearCacheMenu];
@@ -480,7 +480,70 @@
 } //end clearActivityMenu
 
 
+//=============OCR MainVC=====================================================
+-(void) selectCustomerCSVFile
+{
+    NSString *inputPath = [NSString stringWithFormat:@"%@/graphInput",mappDelegate.selectedCustomer];
+    if ([DBClientsManager authorizedClient] || [DBClientsManager authorizedTeamClient])
+    {
+        NSLog(@" dropbox authorized...");
+        //DHS for loading CSV files from dropbox to DB for graphing
+        if (dbt == nil)  // MUST be set up AFTER authorization!
+        {
+            dbt = [[DropboxTools alloc] init];
+            dbt.delegate = self;
+            [dbt setParent:self];
+        }
+        [spv start : @"Get File List..."];
+        [dbt getFolderList:inputPath];
+    } //end auth OK
+    else
+    {
+        NSLog(@" need to be authorized...");
+        //FUnny: this produces a deprecated warning. it's dropbox boilerplate code!
+        [DBClientsManager authorizeFromController:[UIApplication sharedApplication]
+                                       controller:self
+                                          openURL:^(NSURL *url) {
+                                              [[UIApplication sharedApplication] openURL:url];
+                                          }];
+    } //End need auth
 
+
+    //    [dbt downloadTextFile:reportPath];
+}
+
+//=============OCR MainVC=====================================================
+// 4/30 Put up menu to choose CSV file from list of entries : new for csv -> db
+-(void) graphCSVMenu : (NSArray *)entries
+{
+    
+    NSMutableAttributedString *tatString = [[NSMutableAttributedString alloc]initWithString:@"Choose a CSV File"];
+    [tatString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:30] range:NSMakeRange(0, tatString.length)];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:
+                                NSLocalizedString(@"Choose a CSV File",nil)
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    [alert setValue:tatString forKey:@"attributedTitle"];
+    for (int i=0;i<entries.count;i++)
+    {
+        DBFILESMetadata *entry = entries[i];
+        NSString *s = entry.name.lowercaseString;
+        if ([s containsString:@"csv"])
+            [alert addAction:[UIAlertAction actionWithTitle:[NSString stringWithFormat:@"%@",s]
+                                                  style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                      [self makeSelectSound];
+                                                      [self->spv start : @"Download CSV..."];
+                                                      [self->dbt downloadCSV:entry.pathLower :@"ALL"]; //2nd arg is vendors
+                                                  }]];
+    }
+    
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
+                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                  [self makeCancelSound];
+                                              }]];
+    [self presentViewController:alert animated:YES completion:nil];
+
+}
 
 
 //=============OCR MainVC=====================================================
@@ -928,6 +991,41 @@ int currentYear = 2019;
     
 }
 
+#pragma mark - DropboxToolsDelegate
+//=============<DropboxToolsDelegate>=====================================================
+- (void)didGetFolderList : (NSArray *)entries
+{
+    //Came back from dropbox, getting a list of CSV files...
+    //At this point put up a menu to select CSV files ... //
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self->spv stop];
+        [self graphCSVMenu : entries];
+    });
+}
+
+//=============<DropboxToolsDelegate>=====================================================
+- (void)errorGettingFolderList : (NSString *)s
+{
+    NSLog(@" CSV: errorGettingFolderList %@",s);
+}
+
+
+//=============<DropboxToolsDelegate>=====================================================
+- (void)didDownloadCSVFile : (NSString *)vendor : (NSString *)result
+{
+    NSLog(@" CSV OK %@ / %@",vendor,result);
+    [et setTableName : @"EXP_Comparison"]; //Special table name!
+    [et processCSV:result];
+    [spv start : @"Save to DB..."];
+    [et saveEXPOs];
+}
+//=============<DropboxToolsDelegate>=====================================================
+- (void)errorDownloadingCSV : (NSString *)s
+{
+    NSLog(@" CSV: errorDownloadingCSV %@",s);
+
+}
+
 #pragma mark - ActivityTableDelegate
 
 //=============OCR MainVC=====================================================
@@ -974,6 +1072,25 @@ int currentYear = 2019;
         [self errorMessage:@"Error exporting to Excel" : err];
     });
 
+}
+
+//============<EXPTableDelegate>====================================================
+- (void)didSaveEXPOs
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self->spv stop]; //3/25
+        [self errorMessage:@"Finished processing CSV" : @"Data is ready for graph app..."];
+    });
+}
+
+
+//============<EXPTableDelegate>====================================================
+- (void)errorSavingEXPOs : (NSString *)err
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self->spv stop]; //3/25
+        [self errorMessage:@"Error saving CSV to DB" : err];
+    });
 }
 
 

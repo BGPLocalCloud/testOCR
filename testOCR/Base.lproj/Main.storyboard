@@ -270,7 +270,6 @@
                         <segue destination="bXq-Rg-b6M" kind="show" identifier="errorSegue" id="4ga-c4-iBz"/>
                         <segue destination="FdD-VM-v4B" kind="show" identifier="batchReportSegue" id="YCa-TJ-WQF"/>
                         <segue destination="2pW-AS-3QH" kind="show" identifier="invoiceSegue" id="O9x-pA-B20"/>
-                        <segue destination="P7s-Sg-RCH" kind="show" identifier="comparisonSegue" id="8re-ah-y3Q"/>
                         <segue destination="AYb-aX-a6J" kind="show" identifier="errorHelperSegue" id="Sec-ao-vIs"/>
                         <segue destination="SZq-Jm-Iin" kind="show" identifier="helpSegue" id="KDu-RZ-SKo"/>
                         <segue destination="ntx-RE-eFd" kind="show" identifier="loginSegue" id="vcJ-OM-gKU"/>
@@ -496,64 +495,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0QY-cE-Q4U" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-2890.4000000000001" y="713.79310344827593"/>
-        </scene>
-        <!--ComparisonVC-->
-        <scene sceneID="FmZ-xN-cEM">
-            <objects>
-                <viewController id="P7s-Sg-RCH" customClass="ComparisonVC" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="4yA-ib-0V3">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Gnx-6P-BqU">
-                                <rect key="frame" x="15" y="617" width="65" height="30"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="30" id="IBK-sh-UQh"/>
-                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="65" id="oTG-U6-k5b"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="26"/>
-                                <state key="normal" title="&lt;">
-                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="backSelect:" destination="P7s-Sg-RCH" eventType="touchUpInside" id="LRL-FP-dNO"/>
-                                </connections>
-                            </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Load Comparison File" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="anL-Tv-l8Q">
-                                <rect key="frame" x="15" y="20" width="345" height="27"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="345" id="VLr-aV-9y3"/>
-                                    <constraint firstAttribute="height" constant="27" id="X0H-k1-oS1"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" ambiguous="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="a5x-nr-HyA">
-                                <rect key="frame" x="0.0" y="55" width="375" height="554"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            </tableView>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstItem="a5x-nr-HyA" firstAttribute="width" secondItem="4yA-ib-0V3" secondAttribute="width" id="9lQ-vg-yUt"/>
-                            <constraint firstItem="Gnx-6P-BqU" firstAttribute="leading" secondItem="gSu-vp-tuD" secondAttribute="leading" constant="15" id="UUH-9s-Ia7"/>
-                            <constraint firstItem="anL-Tv-l8Q" firstAttribute="top" secondItem="gSu-vp-tuD" secondAttribute="top" id="WXE-6I-2eI"/>
-                            <constraint firstItem="gSu-vp-tuD" firstAttribute="bottom" secondItem="a5x-nr-HyA" secondAttribute="bottom" constant="58" id="iEO-SQ-3CS"/>
-                            <constraint firstItem="gSu-vp-tuD" firstAttribute="bottom" secondItem="Gnx-6P-BqU" secondAttribute="bottom" constant="20" id="kOj-V3-32N"/>
-                            <constraint firstItem="anL-Tv-l8Q" firstAttribute="centerX" secondItem="gSu-vp-tuD" secondAttribute="centerX" id="sdw-XS-RcR"/>
-                            <constraint firstItem="a5x-nr-HyA" firstAttribute="top" secondItem="gSu-vp-tuD" secondAttribute="top" constant="35" id="yZ3-yZ-zTG"/>
-                        </constraints>
-                        <viewLayoutGuide key="safeArea" id="gSu-vp-tuD"/>
-                    </view>
-                    <connections>
-                        <outlet property="table" destination="a5x-nr-HyA" id="mwv-kM-agN"/>
-                        <outlet property="titleLabel" destination="anL-Tv-l8Q" id="pcK-NW-M9u"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="66V-RX-thI" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-2028" y="714"/>
         </scene>
         <!--Batch Report Controller-->
         <scene sceneID="1R4-hZ-zaF">

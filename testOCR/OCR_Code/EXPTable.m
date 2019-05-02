@@ -19,6 +19,7 @@
 //  3/20 add selectedCustomer support
 //  3/22 missed some tableName changes
 //  3/29 sort CSV output by PInv_BatchCounter_key (ascending)
+//  5/1  add processCSV
 #import "EXPTable.h"
 
 @implementation EXPTable
@@ -67,6 +68,127 @@
     batchCounter = 0;
 }
 
+//=============(EXPTable)=====================================================
+// 5/1 CSV support
+-(void) loadCSVConstants
+{
+    pamHeaders  = @[  //Human-readable CSV headers from Excel
+                    @"category", @"month", @"item", @"quantity",
+                    @"unit of measure", @"bulk/ individual pack", @"vendor name", @"total price",
+                    @"price/ uom", @"processed", @"local (l)", @"invoice date",
+                    @"line #"
+                    ];
+    pamKeywords = @[  //matching PARSE column names
+                    PInv_Category_key,PInv_Month_key,PInv_ProductName_key,PInv_Quantity_key,
+                    PInv_UOM_key,PInv_Bulk_or_Individual_key,PInv_Vendor_key,PInv_TotalPrice_key,
+                    PInv_PricePerUOM_key,PInv_Processed_key,PInv_Local_key,PInv_Date_key,
+                    PInv_LineNumber_key
+                    ];
+    
+    
+} //end loadCSVConstants
+
+//=============Comparison VC=====================================================
+// 5/1 CSV support
+//Can't break up a CSV string right if it has commas inside quoted names (like vendor!)
+-(NSString *) stripCommasFromQuotedStrings : (NSString*) s
+{
+    NSString *result = @"";
+    NSRange theRange;
+    BOOL inQuotes = FALSE;
+    for ( NSInteger i = 0; i < [s length]; i++) {
+        theRange.location = i;
+        theRange.length   = 1;
+        NSString* nextChar = [s substringWithRange:theRange];
+        if ([nextChar isEqualToString:@"\""]) //double quotes? toggle quotes flag
+        {
+            inQuotes = !inQuotes;
+        }
+        else if ([nextChar isEqualToString:@","]) //comma? don't append if inside quotes!
+        {
+            if (!inQuotes) result = [result stringByAppendingString:nextChar];
+        } //Not a quote or comma..... just append
+        else result = [result stringByAppendingString:nextChar];
+    } //end for i
+    return result;
+} //end stripCommasFromQuotedStrings
+
+// Sample Lines from CSV:
+//CATEGORY,Month,Item,Quantity,Unit Of Measure,BULK/ INDIVIDUAL PACK,Vendor Name, Total Price ,PRICE/ UOM,PROCESSED ,Local (L),Invoice Date,Line #,,
+//  PROTEIN,01-JUL,Ground Beef,80,lb,,"Hawaii Beef Producers, LLC", $236.80 ,$2.96,UNPROCESSED,Yes,07/03/2018,1,,
+
+//=============Comparison VC=====================================================
+// 5/1 CSV support
+-(void) processCSV : (NSString *)s
+{
+    [self loadCSVConstants];
+    NSLog(@" processing... get hdr info first:");
+    //First check column ordering...
+    NSArray  *csvItems = [s componentsSeparatedByString:@"\n"]; //Break up file into lines
+    if (csvItems.count < 2)
+    {
+        NSLog(@" ERROR: no data in CSV File!");
+        return;
+    }
+    NSMutableArray *columnKeys = [[NSMutableArray alloc] init];
+    NSString *legend      = csvItems[0];
+    NSArray  *legendItems = [legend componentsSeparatedByString:@","]; //Break up legend...
+    for (NSString *nextHeader in legendItems)
+    {
+        NSString *hhh = [nextHeader stringByTrimmingCharactersInSet:
+                         [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSUInteger wherezit = [pamHeaders indexOfObject:hhh.lowercaseString];
+        if (wherezit != NSNotFound)
+        {
+            [columnKeys addObject: [pamKeywords objectAtIndex:wherezit]];
+        }
+        else if (hhh.length > 1){
+            NSLog(@" ERROR: unmatched CSV header title %@",nextHeader);
+            return;
+        }
+    }
+    //Work strings...
+    BOOL firstRecord = TRUE;
+    int writeCount,okCount,errCount,loadCount;
+    writeCount = okCount = errCount = 0;
+    loadCount  = (int)csvItems.count;
+    [self clear];
+    for (NSString *nextLine in csvItems)
+    {
+        if (!firstRecord) //Skip 1st record...
+        {
+            NSString* noQuotedCommas =  [self stripCommasFromQuotedStrings:nextLine];
+            NSArray  *nlItems      = [noQuotedCommas componentsSeparatedByString:@","]; //Break up line...
+            NSMutableArray *fields = [[NSMutableArray alloc] init];
+            NSMutableArray *values = [[NSMutableArray alloc] init];
+            NSDate *idate          = [NSDate date];
+            for (int i=0;i<nlItems.count;i++) //Go thru fields...
+            {
+                if (i >= pamKeywords.count) break; //Out of bounds or extra args on line? skip!
+                NSString *nextField = nlItems[i];
+                NSString *nextPamKw = pamKeywords[i];
+                if ([nextPamKw isEqualToString:PInv_Date_key])
+                { //date format: 07/03/2018
+                    NSDateFormatter * formatter =  [[NSDateFormatter alloc] init];
+                    [formatter setDateFormat:@"MM/dd/yyyy"];
+                    idate = [formatter dateFromString:nextField]; //Unpack date
+                }
+                else{
+                    [fields addObject:nextPamKw];
+                    [values addObject:nextField];
+                }
+            } //end for i
+            if (values.count > 2) //Did we get something?
+            {
+                //OK ready to write!
+                //if (writeCount % 100 == 0) NSLog(@" write %d/%d [%@]",writeCount,loadCount,values[2]);
+                [self addRecordFromArrays : idate :  fields : values];
+                writeCount++;
+            }
+        } //end !first...
+        firstRecord = FALSE;
+    } //end for loop
+} //end processCSV
 
 //=============(EXPTable)=====================================================
 // vendor = * means all

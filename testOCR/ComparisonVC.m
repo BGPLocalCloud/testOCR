@@ -373,7 +373,6 @@
 //===========<DropboxToolDelegate>================================================
 - (void)didGetFolderList : (NSArray *)entries
 {
-    NSLog(@" ok got fodler");
     [spv stop];
     csvEntries = entries; //Store results locally, list of dropbox entries
     [_table reloadData];
