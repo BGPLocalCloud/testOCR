@@ -296,9 +296,10 @@
 } //end addRecord
 
 //=============(EXPTable)=====================================================
-// save everything in the expos table
+// save everything in the expos table, only should be used for small datasets!
 -(void) saveEXPOs
 {
+    NSLog(@" ...save all EXP records to %@, %d records",tableName,(int)_expos.count);
     [PFObject saveAllInBackground:_expos block:^(BOOL succeeded, NSError * _Nullable error) {
         if (succeeded) {
             if (self->_parentUp) [self.delegate didSaveEXPOs];
@@ -309,6 +310,35 @@
         }
     }];
 } //end saveEXPOs
+
+
+//=============(EXPTable)=====================================================
+// Saves large (over 100 records) expos array...
+-(void) saveExposBlocks : (int) skip
+{
+    NSLog(@" saveExposBlocks : %d",skip);
+    int count = (int)_expos.count - skip; //Amount left to save...
+    int saveCount = MIN(count,100);
+    NSMutableArray *pfos = [[NSMutableArray alloc] init];
+    for (int i=0;i<saveCount;i++) //Copy in next block of records to save
+    {
+        pfos[i] = _expos[skip+i];
+    }
+    //annd save it!
+    [PFObject saveAllInBackground:pfos block:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+            if (saveCount < 100) //Last block? let delegate know we're done...
+            {
+                if (self->_parentUp) [self.delegate didSaveEXPOsBlocks];
+            }
+            else [self saveExposBlocks : skip+100]; //More ? recursively call self
+        }
+        else{
+            if (self->_parentUp) [self.delegate errorSavingEXPOsBlocks :
+                                  [NSString stringWithFormat:@"saveEXPOsBlocks error:%@",error.localizedDescription]];
+        }
+    }];
+} //end saveExposBlocks
 
 
 //=============(EXPTable)=====================================================

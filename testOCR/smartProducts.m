@@ -142,6 +142,7 @@
                     ];
 
     nonProducts = @[  //CANNED stuff that never is a product
+                    @"allowance",
                     @"business",
                     @"cash",
                     @"certify",
@@ -151,10 +152,12 @@
                     @"frozen items",
                     @"other",
                     @"payment",
+                    @"purchase",
                     @"refrigerated",
                     @"subtotal",
                     @"surcharge",
-                    @"tax"
+                    @"tax",
+                    @"transaction"
                     ];
         
     beverageNames = @[

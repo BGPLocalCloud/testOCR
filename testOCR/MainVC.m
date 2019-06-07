@@ -24,6 +24,7 @@
 //  3/12 Add help option
 //  3/20 New: multi-customer support, new folder structure
 //  4/30 Add dropbox tools again, add csv -> db loader for graph
+//  5/10 changed graph output table name to reflect seleted customer
 #import "MainVC.h"
 
 @interface MainVC ()
@@ -1014,10 +1015,12 @@ int currentYear = 2019;
 - (void)didDownloadCSVFile : (NSString *)vendor : (NSString *)result
 {
     NSLog(@" CSV OK %@ / %@",vendor,result);
-    [et setTableName : @"EXP_Comparison"]; //Special table name!
+    NSString *tableName = [NSString stringWithFormat:@"EXP_GRAPH_%@",self->scustomer.uppercaseString];
+    [et setTableName : tableName]; //5/10 Special table name!
     [et processCSV:result];
     [spv start : @"Save to DB..."];
-    [et saveEXPOs];
+    //Get rid of old crap...
+    [self->gp deleteAllByTableAndKey:tableName :@"*" :@"*"];
 }
 //=============<DropboxToolsDelegate>=====================================================
 - (void)errorDownloadingCSV : (NSString *)s
@@ -1075,17 +1078,15 @@ int currentYear = 2019;
 }
 
 //============<EXPTableDelegate>====================================================
-- (void)didSaveEXPOs
+- (void)didSaveEXPOsBlocks
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self->spv stop]; //3/25
-        [self errorMessage:@"Finished processing CSV" : @"Data is ready for graph app..."];
-    });
+    [self->spv stop]; //3/25
+    [self errorMessage:@"Finished processing CSV" : @"Data is ready for graph app..."];
 }
 
 
 //============<EXPTableDelegate>====================================================
-- (void)errorSavingEXPOs : (NSString *)err
+- (void)errorSavingEXPOsBlocks : (NSString *)err
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->spv stop]; //3/25
@@ -1098,9 +1099,13 @@ int currentYear = 2019;
 //=============<GenParseDelegate>=====================================================
 - (void)didDeleteAllByTableAndKey : (NSString *)s1 : (NSString *)s2 : (NSString *)s3
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self refreshIt];
-    });
+    if ([s1.lowercaseString containsString:@"graph"]) //5/10 just cleared a graph output table?
+        [et saveExposBlocks : 0];  //Time to save new graph data...
+    else{   //Most likely returning from activity table clear...
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self refreshIt];
+        });
+    }
 }
 
 //=============<GenParseDelegate>=====================================================

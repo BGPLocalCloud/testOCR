@@ -67,6 +67,7 @@
 -(void) fixPricesInObjectByID: (NSString *)oid  : (NSString *)productName : (NSString *)qt : (NSString *)pt : (NSString *)tt;
 -(void) fixFieldInObjectByID : (NSString *)oid : (NSString *)key : (NSString *)value;
 -(void) saveEXPOs;
+-(void) saveExposBlocks : (int) skip;
 -(void) saveToParse : (int) page : (BOOL) lastPage;
 -(void) processCSV : (NSString *)s;
 -(void) readFromParse : (NSString *) invoiceNumberstring;
@@ -105,6 +106,8 @@
 - (void)errorInEXPRecord : (NSString *)err : (NSString *)oid : (NSString *)productName;
 - (void)didSaveEXPOs ;
 - (void)errorSavingEXPOs : (NSString *)err;
+- (void)didSaveEXPOsBlocks ;
+- (void)errorSavingEXPOsBlocks : (NSString *)err;
 - (void)errorSavingEXPToParse : (NSString *)err;
 @end
 
