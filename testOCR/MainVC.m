@@ -60,6 +60,7 @@
     // 3/29 sfx
     _sfx         = [soundFX sharedInstance];
 
+
     ecount = 0;
     refreshControl = [[UIRefreshControl alloc] init];
     batchPFObjects = nil;
@@ -76,7 +77,6 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didReadBatchByIDs:)
                                                  name:@"didReadBatchByIDs" object:nil];
-    
     
     return self;
 }
@@ -179,9 +179,66 @@
     }
     //else NSLog(@" ...logged into Parse");
     _versionLabel.text = [NSString stringWithFormat:@"V %@",versionNumber];
-    [self testit];
+    //[self testCSVCrap];
 }
 
+//=============OCR MainVC=====================================================
+-(void) initSmartp
+{
+    NSLog(@" mainVC: smartp...");
+    smartp = [[smartProducts alloc] init]; //7/15 test GFS CSV file
+    NSLog(@" mainVC: done SMARTP...");
+}
+
+
+//=============OCR MainVC=====================================================
+-(void) testCSVCrap
+{
+    NSError *error;
+    NSArray *sItems;
+    NSString *fileContentsAscii;
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"GFS" ofType:@"txt" inDirectory:@"txt"];
+    NSURL *url = [NSURL fileURLWithPath:path];
+    fileContentsAscii = [NSString stringWithContentsOfURL:url encoding:NSASCIIStringEncoding error:&error];
+    if (error != nil)
+    {
+        NSLog(@" error reading %@ file",path);
+        return;
+    }
+    NSLog(@" load file %@",path);
+    sItems    = [fileContentsAscii componentsSeparatedByString:@"\n"];
+    int lineNum = 1;
+    int errCount = 0;
+    for (NSString*s in sItems)
+    {
+        
+        [smartp clear];
+        smartp.intQuantity = 1;
+        [smartp addVendor:@"Gordon"];
+        [smartp addProductName:s];
+        [smartp addDate:[NSDate date]];
+        [smartp addLineNumber:lineNum];
+        [smartp addQuantity : @"1"];
+        [smartp addUOM:@"items"];
+        [smartp addPrice: @"1.00"];
+        [smartp addAmount: @"1.00"];
+        
+        if ([s containsString:@"cocktail franks"])
+            NSLog(@" bing");
+        int aError = [smartp analyze];
+        if (aError != 0)
+        {
+            NSLog(@" ERROR analyzing %@",s);
+            errCount++;
+        }
+        else
+            NSLog(@" ....OK %@ = %@",s,smartp.analyzedCategory);
+        lineNum++;
+        if (lineNum % 100 == 0) NSLog(@" line %d",lineNum);
+    }
+    NSLog(@" found %d errors",errCount);
+
+}
 
 //=============OCR MainVC=====================================================
 - (IBAction)eSelect:(id)sender  //estie eeg
@@ -248,15 +305,17 @@
                                                   [self makeCancelSound];
                                                   [DBClientsManager unlinkAndResetClients];
                                               }]];
-    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Logout From Sashido",nil)
+    [alert addAction:[UIAlertAction actionWithTitle:@"Init smartp" //NSLocalizedString(@"Logout From Sashido",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                  [PFUser logOut];
-                                                  self->loginMode = @"login";
-                                                  [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
+                                                   [PFUser logOut];
+                                                   self->loginMode = @"login";
+                                                   [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
+                                                 //TEST 7/15 [self initSmartp];
                                               }]];
-    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Help",nil)
+    [alert addAction:[UIAlertAction actionWithTitle:@"Test GFS Items" //NSLocalizedString(@"Help",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                   [self performSegueWithIdentifier:@"helpSegue" sender:@"mainVC"];
+                                                 //TEST 7/15 [self testCSVCrap];
                                               }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {

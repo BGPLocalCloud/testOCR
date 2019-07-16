@@ -74,6 +74,8 @@ NS_ASSUME_NONNULL_BEGIN
     int ecount;
     NSString *loginMode;
     
+    smartProducts *smartp;
+    
 }
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UILabel *logoLabel;

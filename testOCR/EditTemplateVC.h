@@ -165,9 +165,6 @@
 @property (nonatomic , strong) NSString* incomingImageFilename;
 
 
-
-- (IBAction)nextDocSelect:(id)sender;
-
 - (IBAction)arrowDownSelect:(id)sender;
 - (IBAction)arrowUpSelect:(id)sender;
 - (IBAction)arrowLeftSelect:(id)sender;
@@ -177,7 +174,6 @@
 - (IBAction)doneSelect:(id)sender;
 - (IBAction)arrowRightSelect:(id)sender;
 - (IBAction)arrowCenterSelect:(id)sender;
-- (IBAction)testEmail:(id)sender;
 
 @end
 

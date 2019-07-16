@@ -25,6 +25,12 @@
 //        made zero quantity a major error (not warning)
 //  3/22  add T default for intQuantity, assume zero quantity = 1
 //         also assume 3-digit prices are errors missing decimal point
+//  6/11  add doubleKeywords
+// NOTE:  for double keywords, "green beans" -> "produce" should work for:
+//              green beans/beans green/reen beans/eans green
+//  6/14  add nonProducts table to sashido
+//  7/12  add processedProduceTerms
+//  7/15  add more processed terms, pulled cocktail from kws
 #import "smartProducts.h"
 
 @implementation smartProducts
@@ -36,13 +42,16 @@
     if (self = [super init])
     {
         [self loadTables];
-        occ      = [OCRCategories sharedInstance];
-        typos    =  [[NSMutableArray alloc] init];
-        fixed    =  [[NSMutableArray alloc] init];
-        splits   =  [[NSMutableArray alloc] init];
-        joined   =  [[NSMutableArray alloc] init];
-        keywords =  [[NSMutableDictionary alloc] init];
-        keywordsNo1stChar =  [[NSMutableDictionary alloc] init]; //3/15
+        occ         = [OCRCategories sharedInstance];
+        typos       =  [[NSMutableArray alloc] init];
+        fixed       =  [[NSMutableArray alloc] init];
+        splits      =  [[NSMutableArray alloc] init];
+        joined      =  [[NSMutableArray alloc] init];
+        keywords    =  [[NSMutableDictionary alloc] init];
+        dKeywords   =  [[NSMutableDictionary alloc] init];
+        nonProducts =  [[NSMutableArray alloc] init];   //6/14
+        keywordsNo1stChar  =  [[NSMutableDictionary alloc] init]; //3/15
+        dKeywordsNo1stChar =  [[NSMutableDictionary alloc] init]; //3/15
 
         didInitAlready = FALSE;
         _intQuantity   = TRUE; //DHS 3/22 assume int quantities
@@ -50,10 +59,13 @@
         [self loadRulesTextFile : @"splits" : FALSE : splits : joined];
         [self loadRulesTextFile : @"typos"  : TRUE :  typos  : fixed];
 
-        NSLog(@" SmartProducts: Load typos from PARSE");
+        NSLog(@" SmartProducts: Load keywords from PARSE");
         [self loadKeywordsFromParse : 0];
+        [self loadDoubleKeywordsFromParse : 0];
+        NSLog(@" SmartProducts: Load typos/splits from PARSE");
         [self loadTyposFromParse : 0];
         [self loadSplitsFromParse : 0];
+        [self loadNonProductsFromParse:0];
 
     }
     return self;
@@ -138,28 +150,11 @@
                     @"misc",
                     @"protein",
                     @"produce",
+                    @"snacks",
                     @"supplies"
                     ];
 
-    nonProducts = @[  //CANNED stuff that never is a product
-                    @"allowance",
-                    @"business",
-                    @"cash",
-                    @"certify",
-                    @"charge",
-                    @"discount",
-                    @"dry items",
-                    @"frozen items",
-                    @"other",
-                    @"payment",
-                    @"purchase",
-                    @"refrigerated",
-                    @"subtotal",
-                    @"surcharge",
-                    @"tax",
-                    @"transaction"
-                    ];
-        
+    
     beverageNames = @[
                       @"apple juice",
                       @"bottled water",
@@ -228,7 +223,6 @@
                       @"chicken base",
                       @"chocolate",
                       @"chowder",
-                      @"cocktail",
                       @"coconut",
                       @"coconut milk",
                       @"condensed milk",
@@ -306,6 +300,7 @@
                       @"charges",
                       @"taxes"
                      ];
+    
     proteinNames = @[ //CANNED
                      @"beef",
                      @"brst",
@@ -411,7 +406,10 @@
                       @"wiper"
                   ];
     //MISSING: Equipment,Paper Goods, Snacks, Supplement, Bread, Labor, Other Exp, Services, Transfer
+    //DHS 7/12 Processed terms used on produce
+    processedProduceTerms = @[@"slcd",@"sliced",@"dcd",@"diced"];
     
+
 
 }
 
@@ -521,6 +519,69 @@
         }
     }];
 } //end loadKeywordsFromParse
+
+//=============(smartProducts)=====================================================
+// 6/11 double keywords (green beans, pinto beans, etc)
+-(void) loadDoubleKeywordsFromParse : (int) skip
+{
+    PFQuery *query = [PFQuery queryWithClassName:@"DoubleKeywords"];
+    query.skip = skip;
+    if (skip == 0)
+    {
+        [dKeywords          removeAllObjects];
+        [dKeywordsNo1stChar removeAllObjects];
+    }
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            int ocount = (int)objects.count;
+            for (PFObject *pfo in objects)
+            {
+                NSString *keyword = pfo[PInv_Name_key];
+                NSString *cat     = pfo[PInv_Category_key];
+                
+                //Now reverse the two words...
+                NSArray *kItems = [keyword componentsSeparatedByString:@" "]; //Separate words
+                NSString *keywordReversed = nil;
+                if (kItems.count == 2) //Found 2 words? Reverse-em!
+                {
+                    keywordReversed = [NSString stringWithFormat:@"%@ %@",kItems[1],kItems[0]];
+                }
+                [self->dKeywords setObject:cat forKey:keyword];
+                [self->dKeywords setObject:cat forKey:keywordReversed];
+                // 3/15 partial keywords, first char missing
+                [self->dKeywordsNo1stChar setObject:cat forKey:[keyword substringFromIndex:1]];
+                [self->dKeywordsNo1stChar setObject:cat forKey:[keywordReversed substringFromIndex:1]];
+            }
+            if (objects.count == 100) [self loadDoubleKeywordsFromParse:skip+100];
+            else NSLog(@" ...got %d doublekeywords %d nofirstchars (%d records read from DB)",
+                       (int)self->dKeywords.count,(int)self->dKeywordsNo1stChar.count, ocount);
+        }
+    }];
+} //end loadDoubleKeywordsFromParse
+
+//=============(smartProducts)=====================================================
+// 6/14 read one and two-word nonproduct descriptions from db
+-(void) loadNonProductsFromParse : (int) skip
+{
+    PFQuery *query = [PFQuery queryWithClassName:@"NonProducts"];
+    query.skip = skip;
+    if (skip == 0)
+    {
+        [nonProducts removeAllObjects];
+    }
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            for (PFObject *pfo in objects)
+            {
+                NSString *nextNonProduct = pfo[PInv_Name_key];
+                [self->nonProducts addObject:nextNonProduct];
+            }
+            if (objects.count == 100) [self loadNonProductsFromParse:skip+100];
+            else NSLog(@" ...found %d nonProducts", (int)self->nonProducts.count);
+        }
+    }];
+} //end loadNonProductsFromParse
+
 
 //=============(smartProducts)=====================================================
 // 3/4 broke each table out to its own re-entrant method for loading more than 100 items!
@@ -696,16 +757,17 @@
         return ANALYZER_NONPRODUCT;
     }
     //Bail on any weird product names, or obviously NON-product items found in this column...
-    for (NSString *nps in nonProducts)
-    {
-        if ([fullProductName.lowercaseString containsString:nps])
-        {
-            //NSLog(@" non product %@",fullProductName);
-            _nonProduct = TRUE;
-            return ANALYZER_NONPRODUCT;
-        }
-    }
+//6/14 MOVED below product check...
+//    for (NSString *nps in nonProducts) //6/14 mutableArray, loaded from parse now
+//    {
+//        if ([fullProductName.lowercaseString containsString:nps])
+//        {
+//            _nonProduct = TRUE;
+//            return ANALYZER_NONPRODUCT;
+//        }
+//    }
     //DHS 12/31: Fix common misspellings, like "ananas" or "apaya"...
+    //  this call also LOWERCASES the product name!
     fullProductName = [self fixSentenceTypo:fullProductName];
     //DHS 1/1 fix split words like "hawai ian"
     fullProductName = [self fixSentenceSplits:fullProductName];
@@ -737,10 +799,18 @@
     //Miss? Try matching words in the product name with some generic lists of items...
     //  Must do it word-by-word, so it's SLOW...
     //Note we bail this section immediately if found is true
-    for (NSString *nextWord in pItems) if (nextWord.length > 1) //3/14 ignore 1 char fragments
+    //DHS 6/11 for (NSString *nextWord in pItems) if (nextWord.length > 1) //3/14 ignore 1 char fragments
+    for (int pIndex = 0;pIndex<pItems.count;pIndex++)
     {
+        NSString *nextWord   = pItems[pIndex];
+        NSString *secondWord = nil;  //DHS 6/11 get 2nd word for double keyword ID
+        if (pIndex < pItems.count-1)
+        {
+            secondWord = pItems[pIndex+1]; //Peel of 2nd potential keyword , get lowercase
+            secondWord = secondWord.lowercaseString;
+        }
         if (found) break;
-        NSString *lowerCase = [nextWord lowercaseString]; //Always match on lowercase
+        NSString *lowerCase = nextWord.lowercaseString; //Always match on lowercase
         lowerCase = [lowerCase   stringByReplacingOccurrencesOfString:@"/" withString:@""]; //Get rid of illegal stuff!
         if ([beverageNames indexOfObject:lowerCase] != NSNotFound) // Beverage category Found?
         {
@@ -788,6 +858,14 @@
             _analyzedCategory = PRODUCE_CATEGORY;
             _analyzedUOM      = @"lb";
             processed = FALSE;
+            //7/12 look for terms that may indicate we have a processed item here...
+            for (NSString *processedTerm in processedProduceTerms)
+            {
+                if ([fullProductName containsString:processedTerm])
+                {
+                    processed = TRUE;
+                }
+            } //end for NSString...
             bulk = TRUE;
         }
         else if ([proteinNames indexOfObject:lowerCase] != NSNotFound) // Protein category Found?
@@ -829,6 +907,8 @@
             
             NSString *cat = nil; //DHS 3/15 look thru 2 sets of keywords now...
             if (keywords[lowerCase] != nil) cat = keywords[lowerCase];
+            //DHS 6/11 try double keywords too if no match...
+            if (cat == nil) cat = [self matchDoubleKeywords : lowerCase : secondWord];
             if (cat != nil) //Kw match?
             {
                 if ([cat.lowercaseString isEqualToString:@"drygoods"])
@@ -855,6 +935,17 @@
     } //end for nextword...
     _analyzedProductName = fullProductName; // pass result to output
 
+    //6/14 moved below product check...
+    //  lastly, check for NON-product items found in this column... 7/15 only if not found!
+    if (!found) for (NSString *nps in nonProducts) //6/14 mutableArray, loaded from parse now
+    {
+        if ([fullProductName.lowercaseString containsString:nps])
+        {
+            _nonProduct = TRUE;
+            return ANALYZER_NONPRODUCT;
+        }
+    }
+    
     if (!found)
     {
         NSLog(@" analyze ... no product found [%@]",fullProductName);
@@ -1030,7 +1121,25 @@
     if (_majorError != 0) aerror = 0; //Major errors trump minor ones!
     _minorError = aerror;
     return 0;
+    
 } //end analyze
+
+
+
+//=============(smartProducts)=====================================================
+-(NSString*) matchDoubleKeywords : (NSString*)key1 : (NSString*)key2
+{
+    NSString *cat = nil;
+    //First make normal double keyword
+    NSString *dkeytest= [NSString stringWithFormat:@"%@ %@",key1,key2];
+    if (dkeytest.length < 5) return cat; //Shorties need not apply!
+    if ([key1 containsString:@"bean"] || [key2 containsString:@"bean"])
+        NSLog(@"bing!");
+    cat = dKeywords[dkeytest];  //Match with A B / B A combos of the 2 keywords
+    if (cat == nil)
+        cat = dKeywordsNo1stChar[dkeytest]; //Try against A B / B A combos missing 1st char
+    return cat;
+} //end matchDoubleKeywords
 
 
 

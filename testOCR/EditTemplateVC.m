@@ -698,7 +698,7 @@
                                                 style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                     [self->ot clearTags:self->adjustSelect];
                                                     [self->ot saveTemplatesToDisk:self->vendor];
-                                                    [spv start : @"clear Tags..."];
+                                                    [self->spv start : @"clear Tags..."];
                                                     [self->act saveActivityToParse:@"...template:clearTags" : fn];
                                                     [self->ot saveToParse:self->vendor];
                                                 }];
@@ -929,10 +929,10 @@
     xi+=xdel;
     ys+=ysdel;
     xs+=xsdel;
-    int dx = pageRect.origin.x;
+    //int dx = pageRect.origin.x;
     int dy = pageRect.origin.y;
-    int dw = pageRect.size.width;
-    int dh = pageRect.size.height;
+    //int dw = pageRect.size.width;
+    //int dh = pageRect.size.height;
     if (xs<arrowLHStepSize) xs = arrowLHStepSize;
     if (ys<arrowLHStepSize) ys = arrowLHStepSize;
    //4/30 no upper limits... if (xs>dw) xs = dw;

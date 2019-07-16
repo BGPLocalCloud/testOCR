@@ -451,7 +451,7 @@ static BatchObject *sharedInstance = nil;
 
     int i = batchCount-1; //Batch Count is 1...n
     if (i < 0 || i >= dbt.batchFileList.count) return; //2/17 use sorted list! Out of bounds!
-    DBFILESMetadata *entry = pdfEntries[i];
+    //DBFILESMetadata *entry = pdfEntries[i];
     lastFileProcessed = dbt.batchFileList[i]; //2/17 Use sorted results
     if (debugMode) NSLog(@" processing %@ ... (%d)",lastFileProcessed,whereFrom);
     //Check for "skip" string, ignore file if so...

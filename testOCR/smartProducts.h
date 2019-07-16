@@ -56,8 +56,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSArray *produceNames;
     NSArray *snacksNames;
     NSArray *suppliesNames;
-    NSArray *nonProducts;
     NSArray *categories;
+    NSArray *processedProduceTerms;
     NSMutableArray *typos;
     NSMutableArray *fixed;
     NSMutableArray *splits;
@@ -67,6 +67,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     NSMutableDictionary *keywords;
     NSMutableDictionary *keywordsNo1stChar;
+    NSMutableDictionary *dKeywords; //6/11 double keywords
+    NSMutableDictionary *dKeywordsNo1stChar;  
+    NSMutableArray *nonProducts;
     BOOL didInitAlready;
     OCRCategories* occ; //Categories / processed / local lookup table
 }
@@ -114,6 +117,9 @@ NS_ASSUME_NONNULL_BEGIN
 -(int) getKeywordCount : (NSString*)category;
 -(void) saveKeywordsAndTyposToParse;
 
+
+//6/11 test
+-(NSString*) matchDoubleKeywords : (NSString*)key1 : (NSString*)key2;
 
 @end
 

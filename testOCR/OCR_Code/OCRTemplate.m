@@ -114,7 +114,8 @@
 // Double check column alignment and prevent overlaps... assumes pre-ordered!
 -(void) cleanupColumns
 {
-    return; //THERE IS A BUG; FIX BEFORE USING THIS!
+    //THERE IS A BUG; FIX BEFORE USING THIS!
+#ifdef CLEANUPCOLUMNS_BUG_IS_FIXED
     //Somehow it had 2 good columns but then collapsed the RH one onto the LH one!
     //  and the newWid came out NEGATIVE!
     if ([self getColumnXRanges] < 2) return; //Not enuf columns to check!
@@ -135,6 +136,7 @@
             ocrBoxes[cptr] = ob1; //Re-insert fixed box
         }
     } //end for count
+#endif
 } //end cleanupColumns
 
 //=============(OCRTemplate)=====================================================
