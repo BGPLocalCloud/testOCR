@@ -638,6 +638,12 @@ NSString * steps[] = {
 - (void)didDownloadImages
 {
     NSLog(@" ...got image");
+    //DHS 7/17/19 handle nuttin coming back..
+    if (dbt.batchImages.count < 1 || dbt.batchImageRects.count < 1)
+    {
+        NSLog(@" ERROR: got nil images / rects back from dropbox!");
+        return; //asdf
+    }
     _photo     = dbt.batchImages[0];
     NSValue *rectObj = dbt.batchImageRects[0]; //PDF size (hopefully!)
     _photoRect = [rectObj CGRectValue];

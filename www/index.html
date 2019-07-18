@@ -201,6 +201,7 @@ a[href] {
     <li><a href="#typos">Fixing Typos and adding Keywords</a></li>
     <li><a href="#settings">Settings</a></li>
     <li><a href="#flowchart">Batch Flowchart</a></li>
+    <li><a href="#addtemplate">Adding a template</a></li>
 </ul>
     
     
@@ -691,13 +692,13 @@ should be corrected on any future batches you may run.
     <img align=right width=64 height = 64 src=images/topHot.jpg>
 </a>
 <h4>Settings:</h4>
-The app Settings are stored in a table named <i>Settings<i> on Parse.
+The app Settings are stored in a table named <i>Settings</i> on Parse.
 This table contains only one row, and mostly consists of preset folder names.
 <p>
 <ul>
     <li>BatchFolder : Determines where <i>staged files</i> are kept. (*)</li>
     <li>OutputFolder : Determines where <i>processed files</i> are kept. (*)</li>
-    <li>TemplateFolder : Determines where <i>templates</li> are kept.
+    <li>TemplateFolder : Determines where <i>templates</i> are kept.</li>
     <li>ComparisonFolder : used to load CSV files into the DB from Excel</li>
     <li>MoveProcessedFiles : Boolean: YES / NO : moves PDFs from Batch to Output Folder upon success</li>
     <li>ErrorFolder : unused</li>
@@ -712,5 +713,168 @@ This table contains only one row, and mostly consists of preset folder names.
 </a>
 <h4>Batch Flowchart:</h4>
 <img width=100% src=images/flochart.jpg>
+
+    <hr>
+        <a name="addtemplate"></a>
+        <b> Adding a new template </b>
+   
+<p>
+    Here are the basic steps for creating a new template.
+    <ul>
+<li>
+    1> The vendor needs to be present in the DB.  So if there is a new vendor called "smith"
+    there needs to be a "Smith" record created in the Vendors table.
+    <p>
+    <ul>
+        <li>
+    a) Create a new row (Edit / Add a row)
+    <li>
+    b) On the new row, set the "Vendor" column to the new vendor's name,
+    It's OK to use mixed case: enter the name as you would like to see it printed out
+    <li>
+        c) Set the following defaults:
+        <ul>
+<li>    Rotated: "0"
+<li>    IntQuantity : TRUE
+<li>    TLTemplateAnchor: topleft
+<li>    TRTemplateAnchor: topright
+    </ul>
+    <p>
+    </ul>
+    <li>
+
+    2> Once the vendor is entered, it should show up on things like the Batch Menu, etc.
+    <p>
+
+    <li>
+
+    3> You must upload a PNG or JPG (PNG is best) scan of one page from an invoice by
+    this vendor to the "templates" folder on Dropbox.
+    .  Make sure the page is as clean and aligned as possible.
+    
+    <p>
+    <li>
+
+    4> From the app, select "Menu".  When the menu appears, select "Add Template"
+    
+    4> Now its time to choose the new vendor whose template needs adding.
+    If the vendor doesn't appear, make sure it is in the DB and restart the app.
+    If you choose a vendor that already has a template a warning menu will appear as well.
+    <p>
+    <p>
+    <li>
+
+    5> Select a Template Image: You must upload a PNG or JPG (PNG is best) scan of one page
+    from an invoice by this vendor.  Make sure the page is as clean and aligned as possible.
+    <p>
+
+    <li>
+   6> Once an image is chosen, the Rotation control shows up. This straightens the image
+    (Deskews it) if it is crooked.  You can try automatically by pressing "Deskew".  This doesn't
+    always work, so you may need to try manually rotating by 1,10 or 90 degrees.
+    Positive rotations are Clockwise, negative are Counter-Clockwise.
+    Once the image looks straight (a grid will appear once you start rotating) press "Next"
+    For now, ignore the "Load Photo" button bottom center.
+    <p>
+
+    <li>
+   7> After the image is aligned the brightness / contrast can be adjusted.  If the image looks washed
+    out, try increasing the contrast.  If there are bright saturated colors, try "Remove Color"
+    Press "Next" when done.
+    <p>
+
+    <li>
+   8> The OCR engine will now look at the image and see if it can read anything.
+    On the top half is a scrolling window showing the invoice zoomed in, and on the bottom
+    is the raw text output.  If you see things like error messages on the bottom there was a
+    failure.  If you see things like "ParsedResults..." then the OCR was OK.
+    Try scrolling around on the top half and locate a product name, then scroll the bottom
+    and see if you can find that name anywhere,
+    There is no way to verify OCR perfection, it's only eyeballing at this point, so don't worry
+    if you can't see all the correct fields.
+    
+    ...Press "Next"
+    
+    This saves the aligned / contrasted image back into the templates folder.
+    It will be named "template_vendorname.png"
+    <p>
+
+    <li>
+    9> At this point after the image is saved, the Template Editor appears.
+    On this page you actually add fields to the template in the DB, so be careful not to delete
+    anything you may have saved earlier.
+    <p>
+
+    <li>
+    10> You will need to add the following fields so the template knows where to look :
+    
+    Invoice Supplier  (optional)
+    Invoice Number
+    Invoice Date
+    Invoice Customer
+    Header
+    Item/Description/Quantity/Price/Total columns
+    Invoice Total (optional)
+    Also you may have to add "Ignore" areas if there are things like signatures or
+    other canned fields that get in the way of the columnar data.
+    <p>
+
+    <li>
+    11> Try adding Invoice Number: Select Add New Field/Add Invoice Number.
+    A red box appears near bottom right.  Also two sets of Up/Down/Left/Right controls appear.
+    You can move the box around with the fontrols or you can drag it.
+    As you drag the box a zoomed view will appear above the box.
+    First thing to do is to shrink the box down so it's the right size.  On the RH side,
+    where it says "Size", experiment with the buttons until you are able to shrink the box down.
+    Try getting it 2 lines high by about 30 characters wide.
+    
+    Once the box is the right size, try the LH buttons to move it around to where the invoice # is.
+    
+    If the LH or RH arrow menus move/resize the box too much, click on the rabbit icon and
+    it becomes a tortoise.  Now the menu you changed will act more slowly.
+    
+    When you have the box over the invoice number, press "Done".
+    The box should become Cyan colored.  You just saved the box to the DB.
+    <p>
+
+    <li>
+    12> Validation: Go over to sashido, and look for the "templates" table.
+    See if there are any rows with "vendor" matching the new vendor you are entering.
+    Look for the "packedString" column, this contains the instructions which set up the boxes.
+    <p>
+
+    <li>
+   13>  Repeating 11>, try adding the Invoice Date the same way.  Now if you look at the DB you
+    will see ONE NEW record.  Every time you change an invoice a new record is added.  This
+    way if there's a horrible mistake you can just remove the newest record and rely on the
+    older one before it.
+    <p>
+
+    <li>
+   14> Setting up the other fields is pretty much the same, but the Header needs to go across the entire
+    page at the top of the invoice columns.  That way the software can find the top of each page's
+    data.
+    <p>
+
+    <li>
+    15>  The columns then go below this Header.  Once you add the first column with the correct
+    width and height, all the other columns will automatically align vertically.
+    Sometimes the Quantity column is to the left of the description, sometimes to the right.
+    You can add colunmns in any order, but be sure to add all 5 basic types:
+    Item# / Description / Quantity / Price / Total
+    <p>
+
+    <li>
+   16>  At this point you are done, unless you need to add an "Ignore" area.
+    Currently the Invoice Total and Invoice Supplier fields aren't used but they may be
+    useful in the future so you can add them if you like.
+  </ul>
+    Once an invoice is completed and you are sure it's correct, go into the Db and remove all
+    of the older rows for that vendor... if you don't there may be confusion at batch time and the
+    s/w may get an older and incomplete row.
+    
+    
+
+
 </body>
 </html>

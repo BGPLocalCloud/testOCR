@@ -305,14 +305,14 @@
                                                   [self makeCancelSound];
                                                   [DBClientsManager unlinkAndResetClients];
                                               }]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Init smartp" //NSLocalizedString(@"Logout From Sashido",nil)
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Logout From Sashido",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                    [PFUser logOut];
                                                    self->loginMode = @"login";
                                                    [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
                                                  //TEST 7/15 [self initSmartp];
                                               }]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Test GFS Items" //NSLocalizedString(@"Help",nil)
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Help",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                   [self performSegueWithIdentifier:@"helpSegue" sender:@"mainVC"];
                                                  //TEST 7/15 [self testCSVCrap];
