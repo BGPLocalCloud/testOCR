@@ -7,8 +7,10 @@
 //
 //  12/21 add dropbox SDK
 //  1/16  crashlytics ok now
-//WARNING: DO NOT put batchObject.h in here! Causes horrible compiler problems!
-
+//  WARNING: DO NOT put batchObject.h in here! Causes horrible compiler problems!
+//   This may be handy wrt backing up the DB
+//   https://stackoverflow.com/questions/6368867/generate-json-string-from-nsdictionary-in-ios
+//
 #import <UIKit/UIKit.h>
 #import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
 #import <Fabric/Fabric.h>

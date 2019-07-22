@@ -31,6 +31,7 @@
 //  6/14  add nonProducts table to sashido
 //  7/12  add processedProduceTerms
 //  7/15  add more processed terms, pulled cocktail from kws
+//  7/22  add processedProduceKeywords table to DB
 #import "smartProducts.h"
 
 @implementation smartProducts
@@ -50,6 +51,7 @@
         keywords    =  [[NSMutableDictionary alloc] init];
         dKeywords   =  [[NSMutableDictionary alloc] init];
         nonProducts =  [[NSMutableArray alloc] init];   //6/14
+        ppKeywords  =  [[NSMutableArray alloc] init];   //6/14
         keywordsNo1stChar  =  [[NSMutableDictionary alloc] init]; //3/15
         dKeywordsNo1stChar =  [[NSMutableDictionary alloc] init]; //3/15
 
@@ -66,7 +68,7 @@
         [self loadTyposFromParse : 0];
         [self loadSplitsFromParse : 0];
         [self loadNonProductsFromParse:0];
-
+        [self loadPPKeywordsFromParse:0];
     }
     return self;
 }
@@ -406,8 +408,6 @@
                       @"wiper"
                   ];
     //MISSING: Equipment,Paper Goods, Snacks, Supplement, Bread, Labor, Other Exp, Services, Transfer
-    //DHS 7/12 Processed terms used on produce
-    processedProduceTerms = @[@"slcd",@"sliced",@"dcd",@"diced"];
     
 
 
@@ -519,6 +519,31 @@
         }
     }];
 } //end loadKeywordsFromParse
+
+//=============(smartProducts)=====================================================
+// 7/22 processed produce kws, recursive
+-(void) loadPPKeywordsFromParse : (int) skip
+{
+    PFQuery *query = [PFQuery queryWithClassName:@"processedProduceKeywords"];
+    query.skip = skip;
+    if (skip == 0)
+    {
+        [ppKeywords          removeAllObjects];
+    }
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+//            int ocount = (int)objects.count;
+            for (PFObject *pfo in objects)
+            {
+                NSString *keyword = pfo[PInv_Name_key];
+                [self->ppKeywords addObject:keyword];
+            }
+            if (objects.count == 100) [self loadPPKeywordsFromParse:skip+100];
+            else
+                NSLog(@" ...got %d PPkeywords", (int)self->ppKeywords.count);
+        }
+    }];
+} //end loadPPKeywordsFromParse
 
 //=============(smartProducts)=====================================================
 // 6/11 double keywords (green beans, pinto beans, etc)
@@ -858,8 +883,8 @@
             _analyzedCategory = PRODUCE_CATEGORY;
             _analyzedUOM      = @"lb";
             processed = FALSE;
-            //7/12 look for terms that may indicate we have a processed item here...
-            for (NSString *processedTerm in processedProduceTerms)
+            //7/22 look for terms that may indicate we have a processed item here...update to DB ppKeywords
+            for (NSString *processedTerm in ppKeywords)
             {
                 if ([fullProductName containsString:processedTerm])
                 {

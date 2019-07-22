@@ -64,7 +64,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableArray *joined;
     NSMutableArray *wilds;
     NSMutableArray *notwilds;
-    
+    NSMutableArray *ppKeywords;
+
     NSMutableDictionary *keywords;
     NSMutableDictionary *keywordsNo1stChar;
     NSMutableDictionary *dKeywords; //6/11 double keywords
