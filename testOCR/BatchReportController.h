@@ -17,14 +17,18 @@
 #import "AppDelegate.h"
 #import "DBKeys.h"
 #import "DropboxTools.h"
+#import "spinnerView.h"
+
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface BatchReportController : UIViewController < DropboxToolsDelegate>
 {
+    int viewWid,viewHit,viewW2,viewH2;
     NSString *batchID;
     DropboxTools *dbt;
     NSString *reportText;
+    spinnerView *spv;
 
 }
 @property (weak, nonatomic) IBOutlet UILabel *errLabel;

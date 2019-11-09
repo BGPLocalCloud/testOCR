@@ -245,7 +245,7 @@ static OCRCache *sharedInstance = nil;
     NSError *error;
     NSString *path;
     [self clear]; //Clear cache arrays just in case...
-    NSLog(@" loadCache... %d items",ccount);
+    //NSLog(@" loadOCRCache... %d items",ccount);
     for (int i=0;i<ccount;i++) // it looks like ccount is one too big, not causing trouble yet...
     {
         ocrFile   = [cacheNames objectAtIndex:i];

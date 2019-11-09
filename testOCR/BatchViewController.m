@@ -14,6 +14,7 @@
 //  2/13 add debugMenu
 //  3/4  added new debug options
 //  3/20 moved verbose debug from mainVC, add batchCustomer
+//  8/11 only show filecounts gt 0 
 #import "BatchViewController.h"
 
 
@@ -131,8 +132,11 @@
     {
         NSString *vn = [vv getFoldernameByIndex:i]; //DHS 3/6
         int       vc = [bbb getVendorFileCount:vn];
-        //NSLog(@" v[%@]: %d",vn,vc);
-        s = [s stringByAppendingString:[NSString stringWithFormat:@"%@ :%d\n",vn,vc]];
+        if (vc > 0) //8/11 only show vendors with filecounts
+        {
+            //NSLog(@" v[%@]: %d",vn,vc);
+            s = [s stringByAppendingString:[NSString stringWithFormat:@"%@ :%d\n",vn,vc]];
+        }
     }
     _outputText.text = s;
     [self->_monthButton setTitle:batchMonth forState:UIControlStateNormal];

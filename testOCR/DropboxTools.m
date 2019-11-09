@@ -18,6 +18,7 @@
 //  1/10 Add PDF cache hit to bypass downloading...
 //  1/14 Add uploadPNGImage
 //  2/23 Fix array -> mutableArray conversion bug
+//  8/11 improve error messages
 #import "DropboxTools.h"
 
 @implementation DropboxTools
@@ -54,12 +55,16 @@
          }
          else
          {
+#ifdef WHY_DOESNT_THIS_ERROR_WORK
              if (error != nil)
              {
                  NSString * message = [self getErrorMessage:error];
-                 NSLog(@" DBT ERROR! %@ : %@",message,searchPath);
+                 NSLog(@" DBT ERROR countEntries: %@ : %@",message,searchPath); //DHS 8/11
+                 [self->_delegate errorCountingEntries:message : vendorFolder]; //DHS 8/11
              }
-             [self->_delegate didCountEntries:vendorFolder :0];
+             else
+#endif
+                 [self->_delegate didCountEntries:vendorFolder :0];
          }
      }];
 
@@ -190,11 +195,11 @@
          else
          {
              NSString * message = [self getErrorMessage:error];
-             NSLog(@" dbt error: %@",message);
+             NSLog(@" DBT ERROR createFolderIfNeeded: %@: %@",message,folderPath); //DHS 8/11 more info
              [self->_delegate errorCreatingFolder : folderPath];
          }
      }];
-}
+} //end createFolderIfNeeded
 
 //=============(DropboxTools)=====================================================
 // Looks in default location for this app, we have ONLY one folder for now...

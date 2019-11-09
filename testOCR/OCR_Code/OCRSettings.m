@@ -109,7 +109,7 @@ NSString *const PS_MoveProcessedFilesKey    = @"MoveProcessedFiles";
             if (self->loaded)
             {
                 [self.delegate didLoadOCRSettings];
-                [self dump];
+                //[self dump];
             }
             else //Failed to load? Probably called from feedVC before parse came up!
             {

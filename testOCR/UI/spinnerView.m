@@ -65,6 +65,10 @@
             w = frame.size.height;
             h = frame.size.width;
         }
+        
+        CGSize csz   = [UIScreen mainScreen].bounds.size;
+        NSLog(@" spinnerview window size %@",NSStringFromCGSize(csz));
+        
         hvsize = 256;
         lsize  = 128;
         cframe = CGRectMake((w-hvsize)/2,(h-hvsize)/2,hvsize,hvsize);

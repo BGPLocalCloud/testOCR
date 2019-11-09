@@ -181,11 +181,11 @@ NSString *hdkSoundFiles[NUM_SFX_SAMPLES] =
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     if ([userDefaults objectForKey:@"customer"] == nil  ) //No defaults yet?
     {
-        NSLog(@" no defaults: reset");
+        //NSLog(@" no defaults: reset");
         [userDefaults setObject:@"KCH" forKey:@"customer"];
         [userDefaults setObject:@"Kona Hospital" forKey:@"customerFull"];
     }
-    else NSLog(@" found defaults...");
+    //else NSLog(@" found defaults...");
     _selectedCustomer         = [userDefaults objectForKey:@"customer"];
     _selectedCustomerFullName = [userDefaults objectForKey:@"customerFull"];
 

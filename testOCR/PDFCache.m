@@ -41,7 +41,7 @@ static PDFCache *sharedInstance = nil;
         //Check for cache folder DHS 5/24
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         cachesDirectory = [paths objectAtIndex:0];
-        NSLog(@"PDF CACHEPATH[%@]",cachesDirectory);
+        //NSLog(@"PDF CACHEPATH[%@]",cachesDirectory);
         [self createCacheFolder];
         [self loadMasterCacheFile];
         [self loadCache];

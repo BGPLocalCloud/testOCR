@@ -528,6 +528,7 @@ static BatchObject *sharedInstance = nil;
     NSString *vcompare = [vfn stringByReplacingOccurrencesOfString:@" " withString:@"_"];
     for (NSDictionary *d in vendorFileCounts)
     {
+        if ([d[@"Vendor"] isEqualToString:@"F"]) return -1; // 8/11 vendor must exist
         if ([d[@"Vendor"] isEqualToString:vcompare])
         {
             NSNumber *n = d[@"Count"];
@@ -846,11 +847,26 @@ static BatchObject *sharedInstance = nil;
 }
 
 //===========<DropboxToolDelegate>================================================
+// 8/11 Error getting folder contents
+- (void)errorCountingEntries : (NSString *)s : (NSString *)vendor
+{
+    //Update vendor dictionary to indicate this vendor folder is n0t present
+    for (NSMutableDictionary *d in vendorFileCounts)
+    {
+//        if ([d[@"Vendor"] isEqualToString:vendor])
+//            [d setObject:@"F" forKey:@"Exists"];
+    }
+
+    NSLog(@" DB errorCountingEntries, invalidate this vendor %@",vendor);
+}
+
+//===========<DropboxToolDelegate>================================================
 // coming back from dropbox : # files in a folder
 -(void) didCountEntries:(NSString *)vname :(int)count
 {
     //NSLog(@" didcountp[%@]  %d",vname,count);
-    [vendorFileCounts addObject:@{@"Vendor": vname,@"Count":[NSNumber numberWithInt:count]}];
+    // 8/11 add Exists dictionary key
+    [vendorFileCounts addObject:@{@"Vendor": vname,@"Count":[NSNumber numberWithInt:count],@"Exists":@"T"}];
     if (count != 0)
     {
         [vendorFolders setObject:dbt.entries forKey:vname];

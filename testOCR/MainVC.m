@@ -223,8 +223,8 @@
         [smartp addPrice: @"1.00"];
         [smartp addAmount: @"1.00"];
         
-        if ([s containsString:@"cocktail franks"])
-            NSLog(@" bing");
+//        if ([s containsString:@"cocktail franks"])
+//            NSLog(@" bing");
         int aError = [smartp analyze];
         if (aError != 0)
         {
@@ -232,7 +232,7 @@
             errCount++;
         }
         else
-            NSLog(@" ....OK %@ = %@",s,smartp.analyzedCategory);
+            NSLog(@" ....OK %@ = %@ / %@",s,smartp.analyzedCategory,smartp.analyzedProcessed);
         lineNum++;
         if (lineNum % 100 == 0) NSLog(@" line %d",lineNum);
     }
@@ -307,15 +307,15 @@
                                               }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Logout From Sashido",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                   [PFUser logOut];
-                                                   self->loginMode = @"login";
-                                                   [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
-                                                 //TEST 7/15 [self initSmartp];
+                                                  [PFUser logOut];
+                                                  self->loginMode = @"login";
+                                                  [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
+                                                  //TEST DEBUG[self initSmartp];
                                               }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Help",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                  [self performSegueWithIdentifier:@"helpSegue" sender:@"mainVC"];
-                                                 //TEST 7/15 [self testCSVCrap];
+                                                 [self performSegueWithIdentifier:@"helpSegue" sender:@"mainVC"];
+                                                 //TEST DEBUG [self testCSVCrap];
                                               }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -897,7 +897,7 @@
 // Finds batches in our activity list, gets error/other info
 -(void) getBatchInfo
 {
-    [spv start:@"Load Batches..."];
+    [spv start:@"Get Info..."];
     bbb = [BatchObject sharedInstance]; //No need for delegate, just hook up batch
     NSMutableArray *bids = [[NSMutableArray alloc] init];
     for (int i=0;i< [act getReadCount];i++)

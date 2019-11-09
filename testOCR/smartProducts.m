@@ -32,6 +32,11 @@
 //  7/12  add processedProduceTerms
 //  7/15  add more processed terms, pulled cocktail from kws
 //  7/22  add processedProduceKeywords table to DB
+//  7/26  Removed all canned keyword names (beverageNames, etc). use DB exclusively
+//          had to move some flag setting down in the code, see date marks
+//  7/30  add udKeywords;
+//  8/7   add invoiceKeywords
+
 #import "smartProducts.h"
 
 @implementation smartProducts
@@ -51,7 +56,10 @@
         keywords    =  [[NSMutableDictionary alloc] init];
         dKeywords   =  [[NSMutableDictionary alloc] init];
         nonProducts =  [[NSMutableArray alloc] init];   //6/14
-        ppKeywords  =  [[NSMutableArray alloc] init];   //6/14
+        invoiceKeywords =  [[NSMutableArray alloc] init];   //8/7
+        ppKeywords  =  [[NSMutableArray alloc] init];   //7/22
+        udKeywords  =  [[NSMutableArray alloc] init];   //7/30
+        
         keywordsNo1stChar  =  [[NSMutableDictionary alloc] init]; //3/15
         dKeywordsNo1stChar =  [[NSMutableDictionary alloc] init]; //3/15
 
@@ -67,8 +75,10 @@
         NSLog(@" SmartProducts: Load typos/splits from PARSE");
         [self loadTyposFromParse : 0];
         [self loadSplitsFromParse : 0];
+        [self loadInvoiceKeywordsFromParse:0];
         [self loadNonProductsFromParse:0];
         [self loadPPKeywordsFromParse:0];
+        [self loadUDKeywordsFromParse:0];
     }
     return self;
 }
@@ -155,261 +165,6 @@
                     @"snacks",
                     @"supplies"
                     ];
-
-    
-    beverageNames = @[
-                      @"apple juice",
-                      @"bottled water",
-                      @"cocoa",
-                      @"coffee",
-                      @"coke",
-                      @"cream",
-                      @"drink",
-                      @"drink mix",
-                      @"ginger ale",
-                      @"grape juice",
-                      @"juice",
-                      @"lemonade",
-                      @"mix",
-                      @"nectar",   // Need multiple words?",
-                      @"orange juice",
-                      @"raspberry tea",
-                      @"sprite",
-                      @"sprite zero",
-                      @"tea",
-                      @"vegetable soup", //WTF???
-                      @"yogurt",
-                      @"zico natural"
-                      ];
-    breadNames = @[
-                   @"bagel",
-                   @"bread",
-                   @"bun",
-                   @"dough",
-                   @"english",
-                   @"muffin",
-                   @"roll",
-                   @"tortilla",
-                   @"waffle"
-                  ];
-    dairyNames = @[
-                   @"butter",
-                   @"buttermilk",
-                   @"cheese",
-                   @"cream",
-                   @"creamer",
-                   @"ice cream",
-                   @"milk",
-                   @"feta",
-                   @"mozz",
-                   @"mozzerella",
-                   @"parm",
-                   @"parmesian",
-                   @"provolone",
-                   @"PP CS",   //WTF???
-                   @"sherbert",
-                   @"yogurt"
-                   ];
-    dryGoodsNames = @[   //CANNED
-                      @"applesauce",
-                      @"apple sauce",
-                      @"beans",
-                      @"beef base",
-                      @"beef consume",
-                      @"bread",
-                      @"broth",
-                      @"butter prints",
-                      @"canned",
-                      @"catsup",
-                      @"cereal",
-                      @"chicken base",
-                      @"chocolate",
-                      @"chowder",
-                      @"coconut",
-                      @"coconut milk",
-                      @"condensed milk",
-                      @"corn meal",
-                      @"cracker",
-                      @"crackers",
-                      @"cranberry juice",
-                      @"creamer",
-                      @"crisco",
-                      @"crouton",
-                      @"cumin",
-                      @"dressing",
-                      @"dressings",
-                      @"filling",
-                      @"filling cherry pie",
-                      @"filling blueberry",
-                      @"flour",
-                      @"fries",
-                      @"fruit tropical mix",
-                      @"fruit bowl",
-                      @"fruit cocktail",
-                      @"garlic, granulated",
-                      @"granola",
-                      @"granulated",
-                      @"gravy",
-                      @"jelly",
-                      @"ketchup",
-                      @"margarine",
-                      @"mashed potatoes",
-                      @"mayonnaise",
-                      @"mustard",
-                      @"noodle",
-                      @"oats",
-                      @"oil",
-                      @"olive",
-                      @"olives",
-                      @"onion powder",
-                      @"oranges, mandarin",
-                      @"paprika",
-                      @"pasta",
-                      @"paste",
-                      @"peanut",
-                      @"penne",
-                      @"pepper",
-                      @"peaches", //NEVER FRESH?
-                      @"pears",
-                      @"pickle",
-                      @"potato pearls",
-                      @"powder",
-                      @"pudding",
-                      @"pursed broccoli",
-                      @"rice",
-                      @"salt",
-                      @"sauce",
-                      @"seasoning",
-                      @"shoyu",
-                      @"soup",
-                      @"sugar",
-                      @"syrup",
-                      @"tahini",
-                      @"thickener",
-                      @"tortilla",
-                      @"tofu",
-                      @"topping",
-                      @"vanilla",
-                      @"vegetable",
-                      @"vegetables",
-                      @"vienna sausage", //WHY NOT PROTEIN?
-                      @"vinegar",
-                      @"walnut",
-                      @"wafer",
-                      @"yeast"
-                      ];
-    miscNames = @[ //CANNED
-                      @"charges",
-                      @"taxes"
-                     ];
-    
-    proteinNames = @[ //CANNED
-                     @"beef",
-                     @"brst",
-                     @"capicolla",
-                     @"chicken",
-                     @"crab",
-                     @"eggs",
-                     @"fish",
-                     @"fishcake",
-                     @"ham",
-                     @"pork",
-                     @"sknls",
-                     @"sausage",
-                     @"salami",
-                     @"spam",
-                     @"steak",
-                     @"turkey",
-                     @"tuna"    //here or dry goods?
-                     ];
-    produceNames = @[ //CANNED, need to check plurals too!
-                     @"apples",
-                     @"bananas",
-                     @"basil",
-                     @"berries",
-                     @"bok choy",
-                     @"blueberries",
-                     @"breadfruit",
-                     @"broccoli",
-                     @"cantaloupes",
-                     @"cabbage",
-                     @"carrots",
-                     @"cauliflower",
-                     @"celery",
-                     @"corn IFQ",  //???WTF?
-                     @"cranberry",
-                     @"cucumber",
-                     @"cucumbers",
-                     @"garlic",
-                     @"green beans",
-                     @"honeydew",
-                     @"iceberg",
-                     @"lemons",
-                     @"lettuce",
-                     @"mango",
-                     @"mandarin",
-                     @"melon",
-                     @"melons",
-                     @"mushroom",
-                     @"mushrooms",
-                     @"onions",
-                     @"oranges",  //confusion w/ orange juice?
-                     @"papaya",
-                     @"papayas",
-                     @"peas",
-                     @"peppers",
-                     @"pineapple",
-                     @"pineapples",
-                     @"potato",
-                     @"potatoes",
-                     @"romaine",
-                     @"spinach",
-                     @"squash",
-                     @"strawberries",
-                     @"strawberry",
-                     @"tomato",
-                     @"tomatoes",
-                     @"valencia",
-                     @"vegetable blend",
-                     @"watermelon"
-                     ];
-    snacksNames = @[
-                    @"chips",
-                    @"cookie",
-                    @"cookies",
-                    @"gelatin"
-                    ];
-    suppliesNames = @[
-                      @"apron",
-                      @"bowl",
-                      @"cont",
-                      @"cup",
-                      @"cups",
-                      @"degreaser",
-                      @"delimer",
-                      @"detergent",
-                      @"filter",
-                      @"film",
-                      @"foodtray",
-                      @"fork",
-                      @"hairnet",
-                      @"knives",
-                      @"knife",
-                      @"lid",
-                      @"napkin",
-                      @"napkins",
-                      @"presoak",
-                      @"rinse aid",
-                      @"refill",
-                      @"sanitizer",
-                      @"scrubber",
-                      @"spoon",
-                      @"teaspoon",
-                      @"wiper"
-                  ];
-    //MISSING: Equipment,Paper Goods, Snacks, Supplement, Bread, Labor, Other Exp, Services, Transfer
-    
-
 
 }
 
@@ -532,7 +287,6 @@
     }
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
-//            int ocount = (int)objects.count;
             for (PFObject *pfo in objects)
             {
                 NSString *keyword = pfo[PInv_Name_key];
@@ -544,6 +298,30 @@
         }
     }];
 } //end loadPPKeywordsFromParse
+
+//=============(smartProducts)=====================================================
+// 7/30 unprocessed drygoods kws, recursive
+-(void) loadUDKeywordsFromParse : (int) skip
+{
+    PFQuery *query = [PFQuery queryWithClassName:@"unprocessedDrygoodsKeywords"];
+    query.skip = skip;
+    if (skip == 0)
+    {
+        [udKeywords          removeAllObjects];
+    }
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            for (PFObject *pfo in objects)
+            {
+                NSString *keyword = pfo[PInv_Name_key];
+                [self->udKeywords addObject:keyword];
+            }
+            if (objects.count == 100) [self loadUDKeywordsFromParse:skip+100];
+            else
+                NSLog(@" ...got %d UDkeywords", (int)self->udKeywords.count);
+        }
+    }];
+} //end loadUDKeywordsFromParse
 
 //=============(smartProducts)=====================================================
 // 6/11 double keywords (green beans, pinto beans, etc)
@@ -606,6 +384,29 @@
         }
     }];
 } //end loadNonProductsFromParse
+
+//=============(smartProducts)=====================================================
+// 6/14 read one and two-word nonproduct descriptions from db
+-(void) loadInvoiceKeywordsFromParse : (int) skip
+{
+    PFQuery *query = [PFQuery queryWithClassName:@"InvoiceKeywords"];
+    query.skip = skip;
+    if (skip == 0)
+    {
+        [invoiceKeywords removeAllObjects];
+    }
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            for (PFObject *pfo in objects)
+            {
+                NSString *nextInvoiceKeyword = pfo[PInv_Name_key];
+                [self->invoiceKeywords addObject:nextInvoiceKeyword];
+            }
+            if (objects.count == 100) [self loadInvoiceKeywordsFromParse:skip+100];
+            else NSLog(@" ...found %d ikws", (int)self->invoiceKeywords.count);
+        }
+    }];
+} //end loadInvoiceKeywordsFromParse
 
 
 //=============(smartProducts)=====================================================
@@ -781,16 +582,16 @@
         _nonProduct = TRUE;
         return ANALYZER_NONPRODUCT;
     }
-    //Bail on any weird product names, or obviously NON-product items found in this column...
-//6/14 MOVED below product check...
-//    for (NSString *nps in nonProducts) //6/14 mutableArray, loaded from parse now
-//    {
-//        if ([fullProductName.lowercaseString containsString:nps])
-//        {
-//            _nonProduct = TRUE;
-//            return ANALYZER_NONPRODUCT;
-//        }
-//    }
+    // 8/7 Check for invoice-related keywords first...
+    for (NSString *ikw in invoiceKeywords) //6/14 mutableArray, loaded from parse now
+    {
+        if ([fullProductName.lowercaseString containsString:ikw])
+        {
+            _nonProduct = TRUE;
+            //NSLog(@" ...invoice keyword (nonproduct) %@",fullProductName);
+            return ANALYZER_NONPRODUCT;
+        }
+    }
     //DHS 12/31: Fix common misspellings, like "ananas" or "apaya"...
     //  this call also LOWERCASES the product name!
     fullProductName = [self fixSentenceTypo:fullProductName];
@@ -799,7 +600,7 @@
     _analyzedCategory = @"EMPTY";
     NSArray *pItems = [fullProductName componentsSeparatedByString:@" "]; //Separate words
     
-    NSLog(@" Smart?Analyze: %@",fullProductName);
+    // 8/11 NSLog(@" Smart?Analyze: %@",fullProductName);
     // Get product category / processed / local / bulk / etc....
     //Try matching with built-in CSV file cat.txt first...
     BOOL found = FALSE;
@@ -837,86 +638,9 @@
         if (found) break;
         NSString *lowerCase = nextWord.lowercaseString; //Always match on lowercase
         lowerCase = [lowerCase   stringByReplacingOccurrencesOfString:@"/" withString:@""]; //Get rid of illegal stuff!
-        if ([beverageNames indexOfObject:lowerCase] != NSNotFound) // Beverage category Found?
-        {
-            found = TRUE;
-            _analyzedCategory = BEVERAGE_CATEGORY;
-            _analyzedUOM      = @"case";
-            processed = TRUE;
-            bulk = TRUE;
-        }
-        else if ([breadNames indexOfObject:lowerCase] != NSNotFound) // Bread category Found?
-        {
-            found = TRUE;
-            _analyzedCategory = BREAD_CATEGORY;
-            _analyzedUOM      = @"case";
-            processed = TRUE;
-            bulk = TRUE;
-        }
-        else if ([dairyNames indexOfObject:lowerCase] != NSNotFound) // Dairy category Found?
-        {
-            found = TRUE;
-            _analyzedCategory = DAIRY_CATEGORY;
-            _analyzedUOM      = @"qt";
-            processed = TRUE;    //   UOM/processed/bulk, matching product names one for one
-            bulk = TRUE;
-        }
-        else if ([dryGoodsNames indexOfObject:lowerCase] != NSNotFound) // Dry Goods category Found?
-        {
-            found = TRUE;
-            _analyzedCategory = DRY_GOODS_CATEGORY;
-            _analyzedUOM      = @"lb";
-            processed = TRUE;
-            bulk = TRUE;
-        }
-        else if ([miscNames indexOfObject:lowerCase] != NSNotFound) // Misc category Found?
-        {
-            found = TRUE;
-            _analyzedCategory = MISC_CATEGORY;
-            _analyzedUOM      = @"n/a";
-            processed = FALSE;
-            bulk = FALSE;
-        }
-        else if ([produceNames indexOfObject:lowerCase] != NSNotFound) // Produce category Found?
-        {
-            found = TRUE;
-            _analyzedCategory = PRODUCE_CATEGORY;
-            _analyzedUOM      = @"lb";
-            processed = FALSE;
-            //7/22 look for terms that may indicate we have a processed item here...update to DB ppKeywords
-            for (NSString *processedTerm in ppKeywords)
-            {
-                if ([fullProductName containsString:processedTerm])
-                {
-                    processed = TRUE;
-                }
-            } //end for NSString...
-            bulk = TRUE;
-        }
-        else if ([proteinNames indexOfObject:lowerCase] != NSNotFound) // Protein category Found?
-        {
-            found = TRUE;
-            _analyzedCategory = PROTEIN_CATEGORY;
-            _analyzedUOM = @"lb";
-            processed = FALSE; //Is ground beef processed?
-            bulk = TRUE; //Is this ok for all meat?
-        }
-        else if ([snacksNames indexOfObject:lowerCase] != NSNotFound) // Snacks category Found?
-        {
-            found = TRUE;
-            _analyzedCategory = SNACKS_CATEGORY;
-            _analyzedUOM = @"case";
-            processed = TRUE;
-            bulk = FALSE;
-        }
-        else if ([suppliesNames indexOfObject:lowerCase] != NSNotFound) // Supplies category Found?
-        {
-            found = TRUE;
-            _analyzedCategory = SUPPLIES_CATEGORY;
-            _analyzedUOM = @"n/a";
-            processed = FALSE;
-            bulk = FALSE;
-        }
+
+        
+        
         if (!found) //DHS 3/4, look thru keywords table if still no match!
         {
             _analyzedUOM = @"n/a";
@@ -929,7 +653,7 @@
                                      @"lb",     @"protein",
                                      @"case",   @"snacks",
                                     nil];
-            
+
             NSString *cat = nil; //DHS 3/15 look thru 2 sets of keywords now...
             if (keywords[lowerCase] != nil) cat = keywords[lowerCase];
             //DHS 6/11 try double keywords too if no match...
@@ -940,19 +664,60 @@
                     _analyzedCategory = @"DRY GOODS";
                 else
                     _analyzedCategory = cat.uppercaseString;
-                processed = FALSE;
-                // Commonly PROCESSED categories...
-                if ([@[@"beverage",@"bread",@"dairy",@"drygoods",@"snacks",@"supplies"]
-                    containsObject:cat]) processed = TRUE;
-                bulk = FALSE;
-                // Commonly BULK categories...
-                if ([@[@"beverage",@"bread",@"dairy",@"drygoods",@"produce",@"protein"]
-                     containsObject:cat]) bulk = TRUE;
+                // 7/26  Get bulk/processed flags...
+                bulk = processed = TRUE;
+                if ([_analyzedCategory isEqualToString:BEVERAGE_CATEGORY])
+                {
+                    //Nada for now, use defaults
+                }
+                else if ([_analyzedCategory isEqualToString:BREAD_CATEGORY])
+                {
+                    //Nada for now, use defaults
+                }
+                else if ([_analyzedCategory isEqualToString:DAIRY_CATEGORY])
+                {
+                    //Nada for now, use defaults
+                }
+                else if ([_analyzedCategory isEqualToString:DRY_GOODS_CATEGORY])
+                {  //DHS 7/30 look for unprocessed items
+                    for (NSString *udTerm in udKeywords)
+                        if ([fullProductName containsString:udTerm]) processed = FALSE;
+                }
+                else if ([_analyzedCategory isEqualToString:PAPER_GOODS_CATEGORY])
+                {
+                    //Nada for now, use defaults
+                }
+                else if ([_analyzedCategory isEqualToString:PROTEIN_CATEGORY])
+                {
+                    processed = FALSE;
+                }
+                else if ([_analyzedCategory isEqualToString:PRODUCE_CATEGORY])
+                {
+                    //7/22 look for terms that may indicate we have a processed item here...update to DB ppKeywords
+                    processed = FALSE;
+                    for (NSString *processedTerm in ppKeywords)
+                    {
+                        if ([fullProductName containsString:processedTerm]) processed = TRUE;
+                    }
+                }
+                else if ([_analyzedCategory isEqualToString:SNACKS_CATEGORY])
+                {
+                    bulk = FALSE;
+                }
+                else if ([_analyzedCategory isEqualToString:SUPPLEMENTS_CATEGORY])
+                {
+                    bulk = FALSE;
+                }
+                else if ([_analyzedCategory isEqualToString:SUPPLIES_CATEGORY])
+                {
+                    //Nada for now, use defaults
+                }
+                
                 //Use our little dictionary above for UOM's, MOVE DICT TO CLASS!
                 if (uomdict[cat] != nil) _analyzedUOM = uomdict[cat];
                 found = TRUE;
-//                NSLog(@" match %@ => %@ processed %d bulk %d uom %@",
-//                      lowerCase,cat,processed,bulk,_analyzedUOM);
+                //NSLog(@" match %@ => %@ processed %d bulk %d uom %@",
+                //      lowerCase,cat,processed,bulk,_analyzedUOM);
             }
         }
         //Uom set from outside? Override!
@@ -973,7 +738,7 @@
     
     if (!found)
     {
-        NSLog(@" analyze ... no product found [%@]",fullProductName);
+        //NSLog(@" analyze ... no product found [%@]",fullProductName);
         if ([fullProductName isEqualToString:@""]) NSLog(@" EMPTY::::????");
         _majorError = ANALYZER_NO_PRODUCT_FOUND;
         return ANALYZER_NO_PRODUCT_FOUND; //Indicate failure
@@ -1158,8 +923,8 @@
     //First make normal double keyword
     NSString *dkeytest= [NSString stringWithFormat:@"%@ %@",key1,key2];
     if (dkeytest.length < 5) return cat; //Shorties need not apply!
-    if ([key1 containsString:@"bean"] || [key2 containsString:@"bean"])
-        NSLog(@"bing!");
+//    if ([key1 containsString:@"bean"] || [key2 containsString:@"bean"])
+//        NSLog(@"bing!");
     cat = dKeywords[dkeytest];  //Match with A B / B A combos of the 2 keywords
     if (cat == nil)
         cat = dKeywordsNo1stChar[dkeytest]; //Try against A B / B A combos missing 1st char

@@ -19,6 +19,7 @@
 //  2/17 add cleanupNonEnglishCharacters
 //  3/10 new method names: findAllWordsInDocumentRect/TemplateRect
 //  3/14 redo findLongInArrayOfFields
+//  8/11 handle letter I and blanks in quantity column, both become 1
 #import "OCRDocument.h"
 
 @implementation OCRDocument
@@ -230,6 +231,7 @@ double drand(double lo_range,double hi_range ); //External...
 {
     NSString *outstr;
     outstr = [nstr   stringByReplacingOccurrencesOfString:@"O" withString:@"0"];
+    outstr = [outstr stringByReplacingOccurrencesOfString:@"I" withString:@"1"]; //DHS 8/11 Gordon invoices
     outstr = [outstr stringByReplacingOccurrencesOfString:@"i" withString:@"1"];
     outstr = [outstr stringByReplacingOccurrencesOfString:@"C" withString:@"0"];  //C ... really?
     outstr = [outstr stringByReplacingOccurrencesOfString:@"o" withString:@"0"];
@@ -329,7 +331,13 @@ double drand(double lo_range,double hi_range ); //External...
     if (gotPrice)
         for (NSString * s in a) [aout addObject:[self cleanupPrice:s]];
     else if (gotQuantity)
-        for (NSString * s in a) [aout addObject:[self cleanUpNumberString : s]];
+    {
+        for (NSString * s in a)
+            {
+                if (s.length == 0) [aout addObject : @"1"];//8/11 Empty Quantity string? assume its a 1
+                else               [aout addObject : [self cleanUpNumberString : s]];
+            }
+    }
     else if (gotDescription)
         for (NSString * s in a) [aout addObject:[self cleanupNonEnglishCharacters : s]]; // 2/17
     else
@@ -669,8 +677,9 @@ double drand(double lo_range,double hi_range ); //External...
     for (NSNumber *n in a) //Look for obvious keyword now
     {
         OCRWord *ow = allWords[n.longValue];
-        if ([ow.wordtext.lowercaseString containsString:@"amount"])
-            NSLog(@" amount found %@",ow.wordtext);
+//DHS 8/11 spurious
+//        if ([ow.wordtext.lowercaseString containsString:@"amount"])
+//            NSLog(@" amount found %@",ow.wordtext);
 
         if (
             [ow.wordtext.lowercaseString isEqualToString:@"description"] ||

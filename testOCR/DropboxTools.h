@@ -62,6 +62,7 @@
 @optional
 - (void)didGetBatchList : (NSArray *)a;
 - (void)didCountEntries : (NSString *)vname : (int) count;
+- (void)errorCountingEntries : (NSString *)s: (NSString *)vendor;
 - (void)errorGettingBatchList : (NSString *)type : (NSString *)s;
 - (void)didCreateFolder : (NSString *)folderPath;
 - (void)errorCreatingFolder : (NSString *)folderPath;

@@ -122,7 +122,7 @@ static OCRTopObject *sharedInstance = nil;
             //DHS 2/5 look for invoice number / date EVERY PAGE
             if ( [fieldName isEqualToString:INVOICE_NUMBER_FIELD]) //Looking for a number?
             {
-                [od dumpArrayFull:a];
+                if (debugMode) [od dumpArrayFull:a]; //DHS 8/11
                 if ([debugString isEqualToString:@"number"])      //Debug? Convert our array to a bunch of strings...
                     [self displayDebugPrompt : debugString : a]; // and output it in a prompt
                 long testNum = [od findLongInArrayOfFields:a];
@@ -253,7 +253,8 @@ static OCRTopObject *sharedInstance = nil;
         
         NSMutableArray *cleanedUpArray = [od cleanUpRawColumns : i : [ot getColumnType:i] : stringArray ];
         [od addColumnStringData:cleanedUpArray];
-        if (debugMode) NSLog(@" col[%d] cleanup %@",i,cleanedUpArray);
+        if (debugMode)
+            NSLog(@" col[%d] cleanup %@",i,cleanedUpArray);
     }
     
     //Now, columns are ready: let's dig them out!

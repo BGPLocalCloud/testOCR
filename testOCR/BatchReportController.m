@@ -14,6 +14,7 @@
 //  2/23 Fix array -> mutableArray conversion bug
 //  3/20 new folder structure
 //  4/5  add dbt textfile error handler
+//  8/13 Add spinner busy indicator...
 #import "BatchReportController.h"
 
 @interface BatchReportController ()
@@ -31,6 +32,18 @@
     return self;
 }
 
+//=============OCR MainVC=====================================================
+-(void) loadView
+{
+    [super loadView];
+    CGSize csz   = [UIScreen mainScreen].bounds.size;
+    viewWid = (int)csz.width;
+    viewHit = (int)csz.height;
+    viewW2  = viewWid/2;
+    viewH2  = viewHit/2;
+    
+}
+
 
 //=============BatchReport VC=====================================================
 - (void)viewDidLoad {
@@ -42,6 +55,11 @@
 
     _warnLabel.layer.cornerRadius = 10;
     _warnLabel.clipsToBounds      = YES;
+    
+    // 8/13 Add spinner busy indicator...
+    spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, viewWid, viewHit)];
+    [self.view addSubview:spv];
+
 }
 
 //=============BatchReport VC=====================================================
@@ -73,7 +91,9 @@
             AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
             NSString *reportPath = [NSString stringWithFormat:@"%@/%@_report.txt",   //3/20
                                     [bappDelegate getReportsFolderPath],_pfo[PInv_BatchID_key]];
+            [self->spv start:@"Get Report..."]; //DHS 8/13
             [dbt downloadTextFile:reportPath];
+            
         }
     }
 } //end viewWillAppear
@@ -119,6 +139,7 @@
 //===========<DropboxToolDelegate>================================================
 - (void)didDownloadTextFile : (NSString *)result
 {
+    [self->spv stop];  //DHS 8/13
     reportText       = result;
     _contents.text   = reportText;
     _titleLabel.text = _pfo[PInv_BatchID_key];

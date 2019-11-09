@@ -58,6 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSArray *suppliesNames;
     NSArray *categories;
     NSArray *processedProduceTerms;
+
     NSMutableArray *typos;
     NSMutableArray *fixed;
     NSMutableArray *splits;
@@ -65,12 +66,14 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableArray *wilds;
     NSMutableArray *notwilds;
     NSMutableArray *ppKeywords;
+    NSMutableArray *udKeywords;
 
     NSMutableDictionary *keywords;
     NSMutableDictionary *keywordsNo1stChar;
     NSMutableDictionary *dKeywords; //6/11 double keywords
     NSMutableDictionary *dKeywordsNo1stChar;  
     NSMutableArray *nonProducts;
+    NSMutableArray *invoiceKeywords;
     BOOL didInitAlready;
     OCRCategories* occ; //Categories / processed / local lookup table
 }
