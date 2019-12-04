@@ -2140,8 +2140,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1094"
             endingLineNumber = "1094"
-            landmarkName = "-didReadActivityTable"
-            landmarkType = "7">
+            landmarkName = "MainVC"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

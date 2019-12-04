@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -52,7 +52,6 @@
 		722E08F521BF504E00BBD88D /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08F421BF504E00BBD88D /* NetworkExtension.framework */; };
 		722E08F921BF505B00BBD88D /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08F821BF505B00BBD88D /* CoreAudio.framework */; };
 		722E08FB21BF506200BBD88D /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08FA21BF506200BBD88D /* libsqlite3.tbd */; };
-		722E090021BF50BF00BBD88D /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08FC21BF50BE00BBD88D /* Bolts.framework */; };
 		722E090221BF50BF00BBD88D /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08FE21BF50BE00BBD88D /* Parse.framework */; };
 		722E090321BF50BF00BBD88D /* ParseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722E08FF21BF50BF00BBD88D /* ParseUI.framework */; };
 		722F9A7321C23E0D001D8EE6 /* ssd_hare.png in Resources */ = {isa = PBXBuildFile; fileRef = 722F9A7121C23E0D001D8EE6 /* ssd_hare.png */; };
@@ -131,6 +130,7 @@
 		72DA6F97224EF51E0017287D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72DA6F95224EF51D0017287D /* AVFoundation.framework */; };
 		72DA6F9A224EF70D0017287D /* clave.wav in Resources */ = {isa = PBXBuildFile; fileRef = 72DA6F99224EF70D0017287D /* clave.wav */; };
 		72DB332021CDC35F00AA44C0 /* DropboxTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DB331F21CDC35F00AA44C0 /* DropboxTools.m */; };
+		72DDEBFD239745F30083213C /* Bolts in Resources */ = {isa = PBXBuildFile; fileRef = 72DDEBFC239745F30083213C /* Bolts */; };
 		72E3FA89220BC1000073C84A /* PDFVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E3FA88220BC1000073C84A /* PDFVC.m */; };
 		72E5D31121B6DE4C005AF869 /* txt in Resources */ = {isa = PBXBuildFile; fileRef = 72E5D31021B6DE4C005AF869 /* txt */; };
 		72E785AC21CCBFC600EEEF1F /* AddTemplateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E785AB21CCBFC600EEEF1F /* AddTemplateViewController.m */; };
@@ -212,7 +212,6 @@
 		722E08F421BF504E00BBD88D /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		722E08F821BF505B00BBD88D /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		722E08FA21BF506200BBD88D /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
-		722E08FC21BF50BE00BBD88D /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Bolts.framework; path = 3rdparty/Bolts.framework; sourceTree = "<group>"; };
 		722E08FE21BF50BE00BBD88D /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Parse.framework; path = 3rdparty/Parse.framework; sourceTree = "<group>"; };
 		722E08FF21BF50BF00BBD88D /* ParseUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ParseUI.framework; path = 3rdparty/ParseUI.framework; sourceTree = "<group>"; };
 		722F9A7121C23E0D001D8EE6 /* ssd_hare.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ssd_hare.png; path = Resources/ssd_hare.png; sourceTree = SOURCE_ROOT; };
@@ -323,6 +322,7 @@
 		72DA6F99224EF70D0017287D /* clave.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = clave.wav; sourceTree = "<group>"; };
 		72DB331E21CDC35F00AA44C0 /* DropboxTools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DropboxTools.h; sourceTree = "<group>"; };
 		72DB331F21CDC35F00AA44C0 /* DropboxTools.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DropboxTools.m; sourceTree = "<group>"; };
+		72DDEBFC239745F30083213C /* Bolts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Bolts; path = Pods/Bolts; sourceTree = "<group>"; };
 		72E3FA87220BC1000073C84A /* PDFVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PDFVC.h; sourceTree = "<group>"; };
 		72E3FA88220BC1000073C84A /* PDFVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PDFVC.m; sourceTree = "<group>"; };
 		72E5D31021B6DE4C005AF869 /* txt */ = {isa = PBXFileReference; lastKnownFileType = folder; path = txt; sourceTree = "<group>"; };
@@ -350,7 +350,6 @@
 				722E090321BF50BF00BBD88D /* ParseUI.framework in Frameworks */,
 				722E08FB21BF506200BBD88D /* libsqlite3.tbd in Frameworks */,
 				722E08F921BF505B00BBD88D /* CoreAudio.framework in Frameworks */,
-				722E090021BF50BF00BBD88D /* Bolts.framework in Frameworks */,
 				722E08F521BF504E00BBD88D /* NetworkExtension.framework in Frameworks */,
 				722E090221BF50BF00BBD88D /* Parse.framework in Frameworks */,
 				722E08F321BF504700BBD88D /* SystemConfiguration.framework in Frameworks */,
@@ -532,10 +531,10 @@
 		722E08F121BF504700BBD88D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				72DDEBFC239745F30083213C /* Bolts */,
 				72DA6F95224EF51D0017287D /* AVFoundation.framework */,
 				72A9828821CCAC7300D5EAC6 /* WebKit.framework */,
 				729C592E21C1F62400F4C695 /* MessageUI.framework */,
-				722E08FC21BF50BE00BBD88D /* Bolts.framework */,
 				722E08FE21BF50BE00BBD88D /* Parse.framework */,
 				722E08FF21BF50BF00BBD88D /* ParseUI.framework */,
 				722E08FA21BF506200BBD88D /* libsqlite3.tbd */,
@@ -735,6 +734,7 @@
 				726F0A4921DF092F007656FD /* dbGrey.png in Resources */,
 				729E92C521DC1CCC00048DAF /* globeIcon.png in Resources */,
 				7283813121C4A3FD00A2954B /* gearNOT.png in Resources */,
+				72DDEBFD239745F30083213C /* Bolts in Resources */,
 				72270D98224EEF3800151931 /* congamid44k.wav in Resources */,
 				7283812D21C4A36200A2954B /* HamburgerHOT.png in Resources */,
 				7209609621B81E6B00D49C63 /* arrDown.png in Resources */,
@@ -779,20 +779,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-testOCR/Pods-testOCR-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
+				"${PODS_ROOT}/Target Support Files/Pods-testOCR/Pods-testOCR-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-			);
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
+				"${PODS_ROOT}/Target Support Files/Pods-testOCR/Pods-testOCR-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-testOCR/Pods-testOCR-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-testOCR/Pods-testOCR-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		72E44DE321F274C900809DA7 /* ShellScript */ = {
@@ -1050,6 +1045,7 @@
 					"$(PROJECT_DIR)/3rdparty",
 				);
 				INFOPLIST_FILE = testOCR/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1073,6 +1069,7 @@
 					"$(PROJECT_DIR)/3rdparty",
 				);
 				INFOPLIST_FILE = testOCR/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

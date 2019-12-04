@@ -1,25 +1,34 @@
 PODS:
-  - Crashlytics (3.12.0):
-    - Fabric (~> 1.9.0)
-  - Fabric (1.9.0)
-  - ObjectiveDropboxOfficial (3.9.4)
+  - Bolts (1.9.0):
+    - Bolts/AppLinks (= 1.9.0)
+    - Bolts/Tasks (= 1.9.0)
+  - Bolts/AppLinks (1.9.0):
+    - Bolts/Tasks
+  - Bolts/Tasks (1.9.0)
+  - Crashlytics (3.14.0):
+    - Fabric (~> 1.10.2)
+  - Fabric (1.10.2)
+  - ObjectiveDropboxOfficial (3.10.0)
 
 DEPENDENCIES:
+  - Bolts
   - Crashlytics
   - Fabric
   - ObjectiveDropboxOfficial
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
+    - Bolts
     - Crashlytics
     - Fabric
     - ObjectiveDropboxOfficial
 
 SPEC CHECKSUMS:
-  Crashlytics: 07fb167b1694128c1c9a5a5cc319b0e9c3ca0933
-  Fabric: f988e33c97f08930a413e08123064d2e5f68d655
-  ObjectiveDropboxOfficial: a5afefc83f6467c42c45f2253f583f2ad1ffc701
+  Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
+  Crashlytics: 540b7e5f5da5a042647227a5e3ac51d85eed06df
+  Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
+  ObjectiveDropboxOfficial: 19a4913d4d52fba035d41f40da71df0d6b303327
 
-PODFILE CHECKSUM: bf05b9008fb1b09b2b930f177768608931d78383
+PODFILE CHECKSUM: 939e6076adad0d1b25f42ea8dd683c6dacffafa8
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.8.4

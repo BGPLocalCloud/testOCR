@@ -9,5 +9,6 @@ target 'testOCR' do
  pod 'ObjectiveDropboxOfficial'
  pod 'Fabric'
  pod 'Crashlytics'
+ pod 'Bolts'
 
 end

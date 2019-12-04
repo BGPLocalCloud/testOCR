@@ -25,6 +25,8 @@
 //  3/20 New: multi-customer support, new folder structure
 //  4/30 Add dropbox tools again, add csv -> db loader for graph
 //  5/10 changed graph output table name to reflect seleted customer
+//  ios 13 upload errors from apple!
+//  12/1 add locationAlways and whenInUse to info.plist
 #import "MainVC.h"
 
 @interface MainVC ()
