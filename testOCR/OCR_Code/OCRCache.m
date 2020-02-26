@@ -5,6 +5,7 @@
 //  Created by Dave Scruton on 12/28/18.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  2/25/20 remove NSLogs
 
 #import "OCRCache.h"
 
@@ -60,7 +61,7 @@ static OCRCache *sharedInstance = nil;
 // Blows away disk cache...
 -(void) clearHardCore
 {
-    NSLog(@" CLEAR OCR CACHE HARDCORE....");
+    //2/25 NSLog(@" CLEAR OCR CACHE HARDCORE....");
     NSString *path;
     [self clear];
     
@@ -116,11 +117,11 @@ static OCRCache *sharedInstance = nil;
     if (fname == nil || txt == nil || txt.length<2 ) return;
     
     NSString *oid = [self cleanupID:fname];
-    NSLog(@"   addOCRTxt %@",fname);
+    //2/25 NSLog(@"   addOCRTxt %@",fname);
     //No dupes...
     if ([_OCRids containsObject:oid])
     {
-        NSLog(@"  ...cache dupe [%@]...",oid);
+        //2/25 NSLog(@"  ...cache dupe [%@]...",oid);
         return;
     }
     [_OCRids addObject : oid];
@@ -154,7 +155,7 @@ static OCRCache *sharedInstance = nil;
     
     //File is .../Library/Caches/cacheList.txt"
     path = [NSString stringWithFormat:@"%@/%@",cacheFolderPath,cacheMasterFile];
-    NSLog(@"cache loadMasterFile...%@",path);
+    //NSLog(@"cache loadMasterFile...%@",path);
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager fileExistsAtPath:path])
     {
@@ -275,7 +276,7 @@ static OCRCache *sharedInstance = nil;
     NSString *path = [NSString stringWithFormat:@"%@/%@.txt",cacheFolderPath,oid];
     NSData *data =[txt dataUsingEncoding:NSUTF8StringEncoding];
     [data writeToFile:path atomically:YES];
-    NSLog(@" ...savecache txt %@",path);
+    //2/25 NSLog(@" ...savecache txt %@",path);
     
 } //end saveCacheFile
 
@@ -286,7 +287,7 @@ static OCRCache *sharedInstance = nil;
     NSString *path = [NSString stringWithFormat:@"%@/%@.rct",cacheFolderPath,oid];
     NSData *data =[NSStringFromCGRect(r) dataUsingEncoding:NSUTF8StringEncoding];
     [data writeToFile:path atomically:YES];
-    NSLog(@" ...savecache rect %@",path);
+    // 2/25 NSLog(@" ...savecache rect %@",path);
     
 } //end saveCacheFile
 

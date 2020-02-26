@@ -36,6 +36,7 @@
 //          had to move some flag setting down in the code, see date marks
 //  7/30  add udKeywords;
 //  8/7   add invoiceKeywords
+//  2/25/20 comment out NSLogs
 
 #import "smartProducts.h"
 
@@ -65,14 +66,11 @@
 
         didInitAlready = FALSE;
         _intQuantity   = TRUE; //DHS 3/22 assume int quantities
-        NSLog(@" SmartProducts: Load typos from DISK");
         [self loadRulesTextFile : @"splits" : FALSE : splits : joined];
         [self loadRulesTextFile : @"typos"  : TRUE :  typos  : fixed];
 
-        NSLog(@" SmartProducts: Load keywords from PARSE");
         [self loadKeywordsFromParse : 0];
         [self loadDoubleKeywordsFromParse : 0];
-        NSLog(@" SmartProducts: Load typos/splits from PARSE");
         [self loadTyposFromParse : 0];
         [self loadSplitsFromParse : 0];
         [self loadInvoiceKeywordsFromParse:0];
@@ -269,8 +267,8 @@
                 [self->keywordsNo1stChar setObject:catkey forKey:[keyword substringFromIndex:1]];
             }
             if (objects.count == 100) [self loadKeywordsFromParse:skip+100];
-            else NSLog(@" ...found %d keywords %d nofirstchars",
-                       (int)self->keywords.count,(int)self->keywordsNo1stChar.count);
+            //else NSLog(@" ...found %d keywords %d nofirstchars",
+            //           (int)self->keywords.count,(int)self->keywordsNo1stChar.count);
         }
     }];
 } //end loadKeywordsFromParse
@@ -293,8 +291,8 @@
                 [self->ppKeywords addObject:keyword];
             }
             if (objects.count == 100) [self loadPPKeywordsFromParse:skip+100];
-            else
-                NSLog(@" ...got %d PPkeywords", (int)self->ppKeywords.count);
+            //else
+            //    NSLog(@" ...got %d PPkeywords", (int)self->ppKeywords.count);
         }
     }];
 } //end loadPPKeywordsFromParse
@@ -317,8 +315,8 @@
                 [self->udKeywords addObject:keyword];
             }
             if (objects.count == 100) [self loadUDKeywordsFromParse:skip+100];
-            else
-                NSLog(@" ...got %d UDkeywords", (int)self->udKeywords.count);
+            //else
+            //    NSLog(@" ...got %d UDkeywords", (int)self->udKeywords.count);
         }
     }];
 } //end loadUDKeywordsFromParse
@@ -336,7 +334,7 @@
     }
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
-            int ocount = (int)objects.count;
+            //int ocount = (int)objects.count;
             for (PFObject *pfo in objects)
             {
                 NSString *keyword = pfo[PInv_Name_key];
@@ -356,8 +354,8 @@
                 [self->dKeywordsNo1stChar setObject:cat forKey:[keywordReversed substringFromIndex:1]];
             }
             if (objects.count == 100) [self loadDoubleKeywordsFromParse:skip+100];
-            else NSLog(@" ...got %d doublekeywords %d nofirstchars (%d records read from DB)",
-                       (int)self->dKeywords.count,(int)self->dKeywordsNo1stChar.count, ocount);
+            //else NSLog(@" ...got %d doublekeywords %d nofirstchars (%d records read from DB)",
+            //                       (int)self->dKeywords.count,(int)self->dKeywordsNo1stChar.count, ocount);
         }
     }];
 } //end loadDoubleKeywordsFromParse
@@ -380,7 +378,7 @@
                 [self->nonProducts addObject:nextNonProduct];
             }
             if (objects.count == 100) [self loadNonProductsFromParse:skip+100];
-            else NSLog(@" ...found %d nonProducts", (int)self->nonProducts.count);
+            //else NSLog(@" ...found %d nonProducts", (int)self->nonProducts.count);
         }
     }];
 } //end loadNonProductsFromParse
@@ -403,7 +401,7 @@
                 [self->invoiceKeywords addObject:nextInvoiceKeyword];
             }
             if (objects.count == 100) [self loadInvoiceKeywordsFromParse:skip+100];
-            else NSLog(@" ...found %d ikws", (int)self->invoiceKeywords.count);
+            //else NSLog(@" ...found %d ikws", (int)self->invoiceKeywords.count);
         }
     }];
 } //end loadInvoiceKeywordsFromParse
@@ -429,7 +427,7 @@
                 [self->fixed addObject:pfo[PInv_Fixed_key]];
             }
             if (objects.count == 100) [self loadTyposFromParse:skip+100];
-            else NSLog(@" ...found %d typos",(int)self->typos.count);
+            //else NSLog(@" ...found %d typos",(int)self->typos.count);
         }
     }];
 } //end loadTyposFromParse
@@ -454,7 +452,7 @@
                 [self->joined addObject:pfo[PInv_Joined_key]];
             }
             if (objects.count == 100) [self loadSplitsFromParse:skip+100];
-            else NSLog(@" ...found %d splits",(int)self->splits.count);
+            //else NSLog(@" ...found %d splits",(int)self->splits.count);
         }
     }];
 } //end loadSplitsFromParse

@@ -14,7 +14,8 @@
 //  2/13 add debugMenu
 //  3/4  added new debug options
 //  3/20 moved verbose debug from mainVC, add batchCustomer
-//  8/11 only show filecounts gt 0 
+//  8/11 only show filecounts gt 0
+//  2/25/20 comment out NSLogs
 #import "BatchViewController.h"
 
 
@@ -64,15 +65,14 @@
     _outputText.text = @"...";
     _runButton.hidden = TRUE;
     AppDelegate *mappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSLog(@"Verbose Debug Output %d",mappDelegate.debugMode);
+    //NSLog(@"Verbose Debug Output %d",mappDelegate.debugMode);
     batchCustomer = mappDelegate.selectedCustomer;
-    [bbb setupCustomerFolders]; //DHS 4/5
-    [bbb getBatchCounts];
+ //   [bbb setupCustomerFolders]; //DHS 4/5
+ //   [bbb getBatchCounts];
     
     // 3/29 sfx
     _sfx         = [soundFX sharedInstance];
-
-}
+} //end viewDidLoad
 
 //=============Batch VC=====================================================
 - (void)viewDidAppear:(BOOL)animated {
@@ -83,6 +83,9 @@
         //NSLog(@" dropbox authorized...");
         authorized = TRUE;
         bbb.authorized = TRUE;
+        [bbb setupCustomerFolders]; //2/25/20 moved here from viewDidLoad, looked like race condition
+        [bbb getBatchCounts];
+
     } //end auth OK
     else
     {

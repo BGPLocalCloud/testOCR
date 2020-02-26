@@ -128,6 +128,7 @@
     spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, viewWid, viewHit)];
     [self.view addSubview:spv];
 
+    
 } //end viewDidLoad
 
 //=============OCR MainVC=====================================================

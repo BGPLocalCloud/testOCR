@@ -851,11 +851,11 @@ static BatchObject *sharedInstance = nil;
 - (void)errorCountingEntries : (NSString *)s : (NSString *)vendor
 {
     //Update vendor dictionary to indicate this vendor folder is n0t present
-    for (NSMutableDictionary *d in vendorFileCounts)
-    {
+//    for (NSMutableDictionary *d in vendorFileCounts)
+//    {
 //        if ([d[@"Vendor"] isEqualToString:vendor])
 //            [d setObject:@"F" forKey:@"Exists"];
-    }
+//    }
 
     NSLog(@" DB errorCountingEntries, invalidate this vendor %@",vendor);
 }

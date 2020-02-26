@@ -12,6 +12,7 @@
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 //  1/28 move cache to PDFCache sub-folder
+//  2/25/20 remove NSLogs
 
 #import "PDFCache.h"
 
@@ -63,7 +64,7 @@ static PDFCache *sharedInstance = nil;
 // Blows away disk cache...
 -(void) clearHardCore
 {
-    NSLog(@" CLEAR PDF CACHE HARDCORE....");
+    //2/25 NSLog(@" CLEAR PDF CACHE HARDCORE....");
     NSString *path;
     [self clear];
     
@@ -125,7 +126,7 @@ static PDFCache *sharedInstance = nil;
     //No Illegal stuff...
     if (pdfImage == nil || fname == nil || fname.length<2 ) return;
     NSString *oid = [self cleanupID:fname : page];
-    NSLog(@"   addOCRTxt %@",fname);
+    //2/25 NSLog(@"   addOCRTxt %@",fname);
     //No dupes...
     if ([_PDFids containsObject:oid])
     {
@@ -149,7 +150,7 @@ static PDFCache *sharedInstance = nil;
     
     //File is .../Library/Caches/pdfCacheList.txt
     path = [NSString stringWithFormat:@"%@/%@",cacheFolderPath,cacheMasterFile];
-    NSLog(@"pdfcache loadMasterFile...%@",path);
+    //NSLog(@"pdfcache loadMasterFile...%@",path);
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager fileExistsAtPath:path])
     {
@@ -251,7 +252,7 @@ static PDFCache *sharedInstance = nil;
 {
     NSString *path = [NSString stringWithFormat:@"%@/%@.jpg",cacheFolderPath,oid];
     [UIImageJPEGRepresentation(pdfImage, 0.75) writeToFile:path atomically:YES];
-    NSLog(@" ...savecache pdf %@",path);
+    //2/25 NSLog(@" ...savecache pdf %@",path);
 } //end saveCacheImage
 
 

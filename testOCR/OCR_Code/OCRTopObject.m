@@ -30,6 +30,8 @@
 //  3/4  add support for debugging invoice date from UI
 //  3/12 add page field to invoice
 //  3/20 add multi-customer support
+//  2/25 moved getTLAnchorByVendor... calls to performOCROnData from applyTemplate,
+//         now done in foreground, was getting internal crash in bkgd
 #import "OCRTopObject.h"
 
 @implementation OCRTopObject
@@ -83,9 +85,15 @@ static OCRTopObject *sharedInstance = nil;
     // these to scale invoice by:
     CGRect tlTemplate = [ot getTLOriginalRect];
     CGRect trTemplate = [ot getTROriginalRect];
-    AppDelegate *oappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    od.TLAnchor = [oappDelegate.vv getTLAnchorByVendor:_vendor]; //DHS 3/6 new for scaling
-    od.TRAnchor = [oappDelegate.vv getTRAnchorByVendor:_vendor];
+    //2/25/20 OUCH! oappDelegate should NOT be called from here, it looks like we are
+    //  in the background when this happens.  The TLAnchor and TRAnchor should be set
+    //  somewhere in the foreground, OR this object should have these two NSStrings
+    //  set ahead of time from the foreground!
+    // The items in question are in VendorObject: vTLTemplate and vTRTemplate
+    // 2/25 moved to performOCROnData....
+    // 2/25 AppDelegate *oappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    // 2/25 od.TLAnchor = [oappDelegate.vv getTLAnchorByVendor:_vendor]; //DHS 3/6 new for scaling
+    // 2/25 od.TRAnchor = [oappDelegate.vv getTRAnchorByVendor:_vendor];
     [od computeScaling : tlTemplate : trTemplate];
     if (debugMode) NSLog(@"applyTemplate...");
     if (page == 0) //DHS 1/31 ONLY clear on first page!
@@ -97,7 +105,7 @@ static OCRTopObject *sharedInstance = nil;
         _invoiceNumberString = @"";
         headerY = 0; //DHS 3/4
     }
-    
+
     //First add any boxes of content to ignore...
     for (int i=0;i<[ot getBoxCount];i++) //Loop over our boxes...
     {
@@ -224,7 +232,7 @@ static OCRTopObject *sharedInstance = nil;
             [ot addHeaderColumnToSortedArray : i : fieldName : headerY + od.glyphHeight];
         }
     }
-    
+
     //Only now do we have enough info to figure out the header titles...
     NSMutableArray* colz = [[NSMutableArray alloc] init];
     for (int i=0;i<[ot getColumnCount];i++)
@@ -576,6 +584,13 @@ static OCRTopObject *sharedInstance = nil;
 
     [request setHTTPBody:data];
     
+    //2/25 need to get TL/TR anchors here, was attempting to get them from background process
+    AppDelegate *oappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    od.TLAnchor = [oappDelegate.vv getTLAnchorByVendor:_vendor];
+    od.TRAnchor = [oappDelegate.vv getTRAnchorByVendor:_vendor];
+    //2/25 moved here from writeEXPToParse
+    [et setTableNameForCurrentCustomer]; //4/5  multi-customer support moved here!@
+
     // Start data session
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         NSError* myError;
@@ -626,9 +641,9 @@ static OCRTopObject *sharedInstance = nil;
             {
                 //1/19 don't save to cache unless there are NO ERRORS
                 [self->oc addOCRTxtWithRect:fname :r:self->rawOCRResult];
-                if (self->debugMode) NSLog(@"  ...OCR result is %@",self->OCRJSONResult);
+                if (self->debugMode)
+                    NSLog(@"  OCR result is %@",self->OCRJSONResult);
                 [self performFinalOCROnDocument : r : isBatch]; //This calls delegate when done
-
             }
         }
     }];
@@ -793,8 +808,9 @@ static OCRTopObject *sharedInstance = nil;
 //  also smartCount must be set!
 -(void) writeEXPToParse : (int) page
 {
-    
-    [et setTableNameForCurrentCustomer]; //4/5  multi-customer support moved here!@
+    //2/25 BUG!! appDelegate is being used from a bkgd thread here! Move
+    //    to foreground area for call
+    //[et setTableNameForCurrentCustomer]; //4/5  multi-customer support moved here!@
     smartCount  = 0;
     //Set up EXP for new entries...
     [et clear];

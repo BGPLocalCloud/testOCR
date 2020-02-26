@@ -13,7 +13,7 @@
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
 //  4/1 add loadTemplateFromPFObject
-
+//  2/25/20 remove NSLogs
 #import "OCRTemplate.h"
 
 @implementation OCRTemplate
@@ -311,7 +311,7 @@
         //First we have a header with general info...
         if ([titems[0] isEqualToString:INVOICE_TOP_LIMITS_LABEL]) //Look for top limits
              {
-                 NSLog(@" parse rect...");
+                 //2/25 NSLog(@" parse rect...");
                  int ptr = 1;
                  orientationWhenReadable = titems[ptr++];
                  CGRect rr1 = [self getRectFromStringItems:titems :ptr];

@@ -12,6 +12,7 @@
 //  Created by Dave Scruton on 12/20/18.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  2/25/20 remove NSLogs
 
 #import "AddTemplateViewController.h"
 
@@ -473,7 +474,6 @@ NSString * steps[] = {
 - (void)imagePickerController:(UIImagePickerController *)Picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
     //Makes poppy squirrel sound!
-    NSLog(@" ok...");
     _step = 1;
     //[_sfx makeTicSoundWithPitchandLevel:7 :70 : 40];
     [Picker dismissViewControllerAnimated:NO completion:^{
@@ -637,7 +637,7 @@ NSString * steps[] = {
 //===========<DropboxToolDelegate>================================================
 - (void)didDownloadImages
 {
-    NSLog(@" ...got image");
+    //NSLog(@" ...got image");
     //DHS 7/17/19 handle nuttin coming back..
     if (dbt.batchImages.count < 1 || dbt.batchImageRects.count < 1)
     {

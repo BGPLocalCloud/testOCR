@@ -92,9 +92,6 @@
     {
         [self loginUser];
     }
-    
-    
-    NSLog(@" ok...");
 }
 
 

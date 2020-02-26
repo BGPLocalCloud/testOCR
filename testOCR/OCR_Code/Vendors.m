@@ -167,7 +167,7 @@ static Vendors *sharedInstance = nil;
                 [self->_vobjs addObject:vvo];
                 self->_vcount++;
             }
-            NSLog(@" ...loaded all vendors");
+            //NSLog(@" ...loaded all vendors");
             self->_loaded = TRUE;
             [self.delegate didReadVendorsFromParse];
         }

@@ -10,6 +10,7 @@
 //          for setup with google cloud API
 //  3/13    Add customers object
 // 3/20    new folder structure
+//  2/25/20 remove NSLogs
 
 #import "AppDelegate.h"
 
@@ -41,7 +42,7 @@ NSString *hdkSoundFiles[NUM_SFX_SAMPLES] =
         configuration.applicationId = @"jT8oJdg7ySCQrHazHQml6JHEnCoKAiYh5ON5leQk";
         configuration.clientKey     = @"hxSXfyhuz3xik85xRZlmC2XrhQ5URkOlLNAioGeY";
         configuration.server        = @"https://pg-app-jhg70nkxzqetipfyic66ks9q3kq41y.scalabl.cloud/1/";
-        NSLog(@" parse DB at sashido.io connected");
+        //NSLog(@" parse DB at sashido.io connected");
         //Load Vendors from parse db,
         // ...force a load also, since object may already have been created before DB is ready!
     }]];
@@ -58,6 +59,7 @@ NSString *hdkSoundFiles[NUM_SFX_SAMPLES] =
         NSLog(@"Terminating...");
         exit(1);
     }
+    //NSLog(@" ...connect to dropbox");
     [DBClientsManager setupWithAppKey:appKey];
     //NSLog(@" ...logged into dropbox...");
 

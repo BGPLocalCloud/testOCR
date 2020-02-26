@@ -19,6 +19,7 @@
 //  1/14 Add uploadPNGImage
 //  2/23 Fix array -> mutableArray conversion bug
 //  8/11 improve error messages
+//  2/25/20 comment out NSLogs
 #import "DropboxTools.h"
 
 @implementation DropboxTools
@@ -44,8 +45,9 @@
 //=============(DropboxTools)=====================================================
 -(void) countEntries:(NSString *)batchFolder :(NSString *)vendorFolder
 {
-    //NSLog(@" ce %@",vendorFolder);
+    //NSLog(@" db countEntries %@",vendorFolder);
     NSString *searchPath = [NSString stringWithFormat:@"/%@/%@",batchFolder,vendorFolder];
+    //NSLog(@" db countEntries %@ : %@",vendorFolder,searchPath);
     [[client.filesRoutes listFolder:searchPath]
      setResponseBlock:^(DBFILESListFolderResult *result, DBFILESListFolderError *routeError, DBRequestError *error) {
          if (result) { //Only handle good folders
@@ -283,7 +285,7 @@
 - (void)downloadCSV : (NSString *)path : (NSString *)vendor
 {
     DBUserClient *client = [DBClientsManager authorizedClient];
-    NSLog(@" dropbox dload txt [%@[",path);
+    //2/25 NSLog(@" dropbox dload txt [%@[",path);
     
     [[client.filesRoutes downloadData:path]
      setResponseBlock:^(DBFILESFileMetadata *result, DBFILESDownloadError *routeError, DBRequestError *error, NSData *fileData) {
@@ -316,7 +318,7 @@
 - (void)downloadTextFile:(NSString *)imagePath
 {
     DBUserClient *client = [DBClientsManager authorizedClient];
-    NSLog(@" dropbox dload txt [%@[",imagePath);
+    //2/25 NSLog(@" dropbox dload txt [%@[",imagePath);
     
     [[client.filesRoutes downloadData:imagePath]
      setResponseBlock:^(DBFILESFileMetadata *result, DBFILESDownloadError *routeError, DBRequestError *error, NSData *fileData) {
@@ -352,7 +354,7 @@
 - (void)downloadImages:(NSString *)imagePath
 {
     DBUserClient *client = [DBClientsManager authorizedClient];
-    NSLog(@" dropbox dload image %@",imagePath);
+    //2/25 NSLog(@" dropbox dload image %@",imagePath);
     
     [_batchImages     removeAllObjects];
     [_batchImagePaths removeAllObjects];
@@ -365,13 +367,13 @@
              //Got a PDF?
              if ([imagePath.lowercaseString containsString:@"pdf"])
              {
-                 NSLog(@" ...found PDF file data");
+                 //NSLog(@" ...found PDF file data");
                  [self addImagesFromPDFData:fileData:imagePath]; //May add more than one image!
                  return; //Delegate gets called later...
              } //end .pdf string
              else //Jpg / PNG file?
              {
-                 NSLog(@" ...found jpg/png file data");
+                 //NSLog(@" ...found jpg/png file data");
                  nextImage = [UIImage imageWithData:fileData];
                  if (nextImage != nil)
                  { 
