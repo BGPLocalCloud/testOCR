@@ -16,6 +16,7 @@
 //  3/20 moved verbose debug from mainVC, add batchCustomer
 //  8/11 only show filecounts gt 0
 //  2/25/20 comment out NSLogs
+//  3/4/20 ignore monthButton if running batch
 #import "BatchViewController.h"
 
 
@@ -168,6 +169,8 @@
 // 2/4 new button: fiscal month
 - (IBAction)monthSelect:(id)sender
 {
+    //3/4/20 running? Bail!
+    if ([bbb.batchStatus isEqualToString:BATCH_STATUS_RUNNING]) return;
     [self monthMenu];
 }
 

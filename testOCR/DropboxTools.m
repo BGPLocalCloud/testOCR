@@ -61,7 +61,7 @@
              if (error != nil)
              {
                  NSString * message = [self getErrorMessage:error];
-                 NSLog(@" DBT ERROR countEntries: %@ : %@",message,searchPath); //DHS 8/11
+                 //NSLog(@" DBT ERROR countEntries: %@ : %@",message,searchPath); //DHS 8/11
                  [self->_delegate errorCountingEntries:message : vendorFolder]; //DHS 8/11
              }
              else
@@ -197,7 +197,7 @@
          else
          {
              NSString * message = [self getErrorMessage:error];
-             NSLog(@" DBT ERROR createFolderIfNeeded: %@: %@",message,folderPath); //DHS 8/11 more info
+             //NSLog(@" DBT ERROR createFolderIfNeeded: %@: %@",message,folderPath); //DHS 8/11 more info
              [self->_delegate errorCreatingFolder : folderPath];
          }
      }];

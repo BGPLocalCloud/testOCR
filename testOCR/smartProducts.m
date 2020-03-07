@@ -37,6 +37,7 @@
 //  7/30  add udKeywords;
 //  8/7   add invoiceKeywords
 //  2/25/20 comment out NSLogs
+//  3/2/20 remove redundant whitespace from fullProductName in analyze
 
 #import "smartProducts.h"
 
@@ -580,6 +581,12 @@
         _nonProduct = TRUE;
         return ANALYZER_NONPRODUCT;
     }
+    //3/2/20 Remove redundant whitespace, this makes two-word searches easier...
+    //       there is NO NSString function that does this, WTF???
+    while ([fullProductName rangeOfString:@"  "].location != NSNotFound) {
+        fullProductName = [fullProductName stringByReplacingOccurrencesOfString:@"  " withString:@" "];
+    }
+    
     // 8/7 Check for invoice-related keywords first...
     for (NSString *ikw in invoiceKeywords) //6/14 mutableArray, loaded from parse now
     {
@@ -757,7 +764,7 @@
     //3/22 move from bad math area...
     if (afloat < 0.0) afloat = -1.0 * afloat; //Just negate any negatives!
     if (pfloat < 0.0) pfloat = -1.0 * pfloat;
-    NSLog(@" analyze: [%@] priceFix q p a %d %f %f",fullProductName,qint,pfloat,afloat);
+    //NSLog(@" analyze: [%@] priceFix q p a %d %f %f",fullProductName,qint,pfloat,afloat);
     if (afloat > 10000.0) //Huge Amount? Assume decimal error
     {
         //NSLog(@" ERROR: amount over $10000!!");
@@ -798,7 +805,7 @@
     {
         //NSLog(@" ... 2 out of 3 price columns are zero!");
         _majorError = ANALYZER_BAD_PRICE_COLUMNS;
-        NSLog(@" bad price columns %d %f %f",qint,pfloat,afloat);
+        //NSLog(@" bad price columns %d %f %f",qint,pfloat,afloat);
         qint   = 1;
         qfloat = 1.0;
         if (!zeroPrice)  //Got a price, assume quantity is 1...

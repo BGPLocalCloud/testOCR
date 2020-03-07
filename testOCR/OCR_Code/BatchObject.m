@@ -29,6 +29,7 @@
 //  2/28 add call to oto.readCSVThenSaveToDropbox, username to batchReport
 //  3/20 new folder structure, report output
 //  3/24 change PDF renamer for multi-customer 
+//  3/4/20 processPDFPages: cleanup and check for nil arrays
 #import "BatchObject.h"
 
 @implementation BatchObject
@@ -87,6 +88,12 @@ static BatchObject *sharedInstance = nil;
         
         batchTableName = @"Batch"; //3/20
         _batchMonth    = @"01-JUL";
+        _batchID       = @"";   //3/4/20 add missing inits, saw crash in updateParse
+        _batchStatus   = @"";
+        customerName   = @"";
+        vendorName     = @"";
+        batchFiles     = @"";
+        batchProgress  = @"";
 
         _authorized = FALSE;
         
@@ -275,16 +282,16 @@ static BatchObject *sharedInstance = nil;
     bappDelegate.batchID = _batchID; //This way everyone can see the batch
     debugMode = bappDelegate.debugMode; //2/7 For dwbug logging, check every batch
     [oto setDebugMode : debugMode];
-    _batchStatus   = BATCH_STATUS_RUNNING;
+    _batchStatus  = BATCH_STATUS_RUNNING;
     batchErrors   = @"";
     batchFiles    = @"";
     batchProgress = @"";
-    [errorList removeAllObjects];        //Clear error / warning / fixed accumulators
-    [warningList removeAllObjects];
-    [fixedList removeAllObjects];
-    [warningFixedList removeAllObjects];
-    [errorReportList removeAllObjects];   //one set for parse storage, one for report
-    [warningReportList removeAllObjects];
+    [errorList          removeAllObjects];        //Clear error / warning / fixed accumulators
+    [warningList        removeAllObjects];
+    [fixedList          removeAllObjects];
+    [warningFixedList   removeAllObjects];
+    [errorReportList    removeAllObjects];   //one set for parse storage, one for report
+    [warningReportList  removeAllObjects];
     [self.delegate batchUpdate : @"Started Batch..."];
     oto.batchID      = _batchID; //Make sure OCR toplevel has batchID...
     oto.batchMonth   = _batchMonth;
@@ -297,7 +304,7 @@ static BatchObject *sharedInstance = nil;
         runAllBatches = FALSE;
         [self startBatchForCurrentVendor];
     }
-    else
+    else //Run all vendors...
     {
         vendorIndex   = 0;
         runAllBatches = TRUE;
@@ -571,42 +578,20 @@ static BatchObject *sharedInstance = nil;
     //Notify UI of progress...
     imageTools *it = [[imageTools alloc] init];
     
-    int MustUseImagesBecauseWeCantDeskewData = 0;
-    if (MustUseImagesBecauseWeCantDeskewData!=0)
+    //DHS 3/4 cleanup, remove debug code... also check for nil arrays
+    if (dbt.batchImageData.count > 0 && dbt.batchImageRects.count > 0)   //3/4/20 is there data??
     {
-        int numPages = 1; //(int)dbt.batchImages.count;
-        for (int page=0;page<numPages;page++)
-        {
-            batchProgress = [NSString stringWithFormat:@"File %d/%d Page %d/%d",batchCount,batchTotal,page+1,numPages];
-            [self.delegate batchUpdate : batchProgress];
-
-            if (debugMode) NSLog(@" OCR Image(not pdf) page %d of %d",page,numPages);
-            UIImage *ii =  dbt.batchImages[page];
-            if ([vendorRotation isEqualToString:@"-90"]) //Stupid, make this better!
-                ii = [it rotate90CCW:ii];
-            //UIImage *deskewedImage = [it deskew:ii];
-            //OUCH! THis has to be decoupled to handle the OCR returning on each image!
-             //Hand template down to oto
-            oto.ot = ot; //Hand template down to oto
-            [oto performOCROnImage:@"test.png" : ii];
-        }
-
-    }
-    else //OLD PDF DATA, potentially skewed!
-    {
-        NSData *data = dbt.batchImageData[0];  //Raw PDF data, need to process...
-        //NSString *ipath = dbt.batchFileList[0]; //[paths objectAtIndex:batchPage];
-        NSValue *rectObj = dbt.batchImageRects[0]; //PDF size (hopefully!)
+        NSData *data      = dbt.batchImageData[0];  //Raw PDF data, need to process...
+        NSValue *rectObj  = dbt.batchImageRects[0]; //PDF size (hopefully!)
         CGRect imageFrame = [rectObj CGRectValue];
         if (debugMode) NSLog(@"  ...PDF imageXYWH %d %d, %d %d",
-              (int)imageFrame.origin.x,(int)imageFrame.origin.y,
-              (int)imageFrame.size.width,(int)imageFrame.size.height);
+                             (int)imageFrame.origin.x,(int)imageFrame.origin.y,
+                             (int)imageFrame.size.width,(int)imageFrame.size.height);
         oto.vendor = vendorName;
         oto.imageFileName = lastFileProcessed; // DHS 1/22 was using wrong filename!
         oto.ot = ot; //Hand template down to oto
         [oto performOCROnData : lastFileProcessed : data : imageFrame : TRUE];
-    } //end else
-
+    }
 } //end processPDFPages
 
 //=============(BatchObject)=====================================================
@@ -727,6 +712,9 @@ static BatchObject *sharedInstance = nil;
         NSLog(@" ERROR: update batchObject with null ID");
         return;
     }
+    //3/4/20 add some error checks for fields that should be read in...
+    if (vendorName == nil)   vendorName   = @"empty";
+    if (customerName == nil) customerName = @"empty";
     [query whereKey:PInv_BatchID_key equalTo:_batchID];   //Look for current batch
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) { //Query came back...
@@ -737,8 +725,8 @@ static BatchObject *sharedInstance = nil;
                 pfo = [PFObject objectWithClassName:self->batchTableName];
             pfo[PInv_BatchID_key]       = self->_batchID;
             pfo[PInv_BatchStatus_key]   = self->_batchStatus;
-            pfo[PInv_Vendor_key]        = self->vendorName;
-            pfo[PInv_CustomerName_key]  = self->customerName; //3/20
+            pfo[PInv_Vendor_key]        = self->vendorName;    //3/4/20  asdf CRASH HERE! nil key or value
+            pfo[PInv_CustomerName_key]  = self->customerName;  
             pfo[PInv_BatchFiles_key]    = self->batchFiles;
             pfo[PInv_BatchProgress_key] = self->batchProgress;
             //Pack up errors / fixed...
@@ -1040,7 +1028,7 @@ static BatchObject *sharedInstance = nil;
     //Assume only 2 types for now...
     if ([[errMsg substringToIndex:2] containsString:@"E"]) //Error?
     {
-        NSLog(@" exp error %@ : %@: %@",errMsg,objectID,productName);
+        //NSLog(@" exp error %@ : %@: %@",errMsg,objectID,productName);
         [self addError : errMsg : objectID : productName];
     }
     else //Warning?
