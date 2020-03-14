@@ -351,6 +351,9 @@
         [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(nextCust,nil)
                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                       [self->mappDelegate updateCustomerDefaults:nextCust :cfull];
+                                                        // 3/13/20 wups. not setting exp table!
+                                                        [self->et setTableNameForCurrentCustomer]; //DHS 3/20
+
                                                       self->_customerLabel.text = cfull;
                                                   }]];
         i++;

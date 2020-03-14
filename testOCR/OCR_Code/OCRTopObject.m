@@ -814,9 +814,13 @@ static OCRTopObject *sharedInstance = nil;
     smartCount  = 0;
     //Set up EXP for new entries...
     [et clear];
+    [et setTableNameForCurrentCustomer]; //3/13/20 need to make sure table OK, best place here?
     if (debugMode) NSLog(@"  save EXP->Parse");
-    //if (page == pageCount-1) //DHS 2/5
-    [self.delegate batchUpdate : [NSString stringWithFormat:@"Save EXP Records..."]];
+    AppDelegate *oappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+
+    NSString * tableName = [NSString stringWithFormat:@"EXP_%@",oappDelegate.selectedCustomer];
+
+    [self.delegate batchUpdate : [NSString stringWithFormat:@"Save Records to %@...",tableName]];
     for (int i=0;i<od.longestColumn;i++) //OK this does multiple parse saves at once!
     {
         NSMutableArray *ac = [od getRowFromColumnStringData : i];
@@ -868,7 +872,7 @@ static OCRTopObject *sharedInstance = nil;
                 if ([productName.lowercaseString containsString:@"quest"]) skipRecord = TRUE;
                 if (!skipRecord && productName.length > 5) // Ignore short nonsense fields!
                 {
-                    NSLog(@" ---->ERROR: bad product name %@",productName);
+                    //NSLog(@" ---->ERROR: bad product name %@",productName);
                     NSString *s = [NSString stringWithFormat:@"E:Bad Product Name (%@)",productName];
                     [self->_delegate errorInEXPRecord:s:@"n/a":productName];
                 }

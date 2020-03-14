@@ -808,7 +808,7 @@
 {
     AppDelegate *eappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     tableName = [NSString stringWithFormat:@"EXP_%@",eappDelegate.selectedCustomer];
-    NSLog(@"   set EXP Table: %@",tableName);
+    //NSLog(@"   set EXP Table: %@",tableName);
 }
 
 

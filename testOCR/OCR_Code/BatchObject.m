@@ -309,7 +309,7 @@ static BatchObject *sharedInstance = nil;
         vendorIndex   = 0;
         runAllBatches = TRUE;
         [self startNextVendorBatch : FALSE];
-        NSLog(@" run ALL batches...");
+        //NSLog(@" run ALL batches...");
     }
 } //end runOneOrMoreBatches
 

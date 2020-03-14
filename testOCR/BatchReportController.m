@@ -15,6 +15,7 @@
 //  3/20 new folder structure
 //  4/5  add dbt textfile error handler
 //  8/13 Add spinner busy indicator...
+//  3/13/20 fix bug where keyboard comes up!
 #import "BatchReportController.h"
 
 @interface BatchReportController ()
@@ -142,6 +143,7 @@
     [self->spv stop];  //DHS 8/13
     reportText       = result;
     _contents.text   = reportText;
+    [_contents setUserInteractionEnabled:FALSE];  //3/13/20 NO KEYBOARD!
     _titleLabel.text = _pfo[PInv_BatchID_key];
 }
 

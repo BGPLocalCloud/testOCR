@@ -57,7 +57,6 @@ NS_ASSUME_NONNULL_BEGIN
     NSArray *snacksNames;
     NSArray *suppliesNames;
     NSArray *categories;
-    NSArray *processedProduceTerms;
 
     NSMutableArray *typos;
     NSMutableArray *fixed;
@@ -70,8 +69,13 @@ NS_ASSUME_NONNULL_BEGIN
 
     NSMutableDictionary *keywords;
     NSMutableDictionary *keywordsNo1stChar;
+    NSMutableDictionary *keywordCats; //3/13/20
+    NSMutableDictionary *keywordCatsNo1stChar; //3/13/20
     NSMutableDictionary *dKeywords; //6/11 double keywords
-    NSMutableDictionary *dKeywordsNo1stChar;  
+    NSMutableDictionary *dKeywordCats; //3/13/20
+    NSMutableDictionary *dKeywordsNo1stChar;
+    NSMutableDictionary *dKeywordCatsNo1stChar; //3/13/20
+    BOOL foundProcessedInDoubleKw; //used getting processed info from double kws
     NSMutableArray *nonProducts;
     NSMutableArray *invoiceKeywords;
     BOOL didInitAlready;
