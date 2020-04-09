@@ -13,7 +13,7 @@
 //
 //  1/28 move cache to PDFCache sub-folder
 //  2/25/20 remove NSLogs
-
+//  4/8/20 add enabled flag
 #import "PDFCache.h"
 
 @implementation PDFCache
@@ -46,6 +46,7 @@ static PDFCache *sharedInstance = nil;
         [self createCacheFolder];
         [self loadMasterCacheFile];
         [self loadCache];
+        _enabled = TRUE; //4/8/20
     }
     return self;
 } //end init
@@ -123,8 +124,8 @@ static PDFCache *sharedInstance = nil;
 //=====(PDFCache)======================================================================
 -(void) addPDFImage : (UIImage*) pdfImage : (NSString *) fname : (int) page
 {
-    //No Illegal stuff...
-    if (pdfImage == nil || fname == nil || fname.length<2 ) return;
+    //4/8/20 add enabled flag , No Illegal stuff...
+    if (!_enabled || pdfImage == nil || fname == nil || fname.length<2 ) return;
     NSString *oid = [self cleanupID:fname : page];
     //2/25 NSLog(@"   addOCRTxt %@",fname);
     //No dupes...
@@ -210,6 +211,7 @@ static PDFCache *sharedInstance = nil;
 //=====(PDFCache)======================================================================
 -(UIImage *) getImageByID : (NSString *) inoid : (int) page
 {
+    if (!_enabled) return nil;
     NSString *oid   = [self cleanupID : inoid : page];
     if ([_PDFids indexOfObject : oid] == NSNotFound) return nil;
     NSString *path  = [NSString stringWithFormat:@"%@/%@.jpg",cacheFolderPath,oid];

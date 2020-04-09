@@ -30,6 +30,7 @@
 //  3/20 new folder structure, report output
 //  3/24 change PDF renamer for multi-customer 
 //  3/4/20 processPDFPages: cleanup and check for nil arrays
+//  4/5/20 change skip output in processNextFile
 #import "BatchObject.h"
 
 @implementation BatchObject
@@ -465,7 +466,10 @@ static BatchObject *sharedInstance = nil;
     if ([lastFileProcessed.lowercaseString containsString:@"skip"]) //Skip this file?
     {
         if (debugMode) NSLog(@" ...skip %@",lastFileProcessed);
-        [self updateBatchProgress : [NSString stringWithFormat:@"   skip:%@",lastFileProcessed] : FALSE];
+        // 4/5 only show filename (not path) for skip announcement
+        [self updateBatchProgress : [NSString stringWithFormat:@"   skip:%@",
+                                     
+                                     [self getFilenameFromFullPath:lastFileProcessed]] : FALSE];
         [self processNextFile : 0];  //Re-entrant call...
         //DHS 1/31                      may result in batch being completed!
         if ([_batchStatus  isEqualToString: BATCH_STATUS_COMPLETED]) return;
@@ -485,7 +489,6 @@ static BatchObject *sharedInstance = nil;
         batchFiles = [batchFiles stringByAppendingString:lastFileProcessed];
         [self updateBatchProgress : [NSString stringWithFormat:@"Download %@",
                                      [self getStrippedFilename:lastFileProcessed]] : FALSE];
-        //if ([pc imageExistsByID:lastFileProcessed : 1])  // 1/19 pdf cache more logical
         //If we use the PDF cache, it's possible that the file images came down but the OCR did NOT.
         //  in that case the OCR never goes through, it gets a nil file reference and fails
         if ([oc txtExistsByID : lastFileProcessed ])  // Use OCR Cache!
@@ -497,7 +500,6 @@ static BatchObject *sharedInstance = nil;
                 //In this case we need to wait until template comes thru??
                 return;
             }
-
             oto.vendor = vendorName;
             oto.imageFileName = lastFileProcessed;
             oto.ot = ot; //Hand template down to oto
@@ -509,6 +511,15 @@ static BatchObject *sharedInstance = nil;
         }
     }
 } //end processNextFile
+
+//=============AnalyzeVC=====================================================
+-(NSString *) getFilenameFromFullPath : (NSString*)fullpath
+{
+    NSArray  *fstrs = [fullpath componentsSeparatedByString:@"/"]; //Peel off last part of path -> filename
+    NSString *fname = fstrs[fstrs.count-1];
+    return fname;
+}
+
 
 //=============(BatchObject)=====================================================
 -(NSMutableArray *) getErrors
@@ -885,6 +896,7 @@ static BatchObject *sharedInstance = nil;
 - (void)didDownloadImages
 {
     if (debugMode) NSLog(@" ...downloaded all images? got %d",(int)dbt.batchImages.count);
+    
     [self processPDFPages];
 }  //end didDownloadImages
 

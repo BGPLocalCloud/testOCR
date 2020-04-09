@@ -40,6 +40,7 @@ static OCRCache *sharedInstance = nil;
         [self createCacheFolder];
         [self loadMasterCacheFile];
         [self loadCache];
+        _enabled = TRUE; //Enable by default
     }
     return self;
 } //end init
@@ -113,8 +114,8 @@ static OCRCache *sharedInstance = nil;
 //=====(OCRCache)======================================================================
 -(void) addOCRTxtWithRect : (NSString *) fname : (CGRect) r : (NSString *) txt
 {
-    //No Illegal stuff...
-    if (fname == nil || txt == nil || txt.length<2 ) return;
+    //4/8/20 add enabled flag No Illegal stuff...
+    if (!_enabled || fname == nil || txt == nil || txt.length<2 ) return;
     
     NSString *oid = [self cleanupID:fname];
     //2/25 NSLog(@"   addOCRTxt %@",fname);
@@ -155,7 +156,7 @@ static OCRCache *sharedInstance = nil;
     
     //File is .../Library/Caches/cacheList.txt"
     path = [NSString stringWithFormat:@"%@/%@",cacheFolderPath,cacheMasterFile];
-    //NSLog(@"cache loadMasterFile...%@",path);
+    NSLog(@"OCR cache loadMasterFile...%@",path);
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager fileExistsAtPath:path])
     {
@@ -229,6 +230,8 @@ static OCRCache *sharedInstance = nil;
 //=====(OCRCache)======================================================================
 -(BOOL) txtExistsByID : (NSString *) oidIn
 {
+    NSLog(@" OCR Cache enabled %d",_enabled);
+    if (!_enabled) return FALSE;
     NSString *oid = [self cleanupID:oidIn];
     NSString *s = [OCRDict objectForKey:oid];
     if (s == nil) return FALSE;

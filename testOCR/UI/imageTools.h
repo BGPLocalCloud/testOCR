@@ -35,11 +35,11 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @property (nonatomic, assign) double skewAngleFound;
-
+-(double) getSkewAngle : (UIImage *)workImage;    //4/3/20
 -(UIImage *) deskew : (UIImage *)workImage;
 -(UIImage *) rotate90CCW : (UIImage *)workImage;
 -(void) findCorners : (UIImage *)workImage;
-- (UIImage *)imageRotatedByRadians:(CGFloat)radians img:(UIImage *)img;
+-(UIImage *)imageRotatedByRadians:(CGFloat)radians img:(UIImage *)img;
 -(UIImage *)pdfToImage: (CGPDFPageRef) pdfPage;
 
 @end

@@ -27,6 +27,8 @@
 //  5/10 changed graph output table name to reflect seleted customer
 //  ios 13 upload errors from apple!
 //  12/1 add locationAlways and whenInUse to info.plist
+//  4/5  set default email to bridget
+//  4/8  add useCache flag, in getBatchInfo only add UNIQUE batch ids to array
 #import "MainVC.h"
 
 @interface MainVC ()
@@ -53,6 +55,9 @@
     versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
     oc = [OCRCache sharedInstance];
     pc = [PDFCache sharedInstance];
+    useCache = TRUE;   //4/8/20
+    oc.enabled = useCache;
+    pc.enabled = useCache;
     // 1/4 add genparse to clear activities
     gp = [[GenParse alloc] init];
     gp.delegate = self;
@@ -70,7 +75,6 @@
     fixingErrors = TRUE;
     
     fatalErrorSelect = FALSE;
-    
     scustomer = @"KCH";  //DHS 3/20
 
     //Test only, built-in OCR crap...
@@ -291,9 +295,11 @@
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                               [self selectCustomerCSVFile];
                                                           }]];
-    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Clear Local Caches",nil)
+    NSString *s = @"Turn Cache ON";
+    if (useCache) s = @"Turn Cache OFF";
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(s,nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                              [self clearCacheMenu];
+                                                              [self toggleCache];
                                                           }]];
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Clear Activities",nil)
                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -352,7 +358,7 @@
                                                   style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                       [self->mappDelegate updateCustomerDefaults:nextCust :cfull];
                                                         // 3/13/20 wups. not setting exp table!
-                                                        [self->et setTableNameForCurrentCustomer]; //DHS 3/20
+            [self->et setTableNameForCurrentCustomer : self->scustomer]; //DHS 3/20
 
                                                       self->_customerLabel.text = cfull;
                                                   }]];
@@ -494,6 +500,18 @@
 
 
 //=============OCR MainVC=====================================================
+//4/8/20 turn cache on / off, there is a cache bug associated with sysco invoices!
+-(void) toggleCache
+{
+    //In Either case, CLEAR existing caches
+    [self->oc clearHardCore];
+    [self->pc clearHardCore];
+    useCache = !useCache;
+    oc.enabled = useCache;
+    pc.enabled = useCache;
+}
+
+//=============OCR MainVC=====================================================
 // Yes/No for ALL cache clear...
 -(void) clearCacheMenu
 {
@@ -565,14 +583,14 @@
     } //end auth OK
     else
     {
-        NSLog(@" need to be authorized...");
-        //FUnny: this produces a deprecated warning. it's dropbox boilerplate code!
-        [DBClientsManager authorizeFromController:[UIApplication sharedApplication]
-                                       controller:self
-                                          openURL:^(NSURL *url) {
-                                              [[UIApplication sharedApplication] openURL:url];
-                                          }];
-    } //End need auth
+         NSLog(@" need to be authorized...");
+         //FUnny: this produces a deprecated warning. it's dropbox boilerplate code!
+         [DBClientsManager authorizeFromController:[UIApplication sharedApplication]
+                                        controller:self
+                                           openURL:^(NSURL *url) {
+                                               [[UIApplication sharedApplication] openURL:url];
+                                           }];
+     } //End need auth
 
 
     //    [dbt downloadTextFile:reportPath];
@@ -741,6 +759,7 @@
         ErrorViewController *vc = (ErrorViewController*)[segue destinationViewController];
         vc.batchData    = sdata;
         vc.fixingErrors = fixingErrors;
+        vc.customer     = scustomer; //4/3 pass customer
     }
     else if([[segue identifier] isEqualToString:@"errorHelperSegue"])
     {
@@ -913,7 +932,11 @@
         if (aItems.count >= 2) //3/22 Batch activities have 2 or more items
         {
             NSString *izzitAnID = aItems[0];
-            if ([izzitAnID containsString:@"B_"]) [bids addObject:izzitAnID];
+            if ([izzitAnID containsString:@"B_"])
+            {
+                if ([bids containsObject:izzitAnID] == NSNotFound) //4/8/20 only add unique!
+                    [bids addObject:izzitAnID];
+            }
         }
     }
     [bbb readFromParseByIDs:bids];
@@ -955,7 +978,6 @@
         //4/30 test
         NSString *chartitAppURL = @"Chartit://";
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:chartitAppURL]];
-
    }
     if (which == 3 && mappDelegate.vv.loaded) //batch? (2/5 make sure vendors are there first!)
     {
@@ -1024,7 +1046,7 @@ int currentYear = 2019;
     {
         [self->spv start:@"Get CSV List..."];
         NSString *batchID = sItems[0];
-        [et setTableNameForCurrentCustomer]; //DHS 3/20
+        [et setTableNameForCurrentCustomer : scustomer]; //DHS 3/20
         [et readFullTableToCSV:0 :TRUE : batchID];
     }
     
@@ -1199,7 +1221,7 @@ int currentYear = 2019;
         NSString *sfd = [formatter stringFromDate:today];
         NSString *fname = [NSString stringWithFormat:@"EXP_%@.csv",sfd];
         [mail addAttachmentData:sdata mimeType:@"text/plain"  fileName:fname];
-        [mail setToRecipients:@[@"fraktalmaui@gmail.com"]];
+        [mail setToRecipients:@[@"bridget@beyondgreenpartners.com"]];   //4/5/20
         [self presentViewController:mail animated:YES completion:NULL];
     }
     else

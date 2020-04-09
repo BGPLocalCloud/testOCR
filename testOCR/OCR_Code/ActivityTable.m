@@ -71,6 +71,8 @@
     if (actType != nil) [query whereKey:PInv_ActivityType_key equalTo:actType];
     if (vendor != nil)  [query whereKey:PInv_ActivityData_key equalTo:vendor];
     [query orderByDescending:@"createdAt"];
+    query.limit = 1000;
+
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) { //Query came back...
             [self->typeStrings      removeAllObjects];

@@ -40,6 +40,8 @@
 //  3/13   add error handling in loadDoubleKeywordsFromParse and loadUDKeywordsFromParse
 //        for badMath / zeroQuantity errors, check if price is even divisor of amount.
 //          if so, set quantity to the computed integer value amount / price. 2 cents tolerance
+//  3/20  add getGordonCaseCount, gets first number it sees in Description col
+//  4/5   invert negative quantity in analyze
 #import "smartProducts.h"
 
 @implementation smartProducts
@@ -605,6 +607,16 @@
     return [self getErrDescription : _majorError];
 }
 
+//=============(smartProducts)=====================================================
+-(int) getGordonCaseCount : (NSString*) s
+{
+    NSArray *pItems = [s componentsSeparatedByString:@" "]; //Separate words
+    if (pItems.count == 0) return 0;
+    NSString *s0 = pItems[0];
+    int testInt = s0.intValue;
+    //NSLog(@" gordon item %@ first [%@] val %d",s,pItems[0],testInt);
+    return testInt;
+}
 
 //=============(smartProducts)=====================================================
 // Does ALL analyzing...non-zero return value means FAIL: Don't ADD!
@@ -625,6 +637,16 @@
         _nonProduct = TRUE;
         return ANALYZER_NONPRODUCT;
     }
+    
+    _lastProductName = fullProductName; //3/31/20
+    
+    //3/19/20 test of just GORDON:
+    if ([vendor.lowercaseString isEqualToString:@"gordon"] )
+    {
+        int cc = [self getGordonCaseCount:fullProductName];
+    }
+    
+
     //3/2/20 Remove redundant whitespace, this makes two-word searches easier...
     //       there is NO NSString function that does this, WTF???
     while ([fullProductName rangeOfString:@"  "].location != NSNotFound) {
@@ -647,9 +669,12 @@
     //DHS 1/1 fix split words like "hawai ian"
     fullProductName = [self fixSentenceSplits:fullProductName];
     _analyzedCategory = @"EMPTY";
+    
+    
+
     NSArray *pItems = [fullProductName componentsSeparatedByString:@" "]; //Separate words
     
-    // 8/11 NSLog(@" Smart?Analyze: %@",fullProductName);
+    //NSLog(@" Smart?Analyze: [%@]",fullProductName);
     // Get product category / processed / local / bulk / etc....
     //Try matching with built-in CSV file cat.txt first...
     BOOL found = FALSE;
@@ -816,13 +841,18 @@
 
     //Sanity Check: quantity * price = amount?
     int qint         = [quantity intValue];
+    if (qint < 0)
+                qint = -1 * qint; //4/5 this happens due to scribbling on the invoice!
     float qfloat     = [quantity floatValue];
+    if (qfloat < 0)
+              qfloat = -1.0 * qfloat; //4/8 forgot!
     float pfloat     = [price floatValue];
     float afloat     = [amount floatValue];
+    //NSLog(@" [%@] q %d p %f a %f",fullProductName,qint,pfloat,afloat);
     //3/22 move from bad math area...
     if (afloat < 0.0) afloat = -1.0 * afloat; //Just negate any negatives!
     if (pfloat < 0.0) pfloat = -1.0 * pfloat;
-    //NSLog(@" analyze: [%@] priceFix q p a %d %f %f",fullProductName,qint,pfloat,afloat);
+    NSLog(@" analyze: [%@] priceFix q x p = a %d x %f = %f",fullProductName,qint,pfloat,afloat);
     if (afloat > 10000.0) //Huge Amount? Assume decimal error
     {
         //NSLog(@" ERROR: amount over $10000!!");
@@ -849,7 +879,6 @@
     BOOL evenAmount   = [self hasZeroCents:afloat];
     BOOL priceAmountClose = (ABS(pfloat-afloat) < 1.0);
     
-
     if (priceAmountClose) //3/15 Price and amount are curiously close together?
     {
         if (evenPrice && !evenAmount) pfloat = afloat; //Wups! fix price
@@ -881,15 +910,15 @@
     }
     else //2/5 check for one zero field, fixable!
     {
-        //NSLog(@" ...price err: q * p not equal to a!");
         if (zeroAmount)
         {
-            //NSLog(@" ...ZERO Amount: FIX");
+            //NSLog(@"%@ ...ZERO Amount: FIX %f %f",fullProductName,pfloat,afloat);
             if (_intQuantity) //2/14
                 afloat = (float)qint * pfloat;
             else
                 afloat = qfloat * pfloat;
             aerror = ANALYZER_ZERO_AMOUNT;
+            //NSLog(@" ...amountnow %f",afloat);
         }
         else if (zeroQuantity)
         {
@@ -928,13 +957,29 @@
         else if ((_intQuantity  && (afloat != (float)qint * pfloat)) ||    //All fields present but still bad math?
                  (!_intQuantity && fabsf(afloat - (qfloat*pfloat)) > 0.01) ) //3/24 add 1cent tolerance for floats
         {
-            //3/13/20: We can still check if total is even multiple of price!
-            int testq   = (floor)((afloat / pfloat) + 0.5);  // calculate integer quantity test
-            float test2 = (float)testq * pfloat;
-            if (fabsf(test2 - afloat) < 0.03) //3/13/20 within 2 cents?
+            //NSLog(@" possible math err %@ %d %f %f",
+            //      fullProductName,qint,afloat,pfloat);
+            if ((pfloat > 100.0 && afloat < 10.0) || (pfloat > 1000.0 && afloat < 100.0)) //4/5 Off by 100 error price?
             {
-                // NSLog(@" bad math but even price/amount ratio: %d x %f = %f",testq,pfloat,afloat);
-                qint = testq;   //3/12/20 save calculated quantity
+                //try shrinking the big number!
+                float ptfloat = pfloat / 100.0;
+                int testq = [self reconcileQuantity:afloat :ptfloat];
+                //OK now?
+                if (testq > 0) pfloat = ptfloat; //Keep our smaller value!
+            }
+            else if ((afloat > 100.0 && pfloat < 10.0) || (afloat > 1000.0 && pfloat < 100.0)) //4/5 Off by 100 error amount?
+            {
+                //try shrinking the big number!
+                float atfloat = afloat / 100.0;
+                int testq = [self reconcileQuantity:atfloat :pfloat];
+                //OK now?
+                if (testq > 0) afloat = atfloat; //Keep our smaller value!
+            }
+            int testq = [self reconcileQuantity:afloat :pfloat];
+            if (testq > 0) //4/5 move reconcilation to subroutine, testq must be > 0 or else err!
+            {
+                //NSLog(@" math OK after all...");
+                qint = testq;
             }
             else //3/13/20 Cannot reconcile price and amount?
             {
@@ -950,7 +995,6 @@
                             qfloat = afloat/pfloat;
                 }
                 _majorError = ANALYZER_BAD_MATH;
-
             } //end else
         }
     }
@@ -994,7 +1038,18 @@
     
 } //end analyze
 
-
+//=============(smartProducts)=====================================================
+-(int) reconcileQuantity : (float)afloat : (float)pfloat
+{
+    //3/13/20: We can still check if total is even multiple of price!
+    int testq   = (floor)((afloat / pfloat) + 0.5);  // calculate integer quantity test
+    float test2 = (float)testq * pfloat;
+    if (fabsf(test2 - afloat) < 0.015) //3/13/20 within 1.5 cents?
+    {
+        return testq;   //3/12/20 save calculated quantity
+    }
+    return -1;  //Indicate error still exists!
+}
 
 //=============(smartProducts)=====================================================
 -(NSString*) matchDoubleKeywords : (NSString*)key1 : (NSString*)key2

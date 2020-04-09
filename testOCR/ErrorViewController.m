@@ -96,7 +96,7 @@
 {
     [super viewWillAppear:animated];
     //3/22 multi-customer support...
-    [et setTableNameForCurrentCustomer];
+    [et setTableNameForCurrentCustomer:_customer]; //4/3 customer passed in, is this needed btw?
 
     NSLog(@"ERRVC: adata %@",_batchData);
     NSArray* bItems    = [_batchData componentsSeparatedByString:@":"];

@@ -89,6 +89,7 @@
 @property (nonatomic, strong) soundFX *sfx;
 
 @property (nonatomic , assign) BOOL fixingErrors;
+@property (nonatomic , strong) NSString* customer; //4/3/20
 
 - (IBAction)fieldCancelSelect:(id)sender;
 - (IBAction)fieldFixSelect:(id)sender;

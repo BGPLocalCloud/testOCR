@@ -25,6 +25,7 @@
 @property (nonatomic, strong) NSMutableArray *OCRids;
 
 @property (nonatomic , assign) int cacheSize;
+@property (nonatomic , assign) BOOL enabled;
 
 -(void) clear;
 -(void) clearHardCore;

@@ -29,6 +29,7 @@
 @property (nonatomic, unsafe_unretained) id <PDFCacheDelegate> delegate; // receiver of completion messages
 @property (nonatomic, strong) NSMutableArray *PDFids;
 @property (nonatomic , assign) int cacheSize;
+@property (nonatomic , assign) BOOL enabled;
 
 -(void) clear;
 -(void) clearHardCore;

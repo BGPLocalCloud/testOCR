@@ -15,6 +15,7 @@
 //   Scrolling tutorial 
 //  https://www.raywenderlich.com/560-uiscrollview-tutorial-getting-started
 //  3/20 new folder structure
+//  4/5/20 change errorPerformingOCR, to errorPerformingOCRNotification
 
 #import "AnalyzeVC.h"
 
@@ -76,8 +77,8 @@
                                              selector:@selector(didPerformOCR:)
                                                  name:@"didPerformOCR" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(errorPerformingOCR:)
-                                                 name:@"errorPerformingOCR" object:nil];
+                                             selector:@selector(errorPerformingOCRNotification:)
+                                                 name:@"errorPerformingOCRNotification" object:nil];
 
     
 }  //end viewDidLoad
@@ -578,7 +579,7 @@
 #pragma mark - Notifications from OCRTopObject
 
 //=============OCR MainVC=====================================================
-- (void)errorPerformingOCR:(NSNotification *)notification
+- (void)errorPerformingOCRNotification:(NSNotification *)notification
 {
     NSString *errmsg = (NSString*)notification.object;
     dispatch_async(dispatch_get_main_queue(), ^{

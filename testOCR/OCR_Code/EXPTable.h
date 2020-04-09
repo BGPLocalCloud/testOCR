@@ -75,7 +75,7 @@
 -(void) readFromParseAsStrings : (BOOL) dumptoCSV : (NSString *)vendor : (NSString *)batch : invoiceNumberstring;
 -(void) readFullTableToCSV : (int) skip : (BOOL) addErrStatus : (NSString*)batchID;
 -(void) setTableName : (NSString *)newName;
--(void) setTableNameForCurrentCustomer;
+-(void) setTableNameForCurrentCustomer : (NSString*)customer;
 -(NSString *) dumpToCSV;
 
 //Gettors .... assume expos table allll loaded

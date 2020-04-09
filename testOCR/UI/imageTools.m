@@ -12,6 +12,7 @@
 //  Created by Dave Scruton on 12/5/18.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  4/3/20 add getSkewAngle
 
 #import "imageTools.h"
 
@@ -218,12 +219,12 @@
 
 
 //=============(imageTools)=====================================================
--(UIImage *) deskew : (UIImage *)workImage
+-(double) getSkewAngle : (UIImage *)workImage
 {
-    NSLog(@" deskew");
+    NSLog(@" get deskew angle ");
     
     pixelData = CGDataProviderCopyData(CGImageGetDataProvider(workImage.CGImage));
-    if (pixelData == nil) return nil;
+    if (pixelData == nil) return 0.0;
     idata = CFDataGetBytePtr(pixelData);
     iwid = workImage.size.width;
     ihit = workImage.size.height;
@@ -243,7 +244,7 @@
         int ptr = iwid * 4 * row;
         int col = [self scanRowLToROnePixel:idata :ptr :iwid/2 : 120];
         bins[bcount++] = col;
-        NSLog(@" rawbin [%d] = %d",bcount-1,col);
+        //NSLog(@" rawbin [%d] = %d",bcount-1,col);
     }
     
     //Try to find a straight line along the LH side FIRST....
@@ -261,7 +262,7 @@
             if (abs(newx - oldx) < 2) //straight edge?
             {
                 leftVline[row] = bins[row];
-                NSLog(@" ll[%d] = %d",row,bins[row]);
+                //NSLog(@" ll[%d] = %d",row,bins[row]);
             }
         }
         oldx = newx;
@@ -375,7 +376,7 @@
     {
         if (bins[i] >0)
         {
-            NSLog(@" TOPPP  i %d bin %d",i,bins[i]);
+            //NSLog(@" TOPPP  i %d bin %d",i,bins[i]);
             sum+=(double)bins[i];
             scount++;
         }
@@ -387,7 +388,7 @@
     {
         if (bins[i] >0)
         {
-            NSLog(@" BOTTTTTOM  i %d bin %d",i,bins[i]);
+            //NSLog(@" BOTTTTTOM  i %d bin %d",i,bins[i]);
             sum+=(double)bins[i];
             scount++;
         }
@@ -408,7 +409,18 @@
     _skewAngleFound = angle2;
     NSLog(@" start/end bins %d %d  vals %d %d   annnnd angle %f",sbin,ebin,bins[sbin],bins[ebin],_skewAngleFound);
     //float adeg  = 360.0 * (angle / (2 * 3.14159));
-    return [self imageRotatedByRadians:angle2 img:workImage];
+    return angle2;
+} //end getSkewAngle
+
+//=============(imageTools)=====================================================
+//4/3/20 break up into 2 routines
+-(UIImage *) deskew : (UIImage *)workImage
+{
+    double angle = [self getSkewAngle : workImage];
+    if (angle != 0.0)  //Only perform rotate if needed
+        return [self imageRotatedByRadians:angle img:workImage];
+    else
+        return workImage;
 } //end deskew
 
 

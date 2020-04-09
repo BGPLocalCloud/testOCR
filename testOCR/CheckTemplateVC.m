@@ -16,7 +16,7 @@
 //  1/18 change 2nd scroll area  to textfield, add segue to editVC
 //  1/19 Added dropbox file save and PDF cache save
 //  3/17 changed OCRTopObject delegate callbacks to notifications...
-//
+//  4/8/20 add fatalErrorPerformingOCR to prevent crash, change to errorPerformingOCRNotification
 #import "CheckTemplateVC.h"
 
 @interface CheckTemplateVC ()
@@ -56,8 +56,8 @@
                                              selector:@selector(didPerformOCR:)
                                                  name:@"didPerformOCR" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(errorPerformingOCR:)
-                                                 name:@"errorPerformingOCR" object:nil];
+                                             selector:@selector(errorPerformingOCRNotification:)
+                                                 name:@"errorPerformingOCRNotification" object:nil];
 
     
     
@@ -190,7 +190,7 @@
 
 //=============<OCRTopObject notification>=====================================================
 // 3/17
-- (void)errorPerformingOCR:(NSNotification *)notification
+- (void)errorPerformingOCRNotification:(NSNotification *)notification
 {
     NSString *errmsg = (NSString*)notification.object;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -215,6 +215,7 @@
     });
 } //end didReadBatchByIDs
 
+#pragma mark - OCRTopObjectDelegate
 
 //=============<OCRTopObjectDelegate>=====================================================
 - (void)batchUpdate : (NSString *) s
@@ -222,6 +223,18 @@
     NSLog(@" ...stubbed batchUpdate %@",s);
 }
 
+//=============<OCRTopObjectDelegate>=====================================================
+- (void)fatalErrorPerformingOCR : (NSString *) errMsg
+{
+    NSLog(@" fatalErrorPerformingOCR %@",errMsg);
+}
+
+
+//=============<OCRTopObjectDelegate>=====================================================
+- (void)errorSavingEXP : (NSString *) errMsg : (NSString*) objectID : (NSString*) productName
+{
+    NSLog(@" errorSavingEXP %@:%@:%@",errMsg,objectID,productName);
+}
 
 #pragma mark - DropboxToolsDelegate
 

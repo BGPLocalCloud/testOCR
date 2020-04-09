@@ -13,11 +13,12 @@
 #import "EXPTable.h"
 #import "OCRWord.h"
 #import "OCRCache.h"
+#import "PDFCache.h"   //4/3 for skew test
 #import "OCRDocument.h"
 #import "OCRTemplate.h"
 #import "smartProducts.h"
 #import "invoiceTable.h"
-
+#import "imageTools.h"
 @protocol OCRTopObjectDelegate;
 
 
@@ -65,10 +66,9 @@
     NSDictionary *OCRJSONResult;
     NSString *parsedText;
 
-    //CGRect tlRect,trRect;  //Absolute document boundary rects for text
-    //CGRect blRect,brRect;
     OCRCache *oc;
-    
+    PDFCache *pc;
+
     CGRect headerRect;
     int headerY;
 

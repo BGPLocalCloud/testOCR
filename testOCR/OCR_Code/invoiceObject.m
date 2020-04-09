@@ -12,6 +12,7 @@
 //  Created by Dave Scruton on 12/17/18.
 //  Copyright © 2018 Beyond Green Partners. All rights reserved.
 //
+//  4/3/20 init all fields, was crashing on PFObject writes w/ bogus invoice fields
 
 #import "invoiceObject.h"
 
@@ -22,7 +23,19 @@
 {
     if (self = [super init])
     {
-        _objectID = nil;
+        //3/4/20 make sure all fields are initialized
+        _date = [NSDate date];
+        _objectID       = @"";
+        _itotal         = @"";
+        _packedEXPIDs   = @"";
+        _invoiceNumber  = @"";
+        _customer       = @"";
+        _batchID        = @"";
+        _vendor         = @"";
+        _PDFFile        = @"";
+        _pageCount      = @"";
+        _page           = @"";
+
     }
     return self;
 }

@@ -29,6 +29,8 @@
 //  3/17 Added hookups for checkVC passed image/OCRtext
 //  4/1  Looks good for template create / edit
 //  4/5  remove ocr_mode, nextDoc, email, all stubbed stuff
+//  4/8  change to errorPerformingOCRNotification, name clash
+//       add doneConfirm
 #import "EditTemplateVC.h"
 
  
@@ -160,8 +162,8 @@
                                              selector:@selector(didPerformOCR:)
                                                  name:@"didPerformOCR" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(errorPerformingOCR:)
-                                                 name:@"errorPerformingOCR" object:nil];
+                                             selector:@selector(errorPerformingOCRNotification:)
+                                                 name:@"errorPerformingOCRNotification" object:nil];
 
     
 } //end viewDidLoad
@@ -760,22 +762,30 @@
     [ot saveToParse:vendor];
 } //end addTag
 
-
-
 //=============EditTemplateVC=====================================================
 - (IBAction)doneSelect:(id)sender {
     if (editing || adjusting)
     {
-        {
-            fieldFormat = DEFAULT_FIELD_FORMAT;
-            [self finishAndAddBox];
-        }
+        fieldFormat = DEFAULT_FIELD_FORMAT;
+        [self finishAndAddBox];
+        return;
     }
-    else{
-        [self dismiss];
-        
-    }
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:
+                                NSLocalizedString(@"Done Editing?",nil)
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"YES",nil)
+                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                              [self dismiss];
+                                                          }]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"NO",nil)
+                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                           }]];
+    [self presentViewController:alert animated:YES completion:nil];
 } //end doneSelect
+
+
+ 
 
 //=============EditTemplateVC=====================================================
 -(void) finishAndAddBox
@@ -1087,7 +1097,7 @@
 
 
 //=============<OCRTopObject notification>=====================================================
-- (void)errorPerformingOCR:(NSNotification *)notification
+- (void)errorPerformingOCRNotification:(NSNotification *)notification
 {
     NSString *errmsg = (NSString*)notification.object;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1228,6 +1238,11 @@
 - (void)didSaveOCRDataToParse : (NSString *) s
 {
     NSLog(@" OK: full OCR -> DB done, invoice %@",s);
+}
+//===========<OCRTopObjectDelegate>================================================
+- (void)errorPerformingOCR : (NSString *) errMsg
+{
+    NSLog(@" ERROR PERFORMING OCR!");   //4/8/20
 }
 
 //=============<OCRTopObjectDelegate>=====================================================

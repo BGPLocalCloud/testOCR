@@ -193,7 +193,7 @@ NSString * steps[] = {
 -(void) getVendorPDFFiles
 {
     //AppDelegate *bappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    [self->spv start : @"Get PDF List..."];
+    [self->spv start : @"Get Template List..."];
     NSString *folderPath = [NSString stringWithFormat : @"%@/latestBatch/%@",customerSelect,_vendor];
     [dbt getFolderList:folderPath];  //Rest handled in delegate callback...
 } //end getVendorPDFFiles

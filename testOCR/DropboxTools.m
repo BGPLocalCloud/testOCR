@@ -380,6 +380,9 @@
                      [self->_batchImages     addObject:nextImage];
                      [self->_batchImagePaths addObject:imagePath];
                      [self->_batchImageData  addObject:fileData];
+                     CGRect pageRect  = CGRectMake(0,0,nextImage.size.width,nextImage.size.height);
+                     NSValue *rectObj = [NSValue valueWithCGRect:pageRect];
+                     [self->_batchImageRects  addObject:rectObj];
                      [self->pc addPDFImage:nextImage : imagePath : 1];
                  }
              }

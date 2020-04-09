@@ -32,6 +32,7 @@
 //  3/20 add multi-customer support
 //  2/25 moved getTLAnchorByVendor... calls to performOCROnData from applyTemplate,
 //         now done in foreground, was getting internal crash in bkgd
+//  4/5/20 only save LAST page update in activity
 #import "OCRTopObject.h"
 
 @implementation OCRTopObject
@@ -57,6 +58,7 @@ static OCRTopObject *sharedInstance = nil;
         od          = [[OCRDocument alloc] init];     // Document object: handles OCR searches/parsing
         rowItems    = [[NSMutableArray alloc] init]; // Invoice rows end up here
         oc          = [OCRCache sharedInstance];    // Cache: local OCR storage
+        pc          = [PDFCache sharedInstance];    // Cache: local OCR storage
 
         it = [[invoiceTable alloc] init];     // Parse DB: invoice storage
         it.delegate = self;
@@ -64,10 +66,10 @@ static OCRTopObject *sharedInstance = nil;
         et.delegate = self;
         act = [[ActivityTable alloc] init];
 
+
         _batchMonth = @"01-JUL"; //DHS this needs to be INPUT? from DB?ß
         
         debugMode = FALSE; //DHS 2/7
-
     }
     return self;
 }
@@ -262,7 +264,7 @@ static OCRTopObject *sharedInstance = nil;
         NSMutableArray *cleanedUpArray = [od cleanUpRawColumns : i : [ot getColumnType:i] : stringArray ];
         [od addColumnStringData:cleanedUpArray];
         if (debugMode)
-            NSLog(@" col[%d] cleanup %@",i,cleanedUpArray);
+            NSLog(@" col[%d] cleanup %@ -> %@",i,stringArray,cleanedUpArray);
     }
     
     //Now, columns are ready: let's dig them out!
@@ -536,10 +538,15 @@ static OCRTopObject *sharedInstance = nil;
 //  OCR handles multiple pages from PDF data!
 - (void)performOCROnData : (NSString *)fname : (NSData *)imageDataToOCR : (CGRect) r : (BOOL) isBatch
 {
+    //4/5 moved here from down below
+    AppDelegate *oappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    [et setTableNameForCurrentCustomer : oappDelegate.selectedCustomer];
+
     //First, check cache: may already have downloaded OCR raw txt for this file...
     if ([oc txtExistsByID:fname])
     {
-        if (debugMode) NSLog(@" OCR Cache HIT: %@",fname);
+        //if (debugMode)
+            NSLog(@" OCR Cache HIT: %@",fname);
         [self.delegate batchUpdate : [NSString stringWithFormat:@"OCR Cache HIT:%@",fname]];
         rawOCRResult  = [oc getTxtByID:fname];  //Raw OCR'ed text, needs to goto JSON
         r             = [oc getRectByID:fname]; //Get cached image size too...
@@ -551,6 +558,7 @@ static OCRTopObject *sharedInstance = nil;
         [self performFinalOCROnDocument : r : isBatch]; //This calls delegate when done
         return; //Bail!
     }
+    else NSLog(@" OCR Cache MISS! %@",fname);
     // Create URL request (this is the :free: ocr server
 //    NSURL *url = [NSURL URLWithString:@"https://api.ocr.space/Parse/Image"];
     // This is the PAID server (pro plan)
@@ -585,11 +593,8 @@ static OCRTopObject *sharedInstance = nil;
     [request setHTTPBody:data];
     
     //2/25 need to get TL/TR anchors here, was attempting to get them from background process
-    AppDelegate *oappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     od.TLAnchor = [oappDelegate.vv getTLAnchorByVendor:_vendor];
     od.TRAnchor = [oappDelegate.vv getTRAnchorByVendor:_vendor];
-    //2/25 moved here from writeEXPToParse
-    [et setTableNameForCurrentCustomer]; //4/5  multi-customer support moved here!@
 
     // Start data session
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
@@ -609,7 +614,7 @@ static OCRTopObject *sharedInstance = nil;
             //DHS 1/28 fail OCR!
             [self->_delegate fatalErrorPerformingOCR:[NSString stringWithFormat:@"%@ %@",errDesc,self->_imageFileName]];
             //DHS 2/22 lots of objects use this now
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"errorPerformingOCR" object:errDesc userInfo:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"errorPerformingOCRNotification" object:errDesc userInfo:nil];
         }
         else
         {
@@ -628,14 +633,14 @@ static OCRTopObject *sharedInstance = nil;
                 errMsg = self->rawOCRResult; //Assume OCR has some info?
                 [self->_delegate fatalErrorPerformingOCR:[NSString stringWithFormat:@"%@ %@",errMsg,self->_imageFileName]];
                 //DHS 2/22 lots of objects use this now
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"errorPerformingOCR" object:errMsg userInfo:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"errorPerformingOCRNotification" object:errMsg userInfo:nil];
             }
             else if (isErr.boolValue)
             {
                 //1/27 pass fname AND error back...
                 [self->_delegate fatalErrorPerformingOCR:[NSString stringWithFormat:@"%@ %@",errMsg,self->_imageFileName]];
                 //DHS 2/22 lots of objects use this now
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"errorPerformingOCR" object:errMsg userInfo:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"errorPerformingOCRNotification" object:errMsg userInfo:nil];
             }
             else //Success!
             {
@@ -681,6 +686,21 @@ static OCRTopObject *sharedInstance = nil;
         [self->_delegate didSaveOCRDataToParse:_invoiceNumberString];
         return;
     }
+    
+#ifdef TEST_SKEW
+    NSLog(@" TEST SKEW ANGLES %@",_imageFileName);
+    imageTools *it = [[imageTools alloc] init];
+    UIImage *ii = [pc getImageByID : _imageFileName : currentPage+1];
+    //OUCH! for HFM we need a page rotate of 90 degrees!
+    if (ii != nil)
+    {
+        if ([_vendor.lowercaseString isEqualToString:@"hfm"])
+            ii = [it imageRotatedByRadians:(CGFloat)(-M_PI/2) img:ii];
+        double a = [it getSkewAngle:ii];
+        NSLog(@" image page %d skew %f",currentPage+1,a);
+    }
+#endif
+
     
     if (debugMode)
         NSLog(@" handleNextPage.... %d/%d",currentPage,pageCount);
@@ -808,13 +828,10 @@ static OCRTopObject *sharedInstance = nil;
 //  also smartCount must be set!
 -(void) writeEXPToParse : (int) page
 {
-    //2/25 BUG!! appDelegate is being used from a bkgd thread here! Move
-    //    to foreground area for call
-    //[et setTableNameForCurrentCustomer]; //4/5  multi-customer support moved here!@
     smartCount  = 0;
     //Set up EXP for new entries...
     [et clear];
-    [et setTableNameForCurrentCustomer]; //3/13/20 need to make sure table OK, best place here?
+   //3/4 REDUNDANT? [et setTableNameForCurrentCustomer]; //3/13/20 need to make sure table OK, best place here?
     if (debugMode) NSLog(@"  save EXP->Parse");
     AppDelegate *oappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 
@@ -844,7 +861,8 @@ static OCRTopObject *sharedInstance = nil;
         [smartp addAmount: ac[od.amountColumn]];
         [smartp addQuantity : ac[od.quantityColumn]];
         int aError = [smartp analyze]; //fills out fields -> smartp.analyzed...
-        if (debugMode) NSLog(@" analyze OK %d [%@]->%@",smartp.analyzeOK,productName, smartp.analyzedProductName);
+        if (debugMode)
+            NSLog(@" analyze err:%d [%@]->%@",aError,productName, smartp.analyzedProductName);
         if (aError == 0) //Only save valid stuff!
         {
             NSString *errStatus = @"OK";
@@ -853,6 +871,7 @@ static OCRTopObject *sharedInstance = nil;
             else if (smartp.minorError != 0) //Minor error? encode!
                 errStatus = [NSString stringWithFormat:@"W:%@",[smartp getMinorErrorString]];
             smartCount++;
+            NSLog(@"[%d]>>>>>>>>>>>> item %@ status %@ ",smartCount,productName,errStatus);
             //Format line count to triple digits, max 999
             NSString *lineString = [NSString stringWithFormat:@"%3.3d",(_totalLines + smartCount)];
             //OCR: Tons of args: adds allll this shit to the next EXP table entry for saving to parse...
@@ -872,8 +891,8 @@ static OCRTopObject *sharedInstance = nil;
                 if ([productName.lowercaseString containsString:@"quest"]) skipRecord = TRUE;
                 if (!skipRecord && productName.length > 5) // Ignore short nonsense fields!
                 {
-                    //NSLog(@" ---->ERROR: bad product name %@",productName);
-                    NSString *s = [NSString stringWithFormat:@"E:Bad Product Name (%@)",productName];
+                    NSString *s = [NSString stringWithFormat:@"E:Bad Product Name (%@)", //3/31 redo
+                                   productName];
                     [self->_delegate errorInEXPRecord:s:@"n/a":productName];
                 }
             }
@@ -937,8 +956,13 @@ static OCRTopObject *sharedInstance = nil;
     }
     [it clearObjectIds]; //clear object IDs
     for (NSString *objID in a) [it addInvoiceItemByObjectID : objID];
-    NSString *astr = [NSString stringWithFormat:@"...saved EXP page %d of %d",pagesReturned,pageCount];
-    [act saveActivityToParse : astr : _invoiceNumberString];
+ //   NSLog(@" pr %d pc %d",pagesReturned,pageCount);
+    //4/5/20 only save last page, too much info!
+    if (currentPage+1 == pageCount)
+    {
+        NSString *astr = [NSString stringWithFormat:@"...saved EXP page %d of %d",pagesReturned,pageCount];
+        [act saveActivityToParse : astr : _invoiceNumberString];
+    }
     [it updateInvoice : _vendor : _invoiceNumberString : _batchID : (currentPage+1==pageCount)];
     [self.delegate batchUpdate : [NSString stringWithFormat:@"Update Invoice# %@",_invoiceNumberString]];
 

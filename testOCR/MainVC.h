@@ -73,7 +73,7 @@ NS_ASSUME_NONNULL_BEGIN
     BOOL fatalErrorSelect; //2/11 Better way to do this? Maybe type select?
     int ecount;
     NSString *loginMode;
-    
+    BOOL useCache;   //4/8/20
     smartProducts *smartp;
     
 }

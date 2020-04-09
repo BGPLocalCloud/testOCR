@@ -168,6 +168,7 @@
 -(void) saveToParse : (BOOL)lastPage
 {
     if (tableName.length < 1) return; //No table name!
+
     [self packInvoiceOids]; //Set up packedOIDs string
     PFObject *iRecord = [PFObject objectWithClassName:tableName];
     iRecord[PInv_Vendor_key]        = _iobj.vendor;
@@ -200,7 +201,9 @@
 //   if it exists, updates PInv_EXPObjectID_key field with new info and saves
 -(void) updateInvoice : (NSString *)vendor : (NSString *)invoiceNumberstring : (NSString *)batchID : (BOOL)lastPage
 {
-    if (debugMode) NSLog(@" updateInvoice %@ lastpage %d",invoiceNumberstring,lastPage);
+    if (debugMode)
+        NSLog(@" updateInvoice %@ vendor %@ lastpage %d",invoiceNumberstring,vendor,lastPage);
+    //3/20 what about nil vendor??? Should fail?
     [self setupVendorTableName:vendor];
     if (tableName.length < 1) return; //Error: no table name!
     PFQuery *query = [PFQuery queryWithClassName:tableName];

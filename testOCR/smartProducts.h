@@ -80,6 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableArray *invoiceKeywords;
     BOOL didInitAlready;
     OCRCategories* occ; //Categories / processed / local lookup table
+    
 }
 //These props get set by analyze for public access...
 @property (nonatomic , strong) NSString* analyzedDateString;
@@ -95,6 +96,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic , strong) NSString* analyzedLocal;
 @property (nonatomic , strong) NSString* analyzedVendor;
 @property (nonatomic , strong) NSString* analyzedLineNumber; //String?
+@property (nonatomic , strong) NSString* lastProductName; //3/31/20
+
 @property (nonatomic , strong) NSDate* invoiceDate;
 @property (nonatomic , strong) NSString* invoiceDateString;
 @property (nonatomic , assign) BOOL analyzeOK;

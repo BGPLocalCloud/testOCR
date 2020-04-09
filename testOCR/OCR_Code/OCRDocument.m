@@ -250,7 +250,7 @@ double drand(double lo_range,double hi_range ); //External...
 //   NSString *duh = CFStringTransform(bufferRef, NULL, CFSTR("[^[:Latin:][:space:][:number:]] Remove"), false);
     NSString *source = s;
     NSMutableString *dest = [source mutableCopy];
-    
+
     NSCharacterSet *validCharacters = [NSCharacterSet characterSetWithCharactersInString:
                                        @" abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ."];
     NSCharacterSet *invalidCharacters = [validCharacters invertedSet];
@@ -338,8 +338,9 @@ double drand(double lo_range,double hi_range ); //External...
                 else               [aout addObject : [self cleanUpNumberString : s]];
             }
     }
-    else if (gotDescription)
-        for (NSString * s in a) [aout addObject:[self cleanupNonEnglishCharacters : s]]; // 2/17
+// 3/20/20 test to allow numbers thru in descriptions
+//    else if (gotDescription)
+//        for (NSString * s in a) [aout addObject:[self cleanupNonEnglishCharacters : s]]; // 2/17
     else
         aout = [NSMutableArray arrayWithArray:a];
     return aout;

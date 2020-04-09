@@ -20,6 +20,7 @@
 //  3/22 missed some tableName changes
 //  3/29 sort CSV output by PInv_BatchCounter_key (ascending)
 //  5/1  add processCSV
+//  4/5/20 add PInv_PDFFile_key to CSV output to track filename
 #import "EXPTable.h"
 
 @implementation EXPTable
@@ -367,9 +368,11 @@
     int i = 0;
     int kc = (int)kitems.count;
     for (NSString *skey in kitems)
-    {
+    {//asdf
+        NSString* sn = [pfo objectForKey:skey]; //4/5 check to see if string needs processing
+        if ([skey isEqualToString:PInv_PDFFile_key]) sn = [self getStrippedFilename:sn]; //PDF File? strip folder
         s = [s stringByAppendingString:
-             [NSString stringWithFormat:@"%@",[pfo objectForKey:skey]]];
+             [NSString stringWithFormat:@"%@",sn]];
         if (i < kc-1)
              s = [s stringByAppendingString:@","];
         i++;
@@ -382,7 +385,7 @@
 //=============(EXPTable)=====================================================
 -(void) handleCSVInit : (BOOL) dumptoCSV : (BOOL) addErrStatus
 {
-    if (dumptoCSV) EXPDumpCSVList = @"CATEGORY,Month,Item,Quantity,Unit Of Measure,BULK/ INDIVIDUAL PACK,Vendor Name, Total Price ,PRICE/ UOM,PROCESSED ,Local (L),Invoice Date,Line #,Invoice #,\n";
+    if (dumptoCSV) EXPDumpCSVList = @"CATEGORY,Month,Item,Quantity,Unit Of Measure,BULK/ INDIVIDUAL PACK,Vendor Name, Total Price ,PRICE/ UOM,PROCESSED ,Local (L),Invoice Date,PDFFile,Line #,Invoice #,\n";
     else EXPDumpCSVList = @"";
 } //end handleCSVInit
 
@@ -488,13 +491,24 @@
 }
 
 
+//=============(OCRTopObject)=====================================================
+-(NSString*) getStrippedFilename : (NSString*) fname
+{
+    NSString* sfname = fname;
+    NSArray *fItems    = [fname componentsSeparatedByString:@"/"];
+    if (fItems.count > 1) //divided name w/ folders? just get last bit...
+        sfname = fItems[fItems.count-1];
+    return sfname;
+} //end getStrippedFilename
+
 //=============(EXPTable)=====================================================
 -(NSString *) getCSVFromObject : (PFObject *)pfo : (BOOL) addErrStatus
 {
+    //4/5/20 add PDF key
     NSArray *sitems1 = [NSArray arrayWithObjects:
                         PInv_Category_key,PInv_Month_key,PInv_ProductName_key,PInv_Quantity_key,
                         PInv_UOM_key,PInv_Bulk_or_Individual_key,PInv_Vendor_key,PInv_TotalPrice_key,
-                        PInv_PricePerUOM_key,PInv_Processed_key,PInv_Local_key,
+                        PInv_PricePerUOM_key,PInv_Processed_key,PInv_Local_key,PInv_PDFFile_key,
                         nil];
     NSString *s = [self stringFromKeyedItems : pfo :sitems1];
     //Inject date into this mess (it's special!)
@@ -677,7 +691,7 @@
     if (skip == 0) //Start? Clear CSVList and add header
     {
         [csvList removeAllObjects];
-        NSString *header = @"CATEGORY,Month,Item,Quantity,Unit Of Measure,BULK/ INDIVIDUAL PACK,Vendor Name, Total Price ,PRICE/ UOM,PROCESSED ,Local (L),Invoice Date,Line #,Invoice #";
+        NSString *header = @"CATEGORY,Month,Item,Quantity,Unit Of Measure,BULK/ INDIVIDUAL PACK,Vendor Name, Total Price ,PRICE/ UOM,PROCESSED ,Local (L),Invoice Date,PDFFile,Line #,Invoice #";
         if (addErrStatus) header = [header stringByAppendingString:@",ErrStatus"];
         [csvList addObject:header];
     }
@@ -804,10 +818,10 @@
 
 //=============(EXPTable)=====================================================
 // 3/20 WARNING: overrides original table name!
--(void) setTableNameForCurrentCustomer  
+// 3/4 redo w/ customer arg
+-(void) setTableNameForCurrentCustomer : (NSString*) customer
 {
-    AppDelegate *eappDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    tableName = [NSString stringWithFormat:@"EXP_%@",eappDelegate.selectedCustomer];
+    tableName = [NSString stringWithFormat:@"EXP_%@",customer];
     //NSLog(@"   set EXP Table: %@",tableName);
 }
 
