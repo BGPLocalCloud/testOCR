@@ -67,6 +67,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableArray *ppKeywords;
     NSMutableArray *udKeywords;
 
+    NSMutableDictionary *localCriteria;
+
     NSMutableDictionary *keywords;
     NSMutableDictionary *keywordsNo1stChar;
     NSMutableDictionary *keywordCats; //3/13/20

@@ -41,7 +41,7 @@
 //        for badMath / zeroQuantity errors, check if price is even divisor of amount.
 //          if so, set quantity to the computed integer value amount / price. 2 cents tolerance
 //  3/20  add getGordonCaseCount, gets first number it sees in Description col
-//  4/5   invert negative quantity in analyze
+//  4/5   invert negative quantity in analyze, add localCriteria, pull loadRulesTextFile calls
 #import "smartProducts.h"
 
 @implementation smartProducts
@@ -63,6 +63,9 @@
         keywordCats =  [[NSMutableDictionary alloc] init];  //3/13/20 new info
         keywordCatsNo1stChar =  [[NSMutableDictionary alloc] init];  //3/13/20 new info
 
+        //4/8/20 local critera stuff...
+        localCriteria =  [[NSMutableDictionary alloc] init];
+        
         nonProducts =  [[NSMutableArray alloc] init];   //6/14
         invoiceKeywords =  [[NSMutableArray alloc] init];   //8/7
         ppKeywords  =  [[NSMutableArray alloc] init];   //7/22
@@ -75,17 +78,16 @@
         dKeywordCats          =  [[NSMutableDictionary alloc] init]; //3/15
         didInitAlready = FALSE;
         _intQuantity   = TRUE; //DHS 3/22 assume int quantities
-        [self loadRulesTextFile : @"splits" : FALSE : splits : joined];
-        [self loadRulesTextFile : @"typos"  : TRUE :  typos  : fixed];
 
+        //Load various tables containing rules for checking / fixing descriptions
         [self loadKeywordsFromParse : 0];
         [self loadDoubleKeywordsFromParse : 0];
         [self loadTyposFromParse : 0];
         [self loadSplitsFromParse : 0];
         [self loadInvoiceKeywordsFromParse:0];
         [self loadNonProductsFromParse:0];
-        //DHS 3/13 pull [self loadPPKeywordsFromParse:0];
-        //DHS 3/13 pull [self loadUDKeywordsFromParse:0];
+        //4/8/20 new
+        [self loadLocalCriteriaFromParse:0];
     }
     return self;
 }
@@ -478,6 +480,76 @@
         }
     }];
 } //end loadTyposFromParse
+
+
+//=============(smartProducts)=====================================================
+// 4/8/20 for determining local / nonlocal products
+-(void) loadLocalCriteriaFromParse : (int) skip
+{
+    PFQuery *query = [PFQuery queryWithClassName:@"LocalCriteria"];
+    query.skip = skip;
+    if (skip == 0)
+    {
+        [localCriteria removeAllObjects];
+    }
+    NSLog(@" load local criteria...");
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            for (PFObject *pfo in objects)
+            {
+                NSString *vs = @"";
+                NSString *ks = @"";
+                NSString *os = @"";
+                NSString *ls = @"";
+                if (pfo[@"Vendor"] != nil)
+                {
+                    vs = pfo[@"Vendor"];
+                    //get vendors entry...
+                    NSMutableArray *varray = [[NSMutableArray alloc] init];
+                    if (self->localCriteria[vs] != nil) varray = self->localCriteria[vs];
+                    //Add our stuff to this array...
+                    if (pfo[@"Keywords"]  != nil) ks = pfo[@"Keywords"];
+                    if (pfo[@"Omissions"] != nil) os = pfo[@"Omissions"];
+                    if (pfo[@"Local"]     != nil) ls = pfo[@"Local"];
+                    NSString *combo = [NSString stringWithFormat:@"%@:%@:%@",ks,os,ls];
+                    [varray addObject:combo];
+                    self->localCriteria[vs] = varray;
+                } //end pfo[...
+            } //end for pfobject...
+            if (objects.count == 100) [self loadLocalCriteriaFromParse:skip+100];
+        } //end !error
+        NSLog(@"duhh");
+    }];
+} //end loadLocalCriteriaFromParse
+
+//=============(smartProducts)=====================================================
+// 4/8/20 use localCriteria table and description, is it local?
+-(BOOL) matchesLocalCriteria : (NSString *)desc
+{
+    if (self->localCriteria[vendor] == nil) return FALSE;
+                
+    NSArray *varray = self->localCriteria[vendor];
+    for (NSString *combo in varray)
+    {
+        NSArray *a = [combo componentsSeparatedByString:@":"];
+        //Look for keywords...
+        NSString *keys      = a[0];
+        NSString *omissions = a[1];
+        if (keys.length > 1)
+        {
+            NSArray *ka = [keys componentsSeparatedByString:@" "]; //multiple keys?
+            //must contain all keys!
+            for (NSString *keyword in ka)
+            {
+                if (![desc containsString : keyword]) return FALSE;
+            }
+            if (omissions.length < 2) return TRUE; //no omissions? has all keywords!
+        }
+        //Need to check omissions? assume local unless proven otherwise!
+        if (![desc containsString : omissions]) return TRUE;
+    } //end for nsstring...
+    return FALSE;
+} //end matchesLocalCriteria
 
 //=============(smartProducts)=====================================================
 // 3/4 broke each table out to its own re-entrant method for loading more than 100 items!
