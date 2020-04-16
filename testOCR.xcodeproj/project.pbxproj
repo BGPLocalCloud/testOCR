@@ -57,6 +57,7 @@
 		722F9A7321C23E0D001D8EE6 /* ssd_hare.png in Resources */ = {isa = PBXBuildFile; fileRef = 722F9A7121C23E0D001D8EE6 /* ssd_hare.png */; };
 		722F9A7421C23E0D001D8EE6 /* ssd_tortoise.png in Resources */ = {isa = PBXBuildFile; fileRef = 722F9A7221C23E0D001D8EE6 /* ssd_tortoise.png */; };
 		7234DF5121EFEE1500049128 /* gordon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7234DF5021EFEE1500049128 /* gordon.png */; };
+		72370DAC24481046001809FF /* Vendors.m in Sources */ = {isa = PBXBuildFile; fileRef = 72370DAA24481045001809FF /* Vendors.m */; };
 		72435AB621E697290048846A /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 72435AB221E697290048846A /* Reachability.m */; };
 		72435AB721E697290048846A /* LICENCE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 72435AB321E697290048846A /* LICENCE.txt */; };
 		72435AB821E697290048846A /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 72435AB421E697290048846A /* README.md */; };
@@ -136,7 +137,6 @@
 		72E785AC21CCBFC600EEEF1F /* AddTemplateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E785AB21CCBFC600EEEF1F /* AddTemplateViewController.m */; };
 		72ECD04621C88A1000DBD08E /* invoiceObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 72ECD04521C88A1000DBD08E /* invoiceObject.m */; };
 		72F0D8C121D93216005979D2 /* OCRSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F0D8C021D93216005979D2 /* OCRSettings.m */; };
-		72F0D8C421D932BE005979D2 /* Vendors.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F0D8C221D932BD005979D2 /* Vendors.m */; };
 		72F394FF21E91AD4009E59C4 /* lilGreenCheck.png in Resources */ = {isa = PBXBuildFile; fileRef = 72F394FE21E91AD3009E59C4 /* lilGreenCheck.png */; };
 		72F6DC2A21E5C0D900EDF9A4 /* bluecheck.png in Resources */ = {isa = PBXBuildFile; fileRef = 72F6DC2921E5C0D800EDF9A4 /* bluecheck.png */; };
 		72FD6AE422308D4300FCBC20 /* VendorObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 72FD6AE322308D4300FCBC20 /* VendorObject.m */; };
@@ -217,6 +217,8 @@
 		722F9A7121C23E0D001D8EE6 /* ssd_hare.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ssd_hare.png; path = Resources/ssd_hare.png; sourceTree = SOURCE_ROOT; };
 		722F9A7221C23E0D001D8EE6 /* ssd_tortoise.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ssd_tortoise.png; path = Resources/ssd_tortoise.png; sourceTree = SOURCE_ROOT; };
 		7234DF5021EFEE1500049128 /* gordon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gordon.png; path = Resources/gordon.png; sourceTree = SOURCE_ROOT; };
+		72370DAA24481045001809FF /* Vendors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Vendors.m; sourceTree = "<group>"; };
+		72370DAB24481046001809FF /* Vendors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vendors.h; sourceTree = "<group>"; };
 		72435AB221E697290048846A /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		72435AB321E697290048846A /* LICENCE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENCE.txt; sourceTree = "<group>"; };
 		72435AB421E697290048846A /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -331,8 +333,6 @@
 		72ECD04521C88A1000DBD08E /* invoiceObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = invoiceObject.m; sourceTree = "<group>"; };
 		72F0D8BF21D93216005979D2 /* OCRSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCRSettings.h; sourceTree = "<group>"; };
 		72F0D8C021D93216005979D2 /* OCRSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OCRSettings.m; sourceTree = "<group>"; };
-		72F0D8C221D932BD005979D2 /* Vendors.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Vendors.m; path = /Users/davescruton/Desktop/testOCR/testOCR/OCR_Code/Vendors.m; sourceTree = "<absolute>"; };
-		72F0D8C321D932BE005979D2 /* Vendors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Vendors.h; path = /Users/davescruton/Desktop/testOCR/testOCR/OCR_Code/Vendors.h; sourceTree = "<absolute>"; };
 		72F394FE21E91AD3009E59C4 /* lilGreenCheck.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = lilGreenCheck.png; path = Resources/lilGreenCheck.png; sourceTree = SOURCE_ROOT; };
 		72F6DC2921E5C0D800EDF9A4 /* bluecheck.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bluecheck.png; path = Resources/bluecheck.png; sourceTree = SOURCE_ROOT; };
 		72FD6AE222308D4300FCBC20 /* VendorObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VendorObject.h; sourceTree = "<group>"; };
@@ -599,8 +599,8 @@
 				7209609A21B81FB900D49C63 /* OCRTemplate.m */,
 				7209608721B7FBB000D49C63 /* OCRWord.h */,
 				7209608821B7FBB000D49C63 /* OCRWord.m */,
-				72F0D8C321D932BE005979D2 /* Vendors.h */,
-				72F0D8C221D932BD005979D2 /* Vendors.m */,
+				72370DAB24481046001809FF /* Vendors.h */,
+				72370DAA24481045001809FF /* Vendors.m */,
 				72FD6AE222308D4300FCBC20 /* VendorObject.h */,
 				72FD6AE322308D4300FCBC20 /* VendorObject.m */,
 			);
@@ -860,6 +860,7 @@
 				72270DA1224EEF9100151931 /* SynthDave.m in Sources */,
 				7290229C21D58FF900885EF9 /* activityCell.m in Sources */,
 				7206008A21B64052000B26DC /* AppDelegate.m in Sources */,
+				72370DAC24481046001809FF /* Vendors.m in Sources */,
 				72270DA4224EEF9900151931 /* AudioBufferPlayer.m in Sources */,
 				72BA4D2B21CF52B600F432E9 /* BatchObject.m in Sources */,
 				72BA4D2521CE175000F432E9 /* BatchViewController.m in Sources */,
@@ -884,7 +885,6 @@
 				7283813621C4A60000A2954B /* MainVC.m in Sources */,
 				7209608C21B8164F00D49C63 /* imageTools.m in Sources */,
 				72D6516D2204DA97009E2057 /* ComparisonVC.m in Sources */,
-				72F0D8C421D932BE005979D2 /* Vendors.m in Sources */,
 				72ECD04621C88A1000DBD08E /* invoiceObject.m in Sources */,
 				72CA1A6A21CADE7200F908A0 /* SessionManager.m in Sources */,
 				7209159921E0AA2D00F94258 /* PDFCache.m in Sources */,
@@ -1037,6 +1037,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1.0.115;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Q3UNUAXG6Q;
 				ENABLE_BITCODE = NO;
@@ -1050,6 +1051,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0.115;
 				PRODUCT_BUNDLE_IDENTIFIER = com.beyondgreenpartners.testOCR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1062,6 +1064,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1.0.115;
 				DEVELOPMENT_TEAM = Q3UNUAXG6Q;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1074,6 +1077,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0.115;
 				PRODUCT_BUNDLE_IDENTIFIER = com.beyondgreenpartners.testOCR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";

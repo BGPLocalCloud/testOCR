@@ -871,7 +871,7 @@ static OCRTopObject *sharedInstance = nil;
             else if (smartp.minorError != 0) //Minor error? encode!
                 errStatus = [NSString stringWithFormat:@"W:%@",[smartp getMinorErrorString]];
             smartCount++;
-            NSLog(@"[%d]>>>>>>>>>>>> item %@ status %@ ",smartCount,productName,errStatus);
+            //NSLog(@"[%d]>>>>>>>>>>>> item %@ status %@ ",smartCount,productName,errStatus);
             //Format line count to triple digits, max 999
             NSString *lineString = [NSString stringWithFormat:@"%3.3d",(_totalLines + smartCount)];
             //OCR: Tons of args: adds allll this shit to the next EXP table entry for saving to parse...
@@ -893,6 +893,7 @@ static OCRTopObject *sharedInstance = nil;
                 {
                     NSString *s = [NSString stringWithFormat:@"E:Bad Product Name (%@)", //3/31 redo
                                    productName];
+                    NSLog(@"%@",s); //4/6 DEBUG REMOVE
                     [self->_delegate errorInEXPRecord:s:@"n/a":productName];
                 }
             }

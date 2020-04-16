@@ -67,16 +67,11 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableArray *ppKeywords;
     NSMutableArray *udKeywords;
 
-    NSMutableDictionary *localCriteria;
-
     NSMutableDictionary *keywords;
     NSMutableDictionary *keywordsNo1stChar;
-    NSMutableDictionary *keywordCats; //3/13/20
-    NSMutableDictionary *keywordCatsNo1stChar; //3/13/20
+    NSMutableDictionary *keywordProc;   // 4/16 rename
     NSMutableDictionary *dKeywords; //6/11 double keywords
-    NSMutableDictionary *dKeywordCats; //3/13/20
-    NSMutableDictionary *dKeywordsNo1stChar;
-    NSMutableDictionary *dKeywordCatsNo1stChar; //3/13/20
+    NSMutableDictionary *dKeywordProc; // 4/16 rename
     BOOL foundProcessedInDoubleKw; //used getting processed info from double kws
     NSMutableArray *nonProducts;
     NSMutableArray *invoiceKeywords;

@@ -41,7 +41,9 @@
 //        for badMath / zeroQuantity errors, check if price is even divisor of amount.
 //          if so, set quantity to the computed integer value amount / price. 2 cents tolerance
 //  3/20  add getGordonCaseCount, gets first number it sees in Description col
-//  4/5   invert negative quantity in analyze, add localCriteria, pull loadRulesTextFile calls
+//  4/5   invert negative quantity in analyze
+//  4/6   change typo fixing: use keywordsNo1stChar for 1 and 2 kw items, remove
+//          dKeywordsNo1stChar, and other useless dicts
 #import "smartProducts.h"
 
 @implementation smartProducts
@@ -60,34 +62,26 @@
         joined      =  [[NSMutableArray alloc] init];
         keywords    =  [[NSMutableDictionary alloc] init];
         dKeywords   =  [[NSMutableDictionary alloc] init];
-        keywordCats =  [[NSMutableDictionary alloc] init];  //3/13/20 new info
-        keywordCatsNo1stChar =  [[NSMutableDictionary alloc] init];  //3/13/20 new info
+        keywordProc =  [[NSMutableDictionary alloc] init];  //3/13/20 new info
 
-        //4/8/20 local critera stuff...
-        localCriteria =  [[NSMutableDictionary alloc] init];
-        
         nonProducts =  [[NSMutableArray alloc] init];   //6/14
         invoiceKeywords =  [[NSMutableArray alloc] init];   //8/7
         ppKeywords  =  [[NSMutableArray alloc] init];   //7/22
         udKeywords  =  [[NSMutableArray alloc] init];   //7/30
         
         keywordsNo1stChar  =  [[NSMutableDictionary alloc] init]; //3/15
-        dKeywordsNo1stChar =  [[NSMutableDictionary alloc] init]; //3/15
-        //3/13/20 new info
-        dKeywordCatsNo1stChar =  [[NSMutableDictionary alloc] init]; //3/15
-        dKeywordCats          =  [[NSMutableDictionary alloc] init]; //3/15
+        dKeywordProc          =  [[NSMutableDictionary alloc] init]; //3/15
         didInitAlready = FALSE;
         _intQuantity   = TRUE; //DHS 3/22 assume int quantities
+        [self loadRulesTextFile : @"splits" : FALSE : splits : joined];
+        [self loadRulesTextFile : @"typos"  : TRUE :  typos  : fixed];
 
-        //Load various tables containing rules for checking / fixing descriptions
         [self loadKeywordsFromParse : 0];
         [self loadDoubleKeywordsFromParse : 0];
         [self loadTyposFromParse : 0];
         [self loadSplitsFromParse : 0];
         [self loadInvoiceKeywordsFromParse:0];
         [self loadNonProductsFromParse:0];
-        //4/8/20 new
-        [self loadLocalCriteriaFromParse:0];
     }
     return self;
 }
@@ -265,8 +259,7 @@
     {
         [keywords              removeAllObjects];
         [keywordsNo1stChar     removeAllObjects];
-        [keywordCats           removeAllObjects];
-        [keywordCatsNo1stChar  removeAllObjects];
+        [keywordProc           removeAllObjects];
     }
 
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
@@ -285,73 +278,17 @@
                 // 3/13 add processed boolean
                 NSNumber *nn = [NSNumber numberWithBool:
                                 [procyn.lowercaseString isEqualToString:@"y"] ];
-                [self->keywordCats setObject:nn forKey:keyword];  //3/13/20 new
-                // 3/15 partial keywords, first char missing
-                NSString *catkey = [NSString stringWithFormat:@"%@:%@",cat,keyword];
+                [self->keywordProc setObject:nn forKey:keyword];  //3/13/20 new
                 // For HFM invoices mostly: 1st letter is often missing from kws!
                 NSString *keyNo1sChar = [keyword substringFromIndex:1];
-                [self->keywordsNo1stChar setObject:catkey    forKey:keyNo1sChar];
-                [self->keywordCatsNo1stChar setObject:catkey forKey:keyNo1sChar]; //3/13/20 new
+                if (keyNo1sChar.length > 2) //4/6/20 only 3 chars and up please!
+                    [self->keywordsNo1stChar setObject:keyword forKey:keyNo1sChar]; //4/16 no need for cat
             }
             if (objects.count == 100) [self loadKeywordsFromParse:skip+100];
-            //else NSLog(@" ...found %d keywords %d nofirstchars",
-            //           (int)self->keywords.count,(int)self->keywordsNo1stChar.count);
         }
     }];
 } //end loadKeywordsFromParse
 
-//=============(smartProducts)=====================================================
-// 7/22 processed produce kws, recursive
--(void) loadPPKeywordsFromParse : (int) skip
-{
-    PFQuery *query = [PFQuery queryWithClassName:@"processedProduceKeywords"];
-    query.skip = skip;
-    if (skip == 0)
-    {
-        [ppKeywords          removeAllObjects];
-    }
-    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        if (!error) {
-            for (PFObject *pfo in objects)
-            {
-                NSString *keyword = pfo[PInv_Name_key];
-                [self->ppKeywords addObject:keyword];
-            }
-            if (objects.count == 100) [self loadPPKeywordsFromParse:skip+100];
-            //else
-            //    NSLog(@" ...got %d PPkeywords", (int)self->ppKeywords.count);
-        }
-    }];
-} //end loadPPKeywordsFromParse
-
-//=============(smartProducts)=====================================================
-// 7/30 unprocessed drygoods kws, recursive
--(void) loadUDKeywordsFromParse : (int) skip
-{
-    PFQuery *query = [PFQuery queryWithClassName:@"unprocessedDrygoodsKeywords"];
-    query.skip = skip;
-    if (skip == 0)
-    {
-        [udKeywords          removeAllObjects];
-    }
-    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        if (!error) {
-            for (PFObject *pfo in objects)
-            {
-                NSString *keyword = pfo[PInv_Name_key];
-                NSArray *kItems = [keyword componentsSeparatedByString:@" "]; //Separate words
-                if (kItems.count > 1) //3/13 Found more than 1 word? ERROR
-                {
-                    NSLog(@" ERROR: multiple words in single UD kw!: [%@]",keyword);
-                }
-                [self->udKeywords addObject:keyword];
-            }
-            if (objects.count == 100) [self loadUDKeywordsFromParse:skip+100];
-            //else
-            //    NSLog(@" ...got %d UDkeywords", (int)self->udKeywords.count);
-        }
-    }];
-} //end loadUDKeywordsFromParse
 
 //=============(smartProducts)=====================================================
 // 6/11 double keywords (green beans, pinto beans, etc)
@@ -363,10 +300,7 @@
     if (skip == 0)
     {
         [dKeywords             removeAllObjects];
-        [dKeywordsNo1stChar    removeAllObjects];
-        //3/13/20 new data
-        [dKeywordCats          removeAllObjects];
-        [dKeywordCatsNo1stChar removeAllObjects];
+        [dKeywordProc          removeAllObjects];
     }
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
@@ -386,25 +320,24 @@
                 if (kItems.count == 2) //Found 2 words? Reverse-em!
                 {
                     keywordReversed = [NSString stringWithFormat:@"%@ %@",kItems[1],kItems[0]];
+                    [self->dKeywords setObject:cat forKey:keyword];
+                    [self->dKeywords setObject:cat forKey:keywordReversed];
+                    [self->dKeywordProc setObject:nn forKey:keyword];
+                    [self->dKeywordProc setObject:nn forKey:keywordReversed];
+                    //4/16 save first and second keyword to typos fixing dictionary...
+                    NSString *item = kItems[0];
+                    if (item.length > 2) //4/6/20 only 3 chars and up please!
+                        [self->keywordsNo1stChar setObject:item forKey:[item substringFromIndex:1]];
+                    item = kItems[1];
+                    if (item.length > 2)
+                        [self->keywordsNo1stChar setObject:item forKey:[item substringFromIndex:1]];
                 }
                 else if (kItems.count == 1) //3/13 more error handling
                 {
                     NSLog(@" ERROR: bad kw count in double kws!: [%@]",keyword);
                 }
-                [self->dKeywords setObject:cat forKey:keyword];
-                [self->dKeywords setObject:cat forKey:keywordReversed];
-                [self->dKeywordCats setObject:nn forKey:keyword];
-                [self->dKeywordCats setObject:nn forKey:keywordReversed];
-                // 3/15 partial keywords, first char missing
-                [self->dKeywordsNo1stChar setObject:cat forKey:[keyword substringFromIndex:1]];
-                [self->dKeywordsNo1stChar setObject:cat forKey:[keywordReversed substringFromIndex:1]];
-                //3/13/20 add categories...
-                [self->dKeywordCatsNo1stChar setObject:nn forKey:[keyword substringFromIndex:1]];
-                [self->dKeywordCatsNo1stChar setObject:nn forKey:[keywordReversed substringFromIndex:1]];
             }
             if (objects.count == 100) [self loadDoubleKeywordsFromParse:skip+100];
-            //else NSLog(@" ...got %d doublekeywords %d nofirstchars (%d records read from DB)",
-            //                       (int)self->dKeywords.count,(int)self->dKeywordsNo1stChar.count, ocount);
         }
     }];
 } //end loadDoubleKeywordsFromParse
@@ -480,76 +413,6 @@
         }
     }];
 } //end loadTyposFromParse
-
-
-//=============(smartProducts)=====================================================
-// 4/8/20 for determining local / nonlocal products
--(void) loadLocalCriteriaFromParse : (int) skip
-{
-    PFQuery *query = [PFQuery queryWithClassName:@"LocalCriteria"];
-    query.skip = skip;
-    if (skip == 0)
-    {
-        [localCriteria removeAllObjects];
-    }
-    NSLog(@" load local criteria...");
-    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        if (!error) {
-            for (PFObject *pfo in objects)
-            {
-                NSString *vs = @"";
-                NSString *ks = @"";
-                NSString *os = @"";
-                NSString *ls = @"";
-                if (pfo[@"Vendor"] != nil)
-                {
-                    vs = pfo[@"Vendor"];
-                    //get vendors entry...
-                    NSMutableArray *varray = [[NSMutableArray alloc] init];
-                    if (self->localCriteria[vs] != nil) varray = self->localCriteria[vs];
-                    //Add our stuff to this array...
-                    if (pfo[@"Keywords"]  != nil) ks = pfo[@"Keywords"];
-                    if (pfo[@"Omissions"] != nil) os = pfo[@"Omissions"];
-                    if (pfo[@"Local"]     != nil) ls = pfo[@"Local"];
-                    NSString *combo = [NSString stringWithFormat:@"%@:%@:%@",ks,os,ls];
-                    [varray addObject:combo];
-                    self->localCriteria[vs] = varray;
-                } //end pfo[...
-            } //end for pfobject...
-            if (objects.count == 100) [self loadLocalCriteriaFromParse:skip+100];
-        } //end !error
-        NSLog(@"duhh");
-    }];
-} //end loadLocalCriteriaFromParse
-
-//=============(smartProducts)=====================================================
-// 4/8/20 use localCriteria table and description, is it local?
--(BOOL) matchesLocalCriteria : (NSString *)desc
-{
-    if (self->localCriteria[vendor] == nil) return FALSE;
-                
-    NSArray *varray = self->localCriteria[vendor];
-    for (NSString *combo in varray)
-    {
-        NSArray *a = [combo componentsSeparatedByString:@":"];
-        //Look for keywords...
-        NSString *keys      = a[0];
-        NSString *omissions = a[1];
-        if (keys.length > 1)
-        {
-            NSArray *ka = [keys componentsSeparatedByString:@" "]; //multiple keys?
-            //must contain all keys!
-            for (NSString *keyword in ka)
-            {
-                if (![desc containsString : keyword]) return FALSE;
-            }
-            if (omissions.length < 2) return TRUE; //no omissions? has all keywords!
-        }
-        //Need to check omissions? assume local unless proven otherwise!
-        if (![desc containsString : omissions]) return TRUE;
-    } //end for nsstring...
-    return FALSE;
-} //end matchesLocalCriteria
 
 //=============(smartProducts)=====================================================
 // 3/4 broke each table out to its own re-entrant method for loading more than 100 items!
@@ -801,22 +664,21 @@
                                     nil];
 
             NSString *cat = nil; //DHS 3/15 look thru 2 sets of keywords now...
-            if (keywords[lowerCase] != nil)
+            //DHS 4/6/20 try double kws first...
+            cat = [self matchDoubleKeywords : lowerCase : secondWord];
+            processed = foundProcessedInDoubleKw;
+            if (cat == nil) //4/6 single kw SECOND (keywords[lowerCase] != nil)
             {
                 cat = keywords[lowerCase];
-                NSNumber *nn = keywordCats[lowerCase]; //3/13/20
+                NSNumber *nn = keywordProc[lowerCase]; //3/13/20
                 processed = nn.boolValue;
-//                if (cat != nil)
-//                    NSLog(@" 3/13/20 KEYWORD (%@) processed kw----> %d",lowerCase,processed);
             }
             //DHS 6/11 try double keywords too if no match...
-            if (cat == nil)
-            {
-                cat = [self matchDoubleKeywords : lowerCase : secondWord];
-                processed = foundProcessedInDoubleKw;
-//                if (cat != nil)
-//                    NSLog(@" 3/13/20 DOUBLE KEYWORD (%@/%@) processed kw----> %d",lowerCase,secondWord,processed);
-            }
+//            if (cat == nil)
+//            {
+//                cat = [self matchDoubleKeywords : lowerCase : secondWord];
+//                processed = foundProcessedInDoubleKw;
+//            }
             
             if (cat != nil) //Kw match?
             {
@@ -984,6 +846,8 @@
     {
         if (zeroAmount)
         {
+            //DHS 4/6 look for huge price, indicates missing decimal point
+            if (pfloat > 100.0) pfloat = pfloat / 100.0;
             //NSLog(@"%@ ...ZERO Amount: FIX %f %f",fullProductName,pfloat,afloat);
             if (_intQuantity) //2/14
                 afloat = (float)qint * pfloat;
@@ -1019,6 +883,8 @@
         }
         else if (zeroPrice)
         {
+            //DHS 4/6 look for huge amount, indicates missing decimal point
+            if (afloat > 100.0) afloat = afloat / 100.0;
             //NSLog(@" ...ZERO PRICE: FIX");
             if (_intQuantity) //2/14
                 pfloat = afloat / (float)qint;
@@ -1031,7 +897,8 @@
         {
             //NSLog(@" possible math err %@ %d %f %f",
             //      fullProductName,qint,afloat,pfloat);
-            if ((pfloat > 100.0 && afloat < 10.0) || (pfloat > 1000.0 && afloat < 100.0)) //4/5 Off by 100 error price?
+            //4/6 add another 0 to both afloat checks
+            if ((pfloat > 100.0 && afloat < 100.0) || (pfloat > 1000.0 && afloat < 1000.0)) //4/5 Off by 100 error price?
             {
                 //try shrinking the big number!
                 float ptfloat = pfloat / 100.0;
@@ -1124,6 +991,7 @@
 }
 
 //=============(smartProducts)=====================================================
+// 4/6 redo, assume 1st char always present in keywords
 -(NSString*) matchDoubleKeywords : (NSString*)key1 : (NSString*)key2
 {
     NSString *cat = nil;
@@ -1131,14 +999,8 @@
     NSString *dkeytest= [NSString stringWithFormat:@"%@ %@",key1,key2];
     if (dkeytest.length < 5) return cat; //Shorties need not apply!
     cat = dKeywords[dkeytest];  //Match with A B / B A combos of the 2 keywords
-    NSNumber *nn = dKeywordCats[dkeytest]; //3/13/20
+    NSNumber *nn = dKeywordProc[dkeytest]; //3/13/20
     foundProcessedInDoubleKw = nn.boolValue;  //3/13/20
-    if (cat == nil)
-    {
-        cat = dKeywordsNo1stChar[dkeytest]; //Try against A B / B A combos missing 1st char
-        NSNumber *nn = dKeywordCatsNo1stChar[dkeytest]; //3/13/20
-        foundProcessedInDoubleKw = nn.boolValue;  //3/13/20
-    }
     return cat;
 } //end matchDoubleKeywords
 
@@ -1279,17 +1141,14 @@
 // 2 table lookup: typos and fixed spellings, simple array match / replace
 -(NSString *) fixTypo : (NSString *)testString
 {
+    if (testString.length < 2) return testString; //single letters are bad!
     NSUInteger index = [typos indexOfObject:testString];
     if (index != NSNotFound)
     {
         return [fixed objectAtIndex:index];
     }
-    //DHS 3/15 look for keywords w/ first char missing...
-    if (keywordsNo1stChar[testString] != nil)  //These will be in format "category:keyword"
-    {
-        NSArray *wordz = [keywordsNo1stChar[testString] componentsSeparatedByString:@":"]; //break up a:b
-        if (wordz.count > 1) return wordz[1]; //should be proper keyword now
-    }
+    //DHS 3/15 look for keywords w/ first char missing... return dict lookup on match
+    if (keywordsNo1stChar[testString] != nil) return keywordsNo1stChar[testString];
     return testString; //Nothing to fix
 } //end fixTypo
 
