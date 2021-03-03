@@ -818,7 +818,7 @@
     {
         ii = errIcon;
     }
-    //Batch Acdtivity:Batch cell has a badge(errorcount) and custom color...
+    //Batch Activity:Batch cell has a badge(errorcount) and custom color...
     else if ([atypeMatch containsString:@"batch"] && (batchPFObjects != nil))
     {
         ii = batchIcon;
@@ -934,12 +934,12 @@
             NSString *izzitAnID = aItems[0];
             if ([izzitAnID containsString:@"B_"])
             {
-                if ([bids containsObject:izzitAnID] == NSNotFound) //4/8/20 only add unique!
+                if (![bids containsObject:izzitAnID]) //4/8/20 only add unique!
                     [bids addObject:izzitAnID];
             }
         }
     }
-    [bbb readFromParseByIDs:bids];
+    [bbb readFromParseByIDs:bids:0];
 } //end getBatchInfo
 
 //=============OCR MainVC=====================================================

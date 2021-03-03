@@ -115,7 +115,7 @@
 -(void) haltBatch;
 -(int)  getVendorFileCount : (NSString *)vfn;
 -(void) readFromParseByID : (NSString *) bID;
--(void) readFromParseByIDs : (NSArray *) bIDs;
+-(void) readFromParseByIDs : (NSArray *) bIDs  : (int) skip;
 -(void) runOneOrMoreBatches  : (int) vindex;
 -(void) setParent : (UIViewController*) p;
 -(void) setVisualDebug : (UIViewController*) p : (NSString*)dbs;

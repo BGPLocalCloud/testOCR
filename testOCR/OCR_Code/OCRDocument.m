@@ -20,6 +20,7 @@
 //  3/10 new method names: findAllWordsInDocumentRect/TemplateRect
 //  3/14 redo findLongInArrayOfFields
 //  8/11 handle letter I and blanks in quantity column, both become 1
+//  4/17/20 change cleanupPrice to check for missing decimal point
 #import "OCRDocument.h"
 
 @implementation OCRDocument
@@ -277,21 +278,20 @@ double drand(double lo_range,double hi_range ); //External...
         //sout = @"0.00";
         //NSLog(@" non-numeric?");
     }
-   // else
-    {
+    //4/17/20 Check for missing decimal point
+    if ([s containsString:@" "] && ![s containsString:@"."]) //space but no dot?
+        sout = [s stringByReplacingOccurrencesOfString:@" " withString:@"."]; //Add decimal!
+    else //4/17 has decimal point? get rid of xtra blanks!
         sout = [s stringByReplacingOccurrencesOfString:@" " withString:@""]; //No spaces please
-        sout = [self cleanUpNumberString:sout];                                 //Fix typos and pull blanks
-        sout = [sout stringByReplacingOccurrencesOfString:@"," withString:@""]; //No commas please
-        //Dissemble to dollars and cents, then reassemble to guarantee 2 digits of cents
-        float fdollarsAndCents = [sout floatValue];
-        int d = (int) fdollarsAndCents;
-        int c = floor((100.0 * fdollarsAndCents) + 0.5) - 100*d;
-        sout = [NSString stringWithFormat:@"%d.%2.2d",d,c];
-
-    }
+    sout = [self cleanUpNumberString:sout];                                 //Fix typos and pull blanks
+    sout = [sout stringByReplacingOccurrencesOfString:@"," withString:@""]; //No commas please
+    //Dissemble to dollars and cents, then reassemble to guarantee 2 digits of cents
+    float fdollarsAndCents = [sout floatValue];
+    int d = (int) fdollarsAndCents;
+    int c = floor((100.0 * fdollarsAndCents) + 0.5) - 100*d;
+    sout = [NSString stringWithFormat:@"%d.%2.2d",d,c];
     if (debugMode)
         NSLog(@"     cleanedup-> [%@]",sout);
-
     return sout;
 } //end cleanupPrice
 
@@ -321,7 +321,7 @@ double drand(double lo_range,double hi_range ); //External...
         if (index == _quantityColumn) gotQuantity = TRUE;
         if (index == _descriptionColumn) gotDescription = TRUE;
     }
-    else if ([ctype isEqualToString:@"INVOICE_COLUMN_PRICE"] || [ctype isEqualToString:@"INVOICE_COLUMN_TOTAL"])
+    else if ([ctype isEqualToString:@"INVOICE_COLUMN_PRICE"] || [ctype isEqualToString:@"INVOICE_COLUMN_AMOUNT"]) //4/17/20 wups wrong column for amount!
         gotPrice = TRUE;
     else if ([ctype isEqualToString:@"INVOICE_COLUMN_QUANTITY"])
         gotQuantity = TRUE;

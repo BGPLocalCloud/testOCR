@@ -94,6 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic , strong) NSString* analyzedVendor;
 @property (nonatomic , strong) NSString* analyzedLineNumber; //String?
 @property (nonatomic , strong) NSString* lastProductName; //3/31/20
+@property (nonatomic , strong) NSString* analyzedKeyword;  //4/17
 
 @property (nonatomic , strong) NSDate* invoiceDate;
 @property (nonatomic , strong) NSString* invoiceDateString;

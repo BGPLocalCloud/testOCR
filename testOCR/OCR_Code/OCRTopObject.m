@@ -866,6 +866,7 @@ static OCRTopObject *sharedInstance = nil;
         if (aError == 0) //Only save valid stuff!
         {
             NSString *errStatus = @"OK";
+            //NSLog(@" majorerror %d minor %d",smartp.majorError,smartp.minorError);
             if (smartp.majorError != 0) //Major error trumps minor one...
                 errStatus = [NSString stringWithFormat:@"E:%@",[smartp getMajorErrorString]];
             else if (smartp.minorError != 0) //Minor error? encode!

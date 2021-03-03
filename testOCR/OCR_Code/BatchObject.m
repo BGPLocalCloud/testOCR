@@ -698,18 +698,19 @@ static BatchObject *sharedInstance = nil;
 // Sloppy: this is called by a non-batch related UI, so we have to use
 //  NSNotifications to get the results back since this object is a singleton!
 // Just dumps result to notifications...
--(void) readFromParseByIDs : (NSArray *) bIDs
+-(void) readFromParseByIDs : (NSArray *) bIDs : (int) skip
 {
     PFQuery *query = [PFQuery queryWithClassName:batchTableName];
     [query whereKey:PInv_BatchID_key containedIn:bIDs];
+    query.limit = 1000; // 4/17 Cluge! What if table is larger than 1000 items?
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) { //Query came back...
             [[NSNotificationCenter defaultCenter] postNotificationName:@"didReadBatchByIDs" object:objects userInfo:nil];
-            }
-            else
-            {
-                NSLog(@" error batchObject:readFromParseByIDs");
-            }
+        }
+        else
+        {
+            NSLog(@" error batchObject:readFromParseByIDs");
+        }
     }];
 } //end readFromParseByIDs
 

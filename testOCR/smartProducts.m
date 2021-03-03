@@ -151,6 +151,30 @@
     return (ftest == fnum);
 }
 
+//=============(smartProducts)=====================================================
+//  4/17/20 capitalize keyword in input string...
+-(NSString*) highlightKeyword : (NSString*) input : (NSString*) keyword
+{
+    //First find space-delimited substring...
+    NSString *s= [NSString stringWithFormat:@" %@ ",keyword];
+    NSRange range = [input rangeOfString:s];
+    if (range.location == NSNotFound) //Nope? Try substring with trailing space...
+    {
+        s     = [NSString stringWithFormat:@"%@ ",keyword];
+        range = [input rangeOfString:s];
+        if (range.location == NSNotFound) //Still nothing? Try substring with leading space...
+        {
+            s     = [NSString stringWithFormat:@" %@",keyword];
+            range = [input rangeOfString:s];
+            if (range.location == NSNotFound) //All fail? return input
+                return input;
+        }
+    }
+    //OK got a range, capitalize substring
+    NSString *r = [input stringByReplacingCharactersInRange:
+                   range withString:[[input substringWithRange:range] uppercaseString]];
+    return r;
+}
 
 //=============(smartProducts)=====================================================
 //STUBBED FOR NOW, use DB
@@ -174,21 +198,21 @@
 //=============(smartProducts)=====================================================
 -(void) clearOutputs
 {
-    _analyzedCategory = @"";
-    _analyzedUOM = @"";
+    _analyzedCategory         = @"";
+    _analyzedUOM              = @"";
     _analyzedBulkOrIndividual = @"";
-    _analyzedQuantity = @"";
-    _analyzedPricePerUOM = @"";
-    _analyzedPrice = @"";
-    _analyzedProcessed = @"";
-    _analyzedLocal = @"";
-    _analyzedLineNumber  = @"";
-    _analyzedProductName = @"";
-    _analyzedVendor = @"";
-    _analyzedAmount = @"";
-    _analyzedDateString = @"";
-
-}
+    _analyzedQuantity         = @"";
+    _analyzedPricePerUOM      = @"";
+    _analyzedPrice            = @"";
+    _analyzedProcessed        = @"";
+    _analyzedLocal            = @"";
+    _analyzedLineNumber       = @"";
+    _analyzedProductName      = @"";
+    _analyzedVendor           = @"";
+    _analyzedAmount           = @"";
+    _analyzedDateString       = @"";
+    _analyzedKeyword          = @"";
+} //end clearOutputs
 
 
 //=============(smartProducts)=====================================================
@@ -285,9 +309,29 @@
                     [self->keywordsNo1stChar setObject:keyword forKey:keyNo1sChar]; //4/16 no need for cat
             }
             if (objects.count == 100) [self loadKeywordsFromParse:skip+100];
+            else [self dumpKeywords];
         }
     }];
 } //end loadKeywordsFromParse
+
+-(void) dumpKeywords
+{
+    NSString *s;
+    
+    s = @" KEYWORDS: NAME CATEGORY PROCESSED--------------------------\n";
+    NSArray* keys = keywords.allKeys;
+    
+    for (int i=0;i<keys.count;i++)
+    {
+        NSString *key  = keys[i];
+        NSString *cat  = keywords[key];
+        NSString *proc = keywordProc[key];
+        s = [s stringByAppendingString:[NSString stringWithFormat:
+                                        @"%@ , %@ , %@ ,\n",key,cat,proc]];
+    }
+    NSLog(@"%@",s);
+}
+
 
 
 //=============(smartProducts)=====================================================
@@ -338,9 +382,27 @@
                 }
             }
             if (objects.count == 100) [self loadDoubleKeywordsFromParse:skip+100];
+            else [self dumpDoubleKeywords];
         }
     }];
 } //end loadDoubleKeywordsFromParse
+
+-(void) dumpDoubleKeywords
+{
+    NSString *s;
+    
+    s = @" DOUBLE KEYWORDS: NAME CATEGORY PROCESSED--------------------------\n";
+    NSArray* keys = dKeywords.allKeys;
+    for (int i=0;i<keys.count;i++)
+    {
+        NSString *key  = keys[i];
+        NSString *cat  = dKeywords[key];
+        NSString *proc = dKeywordProc[key];
+        s = [s stringByAppendingString:[NSString stringWithFormat:
+                                        @"%@ , %@ , %@ ,\n",key,cat,proc]];
+    }
+    NSLog(@"%@",s);
+}
 
 //=============(smartProducts)=====================================================
 // 6/14 read one and two-word nonproduct descriptions from db
@@ -360,10 +422,23 @@
                 [self->nonProducts addObject:nextNonProduct];
             }
             if (objects.count == 100) [self loadNonProductsFromParse:skip+100];
+            else [self dumpNonProducts];
             //else NSLog(@" ...found %d nonProducts", (int)self->nonProducts.count);
         }
     }];
 } //end loadNonProductsFromParse
+
+-(void) dumpNonProducts
+{
+    NSString *s;
+    
+    s = @" NONPRODUCTSS--------------------------\n";
+    for (int i=0;i<nonProducts.count;i++)
+    {
+        s = [s stringByAppendingString:[NSString stringWithFormat:@" %@ ,\n",nonProducts[i]]];
+    }
+    NSLog(@"%@",s);
+}
 
 //=============(smartProducts)=====================================================
 // 6/14 read one and two-word nonproduct descriptions from db
@@ -409,10 +484,24 @@
                 [self->fixed addObject:pfo[PInv_Fixed_key]];
             }
             if (objects.count == 100) [self loadTyposFromParse:skip+100];
-            //else NSLog(@" ...found %d typos",(int)self->typos.count);
+            else
+                [self dumpTypos];
+//                NSLog(@" ...found %d typos",(int)self->typos.count);
         }
     }];
 } //end loadTyposFromParse
+
+-(void) dumpTypos
+{
+    NSString *s;
+    
+    s = @" TYPOS--------------------------\n";
+    for (int i=0;i<typos.count;i++)
+    {
+        s = [s stringByAppendingString:[NSString stringWithFormat:@" %@ , %@ ,\n",typos[i],fixed[i]]];
+    }
+    NSLog(@"%@",s);
+}
 
 //=============(smartProducts)=====================================================
 // 3/4 broke each table out to its own re-entrant method for loading more than 100 items!
@@ -434,10 +523,25 @@
                 [self->joined addObject:pfo[PInv_Joined_key]];
             }
             if (objects.count == 100) [self loadSplitsFromParse:skip+100];
+            else
+                [self dumpSplits];
             //else NSLog(@" ...found %d splits",(int)self->splits.count);
         }
     }];
 } //end loadSplitsFromParse
+
+
+-(void) dumpSplits
+{
+    NSString *s;
+    
+    s = @" SPLITS / JOINED--------------------------\n";
+    for (int i=0;i<splits.count;i++)
+    {
+        s = [s stringByAppendingString:[NSString stringWithFormat:@" %@ , %@ ,\n",splits[i],joined[i]]];
+    }
+    NSLog(@"%@",s);
+}
 
 
 //=============(smartProducts)=====================================================
@@ -670,16 +774,13 @@
             if (cat == nil) //4/6 single kw SECOND (keywords[lowerCase] != nil)
             {
                 cat = keywords[lowerCase];
-                NSNumber *nn = keywordProc[lowerCase]; //3/13/20
-                processed = nn.boolValue;
+                if (cat != nil) //4/17 found something?
+                {
+                    _analyzedKeyword = lowerCase; //4/17 save matched kw
+                    NSNumber *nn = keywordProc[lowerCase]; // get processed status
+                    processed    = nn.boolValue;
+                }
             }
-            //DHS 6/11 try double keywords too if no match...
-//            if (cat == nil)
-//            {
-//                cat = [self matchDoubleKeywords : lowerCase : secondWord];
-//                processed = foundProcessedInDoubleKw;
-//            }
-            
             if (cat != nil) //Kw match?
             {
                 if ([cat.lowercaseString isEqualToString:@"drygoods"])
@@ -895,8 +996,8 @@
         else if ((_intQuantity  && (afloat != (float)qint * pfloat)) ||    //All fields present but still bad math?
                  (!_intQuantity && fabsf(afloat - (qfloat*pfloat)) > 0.01) ) //3/24 add 1cent tolerance for floats
         {
-            //NSLog(@" possible math err %@ %d %f %f",
-            //      fullProductName,qint,afloat,pfloat);
+            NSLog(@" possible math err %@ %d %f %f",
+                  fullProductName,qint,afloat,pfloat);
             //4/6 add another 0 to both afloat checks
             if ((pfloat > 100.0 && afloat < 100.0) || (pfloat > 1000.0 && afloat < 1000.0)) //4/5 Off by 100 error price?
             {
@@ -917,7 +1018,7 @@
             int testq = [self reconcileQuantity:afloat :pfloat];
             if (testq > 0) //4/5 move reconcilation to subroutine, testq must be > 0 or else err!
             {
-                //NSLog(@" math OK after all...");
+                NSLog(@" math OK after all...");
                 qint = testq;
             }
             else //3/13/20 Cannot reconcile price and amount?
@@ -969,7 +1070,8 @@
     _analyzedLineNumber = [NSString stringWithFormat:@"%d",lineNumber];
     //Just pass across from private -> public here
     _analyzedVendor = vendor;
-    
+    // 4/17 capitalize found keyword...
+    _analyzedProductName = [self highlightKeyword:_analyzedProductName :_analyzedKeyword];
     _analyzeOK = TRUE;
     if (_majorError != 0) aerror = 0; //Major errors trump minor ones!
     _minorError = aerror;
@@ -999,8 +1101,12 @@
     NSString *dkeytest= [NSString stringWithFormat:@"%@ %@",key1,key2];
     if (dkeytest.length < 5) return cat; //Shorties need not apply!
     cat = dKeywords[dkeytest];  //Match with A B / B A combos of the 2 keywords
-    NSNumber *nn = dKeywordProc[dkeytest]; //3/13/20
-    foundProcessedInDoubleKw = nn.boolValue;  //3/13/20
+    if (cat != nil) //4/17 Found something?
+    {
+        _analyzedKeyword = dkeytest;              //4/17 save matched kw
+        NSNumber *nn = dKeywordProc[dkeytest];    // and get processed status
+        foundProcessedInDoubleKw = nn.boolValue;
+    }
     return cat;
 } //end matchDoubleKeywords
 
